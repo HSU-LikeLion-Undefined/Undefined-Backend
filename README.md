@@ -21,6 +21,6 @@
 **📌 Commit rule**
 - micro commit ✨
 - 이해하기 쉽도록 작성
-- 커밋 형식 -> feature: 해당 기능 설명 `ex) feature: 로그인 기능 추가`
+- 커밋 형식 -> feature. 해당 기능 설명 `ex) feature. 로그인 기능 추가`
 - 깃모지 사용으로 가독성 Up
 - 테스트 통과 시, PR 요청하기

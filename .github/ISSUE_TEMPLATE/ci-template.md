@@ -1,13 +1,13 @@
 ---
-name: CI/CD template
+name: CI template
 about: 이슈 템플릿을 이용하여, 이슈를 생성해주세요
-title: "[CI/CD]"
+title: "[CI]"
 labels: ":construction_worker: CI/CD"
 assignees: frombunny
 
 ---
 
-## 🚀 CI/CD 요청 제목
+## 🚀 CI 제목
 간결하고 명확한 요청 제목을 작성해주세요.
 
 ## 📖 설명

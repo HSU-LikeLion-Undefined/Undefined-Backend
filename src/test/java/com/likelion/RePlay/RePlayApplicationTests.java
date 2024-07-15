@@ -9,5 +9,4 @@ class RePlayApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

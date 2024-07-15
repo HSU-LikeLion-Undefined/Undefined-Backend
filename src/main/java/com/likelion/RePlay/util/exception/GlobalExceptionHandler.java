@@ -1,6 +1,6 @@
-package com.example.demo.util.exception;
+package com.likelion.RePlay.util.exception;
 
-import com.example.demo.util.response.CustomAPIResponse;
+import com.likelion.RePlay.util.response.CustomAPIResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;

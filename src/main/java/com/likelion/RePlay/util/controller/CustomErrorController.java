@@ -1,6 +1,6 @@
-package com.example.demo.util.controller;
+package com.likelion.RePlay.util.controller;
 
-import com.example.demo.util.response.CustomAPIResponse;
+import com.likelion.RePlay.util.response.CustomAPIResponse;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.web.servlet.error.ErrorController;

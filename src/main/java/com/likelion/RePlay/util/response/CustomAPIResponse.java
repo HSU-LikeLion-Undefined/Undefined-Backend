@@ -1,4 +1,4 @@
-package com.example.demo.util.response;
+package com.likelion.RePlay.util.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.example.demo.util.entity;
+package com.likelion.RePlay.util.entity;
 
 
 import jakarta.persistence.Column;

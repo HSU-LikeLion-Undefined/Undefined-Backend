@@ -1,4 +1,4 @@
-package com.example.demo.util.config;
+package com.likelion.RePlay.util.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

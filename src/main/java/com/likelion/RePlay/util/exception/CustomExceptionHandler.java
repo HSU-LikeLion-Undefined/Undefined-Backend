@@ -1,5 +1,6 @@
-package com.example.demo.util.exception;
+package com.likelion.RePlay.util.exception;
 
+import com.likelion.RePlay.util.response.CustomAPIResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.boot.web.servlet.error.ErrorController;
@@ -9,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import com.example.demo.util.response.CustomAPIResponse;
 
 import java.util.stream.Collectors;
 

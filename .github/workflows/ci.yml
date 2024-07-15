@@ -21,6 +21,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5
 
@@ -36,8 +46,8 @@ jobs:
           echo "spring.jpa.database-platform=org.hibernate.dialect.MySQL5Dialect" >> src/main/resources/application.properties
           cat src/main/resources/application.properties # 확인을 위해 출력
 
-      - name: Build with Gradle Wrapper
-        run: ./gradlew build
+      - name: Clean and build with Gradle
+        run: ./gradlew clean build --no-daemon --stacktrace
 
       - name: Log in to Amazon ECR
         id: login-ecr

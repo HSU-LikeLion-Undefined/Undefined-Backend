@@ -30,9 +30,9 @@ jobs:
           echo "spring.application.name=RePlay" > src/main/resources/application.properties
           echo "spring.datasource.url=${{ secrets.DB_URL }}" >> src/main/resources/application.properties
           echo "spring.datasource.username=${{ secrets.DB_USERNAME }}" >> src/main/resources/application.properties
-          echo "spring.datasource.password=${{ secrets.DB_PASSWORD }}" >> src/main/resources.application.properties
+          echo "spring.datasource.password=${{ secrets.DB_PASSWORD }}" >> src/main/resources/application.properties
           echo "spring.jpa.properties.hibernate.format_sql=true" >> src/main/resources/application.properties
-          echo "spring.jpa.hibernate.ddl-auto=update" >> src/main/resources.application.properties
+          echo "spring.jpa.hibernate.ddl-auto=update" >> src/main/resources/application.properties
           echo "spring.jpa.database-platform=org.hibernate.dialect.MySQL5Dialect" >> src/main/resources/application.properties
           cat src/main/resources/application.properties # 확인을 위해 출력
 

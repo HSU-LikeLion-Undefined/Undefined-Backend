@@ -7,7 +7,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class RePlayApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RePlayApplication.class, args);
+		printName("RePlay");
 	}
 
+	public static void printName(String name) {
+		System.out.println("Hello, " + name + "!");
+	}
 }

@@ -89,13 +89,20 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > private_key.pem
           chmod 400 private_key.pem
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@$SSH_HOST << 'EOF'
+            # apt-get을 사용 중인 프로세스가 완료될 때까지 기다림
+            while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+              echo "Waiting for other apt-get process to finish..."
+              sleep 1
+            done
+            while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1; do
+              echo "Waiting for other dpkg process to finish..."
+              sleep 1
+            done
             # Docker 설치
-            if ! [ -x "$(command -v docker)" ]; then
-              sudo apt-get update
-              sudo apt-get install -y docker.io
-              sudo systemctl start docker
-              sudo systemctl enable docker
-            fi
+            sudo apt-get update
+            sudo apt-get install -y docker.io
+            sudo systemctl start docker
+            sudo systemctl enable docker
             docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
             docker stop replay || true
             docker rm replay || true

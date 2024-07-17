@@ -98,13 +98,13 @@ jobs:
               echo "Waiting for other dpkg process to finish..."
               sleep 1
             done
-            # Docker 설치 및 설정
+            # Docker 및 AWS CLI 설치
             sudo apt-get update
-            sudo apt-get install -y docker.io
+            sudo apt-get install -y docker.io awscli
             sudo systemctl start docker
             sudo systemctl enable docker
             # Docker 이미지를 가져와서 실행
-            docker login -u AWS -p $(aws ecr get-login-password --region ap-northeast-2) $ECR_REGISTRY
+            $(aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $ECR_REGISTRY)
             docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
             docker stop replay || true
             docker rm replay || true

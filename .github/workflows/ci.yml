@@ -99,17 +99,28 @@ jobs:
               echo "Waiting for other dpkg process to finish..."
               sleep 1
             done
-            # Docker 및 AWS CLI 설치
+
+            # Docker 설치
             sudo apt-get update
-            sudo apt-get install -y docker.io awscli
+            sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+            sudo apt-get update
+            sudo apt-get install -y docker-ce
             sudo systemctl start docker
             sudo systemctl enable docker
-            # Docker 이미지를 가져와서 실행
-            $(aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $ECR_REGISTRY)
-            docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-            docker stop replay || true
-            docker rm replay || true
-            docker run -d --name replay -p 8080:8080 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+            # AWS CLI v2 설치
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install --update
+
+            # ECR 로그인 및 도커 이미지 실행
+            /usr/local/bin/aws ecr get-login-password --region ap-northeast-2 | sudo docker login --username AWS --password-stdin $ECR_REGISTRY
+            sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            sudo docker stop replay || true
+            sudo docker rm replay || true
+            sudo docker run -d --name replay -p 8080:8080 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           EOF
 
   dependency-submission:

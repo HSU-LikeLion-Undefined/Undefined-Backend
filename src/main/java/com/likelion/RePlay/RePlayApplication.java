@@ -10,4 +10,7 @@ public class RePlayApplication {
 		SpringApplication.run(RePlayApplication.class, args);
 	}
 
+	public static void printName(String name) {
+		System.out.println(name);
+	}
 }

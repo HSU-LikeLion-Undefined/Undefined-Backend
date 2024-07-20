@@ -3,11 +3,18 @@ package com.likelion.RePlay;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class RePlayApplicationTests {
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
+import org.junit.jupiter.api.Test;
+
+public class RePlayApplicationTests {
 
 	@Test
-	void contextLoads() {
+	void testPrintName() {
+		assertDoesNotThrow(() -> {
+			RePlayApplication.printName("RePlay");
+		});
 	}
-
 }

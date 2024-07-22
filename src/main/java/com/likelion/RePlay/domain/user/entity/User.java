@@ -2,12 +2,8 @@ package com.likelion.RePlay.domain.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.likelion.RePlay.domain.info.entity.InfoSubmit;
-import com.likelion.RePlay.domain.info.learning.*;
-import com.likelion.RePlay.domain.info.playing.*;
 import com.likelion.RePlay.domain.learning.entity.*;
 import com.likelion.RePlay.domain.playing.entity.*;
-import com.likelion.RePlay.entity.learning.*;
-import com.likelion.RePlay.entity.playing.*;
 import com.likelion.RePlay.global.enums.District;
 import com.likelion.RePlay.global.enums.State;
 import com.likelion.RePlay.global.enums.Role;
@@ -22,7 +18,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name="USER")
+@Table(name="USERS")
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

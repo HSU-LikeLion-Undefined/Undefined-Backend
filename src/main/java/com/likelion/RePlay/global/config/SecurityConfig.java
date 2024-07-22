@@ -25,7 +25,7 @@ public class SecurityConfig {
         //CSRF 보호를 비활성화 (CSRF : 악의적인 웹 사이트가 사용자를 대신해 요청을 보내는 공격) -> RESTful API 서버에서 필요 X
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                //HTTP 기본 인증을 비활성화합 (기본 인증은 브라우저의 기본 로그인 창을 사용하는 방식) -> 사용자 친화적인 로그인 폼 사용을 위해
+                //HTTP 기본 인증을 비활성화 (기본 인증은 브라우저의 기본 로그인 창을 사용하는 방식) -> 사용자 친화적인 로그인 폼 사용을 위해
                 .httpBasic(AbstractHttpConfigurer::disable)
                 //기본 로그인 폼을 비활성화 -> 커스텀 로그인 폼 사용
                 .formLogin(AbstractHttpConfigurer::disable)

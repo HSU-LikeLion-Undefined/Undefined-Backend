@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,6 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
     @Transactional
     @Override
     public ResponseEntity<CustomAPIResponse<?>> signUp(UserSignUpDto userSignUpDto) {
@@ -31,7 +33,7 @@ public class UserServiceImpl implements UserService {
         // 존재하지 않으면 회원가입 진행
         User newUser = User.builder()
                 .phoneId(phoneId)
-                .password(userSignUpDto.getPassword())
+                .password(passwordEncoder.encode(userSignUpDto.getPassword()))
                 .nickname(userSignUpDto.getNickname())
                 .state(userSignUpDto.getState())
                 .district(userSignUpDto.getDistrict())
@@ -46,7 +48,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<CustomAPIResponse<?>> login(UserLoginDto userLoginDto) {
-        // 아이디 존재하지 않음
         Optional<User> idExistUser = userRepository.findByPhoneId(userLoginDto.getPhoneId());
         if (idExistUser.isEmpty()) {
             CustomAPIResponse<Object> failResponse = CustomAPIResponse
@@ -54,8 +55,10 @@ public class UserServiceImpl implements UserService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(failResponse);
         }
 
+        User user = idExistUser.get();
+
         // 패스워드 불일치
-        if (!idExistUser.get().getPassword().equals(userLoginDto.getPassword())) {
+        if (!passwordEncoder.matches(userLoginDto.getPassword(), user.getPassword())) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(CustomAPIResponse.createFailWithout(HttpStatus.UNAUTHORIZED.value(),

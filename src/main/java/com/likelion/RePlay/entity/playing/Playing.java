@@ -37,6 +37,9 @@ public class Playing extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private IsRecruit isRecruit;
 
+    @Column(name = "TOTAL_COUNT")
+    private Long totalCount;
+
     @Column(name="RECRUIT_COUNT")
     private Long recruitCount;
 

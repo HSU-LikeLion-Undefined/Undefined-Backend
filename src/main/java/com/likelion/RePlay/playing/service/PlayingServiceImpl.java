@@ -2,6 +2,7 @@ package com.likelion.RePlay.playing.service;
 
 import com.likelion.RePlay.entity.User;
 import com.likelion.RePlay.entity.playing.Playing;
+import com.likelion.RePlay.enums.IsCompleted;
 import com.likelion.RePlay.enums.IsRecruit;
 import com.likelion.RePlay.playing.dto.PlayingWriteRequestDTO;
 import com.likelion.RePlay.playing.repository.PlayingRepository;
@@ -46,19 +47,21 @@ public class PlayingServiceImpl implements PlayingService{
             e.printStackTrace();
         }
 
-        // 존재한다면 게시글을 DB에 저장한다
+        // 존재한다면 게시글을 DB에 저장한다. 자기소개는 User 엔티티에 저장한다.
         Playing newPlaying = Playing.builder()
                 .title(playingWriteRequestDTO.getTitle())
                 .category(playingWriteRequestDTO.getCategory())
                 .date(date)
                 .isRecruit(IsRecruit.TRUE)
+                .isCompleted(IsCompleted.FALSE)
+                .totalCount(playingWriteRequestDTO.getTotalCount())
+                .recruitCount(0L)
                 .content(playingWriteRequestDTO.getContent())
                 .cost(Long.valueOf(playingWriteRequestDTO.getCost()))
-                .costDescription(playingWriteRequestDTO.getCostDiscript())
+                .costDescription(playingWriteRequestDTO.getCostDescription())
                 .build();
 
         playingRepository.save(newPlaying);
-
 
 
         return ResponseEntity.status(201)

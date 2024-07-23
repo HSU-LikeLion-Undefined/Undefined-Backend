@@ -6,4 +6,6 @@ import org.springframework.http.ResponseEntity;
 
 public interface PlayingService {
     ResponseEntity<CustomAPIResponse<?>> writePost(PlayingWriteRequestDTO postWriteRequestDTO);
+
+    ResponseEntity<CustomAPIResponse<?>> getAllPosts();
 }

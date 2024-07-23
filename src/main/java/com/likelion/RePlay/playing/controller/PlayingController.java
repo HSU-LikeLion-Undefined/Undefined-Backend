@@ -5,10 +5,7 @@ import com.likelion.RePlay.playing.service.PlayingServiceImpl;
 import com.likelion.RePlay.util.response.CustomAPIResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/playing")
@@ -20,6 +17,11 @@ public class PlayingController {
     @PostMapping("/writePost")
     private ResponseEntity<CustomAPIResponse<?>> writePost(@RequestBody PlayingWriteRequestDTO playingWriteRequestDTO) {
         return playingService.writePost(playingWriteRequestDTO);
+    }
+
+    @GetMapping("/")
+    private ResponseEntity<CustomAPIResponse<?>> getAllPosts() {
+        return playingService.getAllPosts();
     }
 
 }

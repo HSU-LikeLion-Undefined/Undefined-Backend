@@ -4,6 +4,7 @@ import com.likelion.RePlay.entity.User;
 import com.likelion.RePlay.entity.playing.Playing;
 import com.likelion.RePlay.enums.IsCompleted;
 import com.likelion.RePlay.enums.IsRecruit;
+import com.likelion.RePlay.playing.dto.PlayingListDTO;
 import com.likelion.RePlay.playing.dto.PlayingWriteRequestDTO;
 import com.likelion.RePlay.playing.repository.PlayingRepository;
 import com.likelion.RePlay.user.repository.UserRepository;
@@ -15,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Transactional
@@ -55,7 +58,7 @@ public class PlayingServiceImpl implements PlayingService{
                 .isRecruit(IsRecruit.TRUE)
                 .isCompleted(IsCompleted.FALSE)
                 .totalCount(playingWriteRequestDTO.getTotalCount())
-                .recruitCount(0L)
+                .recruitmentCount(0L)
                 .content(playingWriteRequestDTO.getContent())
                 .cost(Long.valueOf(playingWriteRequestDTO.getCost()))
                 .costDescription(playingWriteRequestDTO.getCostDescription())
@@ -66,5 +69,28 @@ public class PlayingServiceImpl implements PlayingService{
 
         return ResponseEntity.status(201)
                 .body(CustomAPIResponse.createSuccess(201, null, "게시글을 성공적으로 작성하였습니다."));
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getAllPosts() {
+        List<Playing> playings = playingRepository.findAll();
+
+        List<PlayingListDTO.PlayingResponse> playingResponses = new ArrayList<>();
+
+        for (Playing playing : playings) {
+            playingResponses.add(PlayingListDTO.PlayingResponse.builder()
+                    .category(playing.getCategory())
+                    .title(playing.getTitle())
+                    .state(playing.getState())
+                    .district(playing.getDistrict())
+                    .date(playing.getDate())
+                    .totalCount(playing.getTotalCount())
+                    .recruitmentCount(playing.getRecruitmentCount())
+                    .build());
+        }
+
+        // 사용자에게 반환하기위한 최종 데이터
+        return ResponseEntity.status(201)
+                .body(CustomAPIResponse.createSuccess(201, playingResponses, "게시글 목록을 성공적으로 불러왔습니다."));
     }
 }

@@ -37,6 +37,9 @@ public class Playing extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private IsRecruit isRecruit;
 
+    @Column(name = "TOTAL_COUNT")
+    private Long totalCount;
+
     @Column(name="RECRUIT_COUNT")
     private Long recruitCount;
 
@@ -51,6 +54,12 @@ public class Playing extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private IsCompleted isCompleted;
+
+    @Column(name = "COST")
+    private Long cost;
+
+    @Column(name = "COST_DESCRIPTION")
+    private String costDescription;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID")

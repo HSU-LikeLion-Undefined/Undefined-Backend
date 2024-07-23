@@ -49,6 +49,9 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role; // 관리자인지, 회원인지 구분하기 위함
 
+    @Column(name = "INTRODUCE")
+    private String introduce;
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

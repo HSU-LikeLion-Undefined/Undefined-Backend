@@ -18,7 +18,7 @@ public class PlayingController {
     private final PlayingServiceImpl playingService;
 
     @PostMapping("/writePost")
-    private ResponseEntity<CustomAPIResponse<?>> createPost(@RequestBody PlayingWriteRequestDTO playingWriteRequestDTO) {
+    private ResponseEntity<CustomAPIResponse<?>> writePost(@RequestBody PlayingWriteRequestDTO playingWriteRequestDTO) {
         return playingService.writePost(playingWriteRequestDTO);
     }
 

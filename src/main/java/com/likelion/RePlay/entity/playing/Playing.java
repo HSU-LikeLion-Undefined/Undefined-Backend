@@ -2,9 +2,7 @@ package com.likelion.RePlay.entity.playing;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.likelion.RePlay.entity.User;
-import com.likelion.RePlay.enums.Category;
-import com.likelion.RePlay.enums.IsCompleted;
-import com.likelion.RePlay.enums.IsRecruit;
+import com.likelion.RePlay.enums.*;
 import com.likelion.RePlay.util.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -40,8 +38,8 @@ public class Playing extends BaseEntity {
     @Column(name = "TOTAL_COUNT")
     private Long totalCount;
 
-    @Column(name="RECRUIT_COUNT")
-    private Long recruitCount;
+    @Column(name="RECRUITMENT_COUNT")
+    private Long recruitmentCount;
 
     @Column(name="CONTENT")
     private String content;
@@ -60,6 +58,12 @@ public class Playing extends BaseEntity {
 
     @Column(name = "COST_DESCRIPTION")
     private String costDescription;
+
+    @Enumerated(EnumType.STRING)
+    private State state; // 시
+
+    @Enumerated(EnumType.STRING)
+    private District district; // 구
 
     @ManyToOne
     @JoinColumn(name = "USER_ID")

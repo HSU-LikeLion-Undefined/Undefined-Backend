@@ -52,6 +52,12 @@ public class Playing extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private IsCompleted isCompleted;
 
+    @Column(name = "COST")
+    private Long cost;
+
+    @Column(name = "COST_DESCRIPTION")
+    private String costDescription;
+
     @ManyToOne
     @JoinColumn(name = "USER_ID")
     private User user;

@@ -1,5 +1,6 @@
 package com.likelion.RePlay.playing.controller;
 
+import com.likelion.RePlay.playing.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.playing.dto.PlayingWriteRequestDTO;
 import com.likelion.RePlay.playing.service.PlayingServiceImpl;
 import com.likelion.RePlay.util.response.CustomAPIResponse;
@@ -27,6 +28,11 @@ public class PlayingController {
     @GetMapping("/{playingId}")
     private ResponseEntity<CustomAPIResponse<?>> getPost(@PathVariable Long playingId) {
         return playingService.getPost(playingId);
+    }
+
+    @GetMapping("/filtering")
+    private ResponseEntity<CustomAPIResponse<?>> filtering(@RequestBody PlayingFilteringDTO playingFilteringDTO) {
+        return playingService.filtering(playingFilteringDTO);
     }
 
 }

@@ -2,13 +2,16 @@ package com.likelion.RePlay.playing.service;
 
 import com.likelion.RePlay.entity.User;
 import com.likelion.RePlay.entity.playing.Playing;
+import com.likelion.RePlay.entity.playing.QPlaying;
 import com.likelion.RePlay.enums.IsCompleted;
 import com.likelion.RePlay.enums.IsRecruit;
+import com.likelion.RePlay.playing.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.playing.dto.PlayingListDTO;
 import com.likelion.RePlay.playing.dto.PlayingWriteRequestDTO;
 import com.likelion.RePlay.playing.repository.PlayingRepository;
 import com.likelion.RePlay.user.repository.UserRepository;
 import com.likelion.RePlay.util.response.CustomAPIResponse;
+import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -90,8 +93,8 @@ public class PlayingServiceImpl implements PlayingService{
         }
 
         // 사용자에게 반환하기위한 최종 데이터
-        return ResponseEntity.status(201)
-                .body(CustomAPIResponse.createSuccess(201, playingResponses, "게시글 목록을 성공적으로 불러왔습니다."));
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, playingResponses, "게시글 목록을 성공적으로 불러왔습니다."));
     }
 
     @Override
@@ -116,7 +119,53 @@ public class PlayingServiceImpl implements PlayingService{
                 .costDescription(findPlaying.get().getCostDescription())
                 .build();
 
-        return ResponseEntity.status(201)
-                .body(CustomAPIResponse.createSuccess(201, playingResponse, "특정 게시글을 성공적으로 불러왔습니다."));
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, playingResponse, "특정 게시글을 성공적으로 불러왔습니다."));
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> filtering(PlayingFilteringDTO playingFilteringDTO) {
+
+        // 조건으로 들어온 날짜, 지역, 카테고리
+        QPlaying playing = QPlaying.playing;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (playingFilteringDTO.getCategory() != null) {
+            builder.and(playing.category.eq(playingFilteringDTO.getCategory()));
+        }
+        if (playingFilteringDTO.getDateList() != null && !playingFilteringDTO.getDateList().isEmpty()) {
+            BooleanBuilder dateBuilder = new BooleanBuilder();
+            for (Date date : playingFilteringDTO.getDateList()) {
+                dateBuilder.or(playing.date.eq(date));
+            }
+            builder.and(dateBuilder);
+        }
+        if (playingFilteringDTO.getStateList() != null && !playingFilteringDTO.getStateList().isEmpty()) {
+            builder.and(playing.state.in(playingFilteringDTO.getStateList()));
+        }
+        if (playingFilteringDTO.getDistrictList() != null && !playingFilteringDTO.getDistrictList().isEmpty()) {
+            builder.and(playing.district.in(playingFilteringDTO.getDistrictList()));
+        }
+
+        List<Playing> results = (List<Playing>) playingRepository.findAll(builder);
+
+        // 메인 페이지에서 보여질 정보만 추출해서 보내기
+        List<PlayingListDTO.PlayingResponse> playingResponse = new ArrayList<>();
+        for (Playing result : results) {
+            PlayingListDTO.PlayingResponse response = PlayingListDTO.PlayingResponse.builder()
+                    .category(result.getCategory())
+                    .title(result.getTitle())
+                    .state(result.getState())
+                    .district(result.getDistrict())
+                    .date(result.getDate())
+                    .totalCount(result.getTotalCount())
+                    .recruitmentCount(result.getRecruitmentCount())
+                    .build();
+            playingResponse.add(response);
+        }
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, playingResponse, "조건에 맞는 게시글들을 성공적으로 불러왔습니다."));
+
     }
 }

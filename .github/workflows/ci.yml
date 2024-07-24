@@ -44,6 +44,8 @@ jobs:
           echo "spring.jpa.properties.hibernate.format_sql=true" >> src/main/resources/application.properties
           echo "spring.jpa.hibernate.ddl-auto=update" >> src/main/resources/application.properties
           echo "spring.jpa.database-platform=org.hibernate.dialect.MySQL5Dialect" >> src/main/resources/application.properties
+          echo "application.security.jwt.secret-key=${{ secrets.JWT_SECRET_KEY }}" >> src/main/resources/application.properties
+          echo "application.security.jwt.expiration=2592000000" >> src/main/resources/application.properties
           cat src/main/resources/application.properties # 확인을 위해 출력
 
       - name: Clean and build with Gradle
@@ -59,7 +61,6 @@ jobs:
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1.3.3
-
 
       - name: Build and push Docker image
         env:

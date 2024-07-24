@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/api/user/signUp", "/api/user/login").permitAll()
+                        .requestMatchers("/api/playing/**").permitAll()
                         .anyRequest().hasAnyAuthority("ROLE_ADMIN")
                 )
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)

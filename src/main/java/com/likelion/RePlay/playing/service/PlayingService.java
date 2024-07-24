@@ -8,4 +8,6 @@ public interface PlayingService {
     ResponseEntity<CustomAPIResponse<?>> writePost(PlayingWriteRequestDTO postWriteRequestDTO);
 
     ResponseEntity<CustomAPIResponse<?>> getAllPosts();
+
+    ResponseEntity<CustomAPIResponse<?>> getPost(Long playingId);
 }

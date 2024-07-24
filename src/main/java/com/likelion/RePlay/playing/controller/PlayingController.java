@@ -24,4 +24,9 @@ public class PlayingController {
         return playingService.getAllPosts();
     }
 
+    @GetMapping("/{playingId}")
+    private ResponseEntity<CustomAPIResponse<?>> getPost(@PathVariable Long playingId) {
+        return playingService.getPost(playingId);
+    }
+
 }

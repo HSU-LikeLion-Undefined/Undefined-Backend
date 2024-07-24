@@ -93,4 +93,30 @@ public class PlayingServiceImpl implements PlayingService{
         return ResponseEntity.status(201)
                 .body(CustomAPIResponse.createSuccess(201, playingResponses, "게시글 목록을 성공적으로 불러왔습니다."));
     }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getPost(Long playingId) {
+
+        Optional<Playing> findPlaying = playingRepository.findById(playingId);
+
+        PlayingListDTO.PlayingResponse playingResponse = new PlayingListDTO.PlayingResponse();
+
+        playingResponse = PlayingListDTO.PlayingResponse.builder()
+                .nickname(findPlaying.get().getUser().getNickname())
+                .introduce(findPlaying.get().getUser().getIntroduce())
+                .category(findPlaying.get().getCategory())
+                .title(findPlaying.get().getTitle())
+                .date(findPlaying.get().getDate())
+                .state(findPlaying.get().getState())
+                .district(findPlaying.get().getDistrict())
+                .totalCount(findPlaying.get().getTotalCount())
+                .recruitmentCount(findPlaying.get().getRecruitmentCount())
+                .content(findPlaying.get().getContent())
+                .cost(findPlaying.get().getCost())
+                .costDescription(findPlaying.get().getCostDescription())
+                .build();
+
+        return ResponseEntity.status(201)
+                .body(CustomAPIResponse.createSuccess(201, playingResponse, "특정 게시글을 성공적으로 불러왔습니다."));
+    }
 }

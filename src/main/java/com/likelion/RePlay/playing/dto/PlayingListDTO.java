@@ -16,13 +16,18 @@ public class PlayingListDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PlayingResponse {
+        private String nickname;
+        private String introduce;
         private Category category;
         private String title;
+        private String content;
         private State state;
         private District district;
         private Date date;
         private Long totalCount;
         private Long recruitmentCount;
+        private Long cost;
+        private String costDescription;
     }
 
     @Getter @Setter

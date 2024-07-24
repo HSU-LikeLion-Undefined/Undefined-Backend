@@ -10,6 +10,7 @@ import com.likelion.RePlay.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -46,50 +47,55 @@ public class User extends BaseEntity {
     private String profileImage; // 프로필 사진
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<UserRole> userRoles;
+    @Builder.Default
+    private List<UserRole> userRoles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<Playing> playings;
+    private List<Playing> playings = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<PlayingReview> playingReviews;
+    private List<PlayingReview> playingReviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<PlayingComment> playingComments;
+    private List<PlayingComment> playingComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<PlayingScrap> playingScraps;
+    private List<PlayingScrap> playingScraps = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<PlayingApply> playingApplies;
+    private List<PlayingApply> playingApplies = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<InfoSubmit> infoSubmits;
+    private List<InfoSubmit> infoSubmits = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<Learning> learnings;
+    private List<Learning> learnings = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<LearningReview> learningReviews;
+    private List<LearningReview> learningReviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<LearningComment> learningComments;
+    private List<LearningComment> learningComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<LearningScrap> learningScraps;
+    private List<LearningScrap> learningScraps = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<LearningApply> learningApplies;
+    private List<LearningApply> learningApplies = new ArrayList<>();
 
+    public void addRole(Role role) {
+        UserRole userRole = new UserRole(this, role);
+        this.userRoles.add(userRole);
+    }
 }

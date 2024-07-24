@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -29,4 +31,7 @@ public class UserSignUpDto {
 
     @NotNull(message = "출생연도가 필요합니다.")
     private Long year;
+
+    @NotNull(message = "사용자 역할이 필요합니다.")
+    List<String> userRoles;
 }

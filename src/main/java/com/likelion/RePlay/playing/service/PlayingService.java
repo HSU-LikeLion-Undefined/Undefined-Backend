@@ -13,4 +13,6 @@ public interface PlayingService {
     ResponseEntity<CustomAPIResponse<?>> getPost(Long playingId);
 
     ResponseEntity<CustomAPIResponse<?>> filtering(PlayingFilteringDTO playingFilteringDTO);
+
+    ResponseEntity<CustomAPIResponse<?>> recruitPlaying(Long playingId, String phoneId);
 }

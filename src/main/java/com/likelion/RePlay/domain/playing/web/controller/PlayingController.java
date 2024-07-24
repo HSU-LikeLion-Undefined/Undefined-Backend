@@ -1,7 +1,7 @@
-package com.likelion.RePlay.domain.playing.controller;
+package com.likelion.RePlay.domain.playing.web.controller;
 
-import com.likelion.RePlay.domain.playing.dto.PlayingFilteringDTO;
-import com.likelion.RePlay.domain.playing.dto.PlayingWriteRequestDTO;
+import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
+import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.service.PlayingServiceImpl;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import lombok.RequiredArgsConstructor;

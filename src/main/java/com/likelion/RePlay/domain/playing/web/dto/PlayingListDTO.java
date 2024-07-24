@@ -1,4 +1,4 @@
-package com.likelion.RePlay.domain.playing.dto;
+package com.likelion.RePlay.domain.playing.web.dto;
 
 
 import com.likelion.RePlay.global.enums.Category;

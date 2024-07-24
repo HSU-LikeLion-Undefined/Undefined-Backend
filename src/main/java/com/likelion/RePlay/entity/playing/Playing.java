@@ -89,4 +89,15 @@ public class Playing extends BaseEntity {
     @JsonManagedReference
     private List<PlayingApply> playingApplies;
 
+
+    // 연관관계 편의 메서드
+    public void changeIsRecruit(IsRecruit isRecruit) {
+        this.isRecruit = isRecruit;
+    }
+
+    public void changeRecruitmentCount(Long recruitmentCount) {
+        this.recruitmentCount = recruitmentCount;
+    }
+
+
 }

@@ -25,4 +25,13 @@ public class PlayingApply extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "PLAYING_ID")
     private Playing playing;
+
+    // 연관관계 편의 메서드
+    public void changeUser(User user) {
+        this.user = user;
+    }
+
+    public void changePlaying(Playing playing) {
+        this.playing = playing;
+    }
 }

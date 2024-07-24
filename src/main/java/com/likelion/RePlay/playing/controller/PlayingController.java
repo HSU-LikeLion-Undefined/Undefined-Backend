@@ -35,4 +35,9 @@ public class PlayingController {
         return playingService.filtering(playingFilteringDTO);
     }
 
+    @PutMapping("/{playingId}")
+    private ResponseEntity<CustomAPIResponse<?>> recruitPlaying(@PathVariable Long playingId, @PathVariable String phoneId) {
+        return playingService.recruitPlaying(playingId, phoneId);
+    }
+
 }

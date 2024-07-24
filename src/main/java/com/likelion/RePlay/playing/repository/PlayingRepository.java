@@ -10,5 +10,4 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import java.util.Optional;
 
 public interface PlayingRepository extends JpaRepository<Playing, Long>, QuerydslPredicateExecutor<Playing> {
-    Optional<Playing> findPlayingsByCategoryAndStateAndDistrict(Category category, State state, District district);
 }

@@ -2,12 +2,14 @@ package com.likelion.RePlay.playing.service;
 
 import com.likelion.RePlay.entity.User;
 import com.likelion.RePlay.entity.playing.Playing;
+import com.likelion.RePlay.entity.playing.PlayingApply;
 import com.likelion.RePlay.entity.playing.QPlaying;
 import com.likelion.RePlay.enums.IsCompleted;
 import com.likelion.RePlay.enums.IsRecruit;
 import com.likelion.RePlay.playing.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.playing.dto.PlayingListDTO;
 import com.likelion.RePlay.playing.dto.PlayingWriteRequestDTO;
+import com.likelion.RePlay.playing.repository.PlayingApplyRepository;
 import com.likelion.RePlay.playing.repository.PlayingRepository;
 import com.likelion.RePlay.user.repository.UserRepository;
 import com.likelion.RePlay.util.response.CustomAPIResponse;
@@ -31,6 +33,7 @@ public class PlayingServiceImpl implements PlayingService{
 
     private final UserRepository userRepository;
     private final PlayingRepository playingRepository;
+    private final PlayingApplyRepository playingApplyRepository;
 
     @Override
     public ResponseEntity<CustomAPIResponse<?>> writePost(PlayingWriteRequestDTO playingWriteRequestDTO) {
@@ -163,6 +166,63 @@ public class PlayingServiceImpl implements PlayingService{
                     .build();
             playingResponse.add(response);
         }
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, playingResponse, "조건에 맞는 게시글들을 성공적으로 불러왔습니다."));
+
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> recruitPlaying(Long playingId, String phoneId) {
+
+        // 놀이터 게시글이 DB에 존재하는가?
+        Optional<Playing> findPlaying = playingRepository.findById(playingId);
+        Optional<User> findUser = userRepository.findByPhoneId(phoneId);
+        Optional<PlayingApply> findPlayingApply = playingApplyRepository.findByUserPhoneId(phoneId);
+
+
+        // 존재하지 않는다면 오류 반환
+        if (findPlaying.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
+        }
+
+        // 인원이 다 차거나 모집 완료된 활동일 경우 오류 반환
+        if (findPlaying.get().getIsRecruit() == IsRecruit.FALSE ) {
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400, "인원이 마감되었습니다."));
+        } else if (findPlaying.get().getIsCompleted() == IsCompleted.TRUE) {
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400, "모집 완료된 활동입니다."));
+        }
+
+        // 이미 신청한 활동일 경우, 오류 반환
+        for (int i = 0; i < findUser.get().getPlayingApplies().size(); i++) {
+            if (findUser.get().getPlayingApplies().get(i).getPlayingApplyId() == findPlayingApply.get().getPlayingApplyId()) {
+                return ResponseEntity.status(400)
+                        .body(CustomAPIResponse.createFailWithout(400, "이미 신청한 활동입니다."));
+            }
+        }
+
+        // 신청하지 않은 활동일 경우
+        // 해당 게시글 신청 정보에 해당 유저의 정보를 추가한다.
+        findPlayingApply.get().changeUser(findUser.get());
+        findPlayingApply.get().changePlaying(findPlaying.get());
+
+        // 해당 게시글에 모집 인원을 추가한다.
+        findPlaying.get().changeRecruitmentCount(findPlaying.get().getRecruitmentCount() + 1);
+
+        // 모집인원이 다 찼을 경우, 모집중 -> 모집완료로 바꾼다.
+        if (findPlaying.get().getRecruitmentCount() == findPlaying.get().getTotalCount()) {
+            findPlaying.get().changeIsRecruit(IsRecruit.FALSE);
+        }
+
+        PlayingListDTO.PlayingResponse playingResponse = PlayingListDTO.PlayingResponse.builder()
+                .category(findPlaying.get().getCategory())
+                .title(findPlaying.get().getTitle())
+                .date(findPlaying.get().getDate())
+                .cost((long) (findPlaying.get().getCost() * (1.03)))
+                .build();
 
         return ResponseEntity.status(200)
                 .body(CustomAPIResponse.createSuccess(200, playingResponse, "조건에 맞는 게시글들을 성공적으로 불러왔습니다."));

@@ -50,6 +50,10 @@ public class User extends BaseEntity {
     @Builder.Default
     private List<UserRole> userRoles = new ArrayList<>();
 
+    @Column(name = "INTRODUCE")
+    private String introduce;
+
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Playing> playings = new ArrayList<>();

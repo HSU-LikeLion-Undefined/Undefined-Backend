@@ -1,4 +1,4 @@
-package com.likelion.RePlay.global.config;
+package com.likelion.RePlay.global.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

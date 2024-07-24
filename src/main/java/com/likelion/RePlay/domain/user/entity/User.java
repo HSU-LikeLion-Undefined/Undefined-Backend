@@ -6,7 +6,6 @@ import com.likelion.RePlay.domain.learning.entity.*;
 import com.likelion.RePlay.domain.playing.entity.*;
 import com.likelion.RePlay.global.enums.District;
 import com.likelion.RePlay.global.enums.State;
-import com.likelion.RePlay.global.enums.Role;
 import com.likelion.RePlay.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -46,9 +45,8 @@ public class User extends BaseEntity {
     @Column(name="PROFILE_IMAGE")
     private String profileImage; // 프로필 사진
 
-    @Enumerated(EnumType.STRING)
-    private Role role; // 관리자인지, 회원인지 구분하기 위함
-
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<UserRole> userRoles;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

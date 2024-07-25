@@ -23,4 +23,7 @@ public class Info extends BaseEntity {
     @Column(name = "CONTENT")
     private String content;
 
+    @Column(name="INFO_NUM")
+    private Long infoNum;
+
 }

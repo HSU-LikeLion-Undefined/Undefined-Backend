@@ -116,6 +116,7 @@ public class PlayingServiceImpl implements PlayingService {
     public ResponseEntity<CustomAPIResponse<?>> getPost(Long playingId) {
 
         Optional<Playing> findPlaying = playingRepository.findById(playingId);
+        User user = findPlaying.get().getUser();
 
         if (findPlaying.isEmpty()) {
             return ResponseEntity.status(404)
@@ -123,11 +124,12 @@ public class PlayingServiceImpl implements PlayingService {
         }
 
         PlayingListDTO.PlayingResponse playingResponse = PlayingListDTO.PlayingResponse.builder()
-                .nickname(findPlaying.get().getUser().getNickname())
-                .introduce(findPlaying.get().getUser().getIntroduce())
+                .nickname(user.getNickname())
+                .introduce(user.getIntroduce())
                 .category(findPlaying.get().getCategory())
                 .title(findPlaying.get().getTitle())
                 .date(findPlaying.get().getDate())
+                .locate(findPlaying.get().getLocate())
                 .state(findPlaying.get().getState())
                 .district(findPlaying.get().getDistrict())
                 .totalCount(findPlaying.get().getTotalCount())
@@ -135,6 +137,7 @@ public class PlayingServiceImpl implements PlayingService {
                 .content(findPlaying.get().getContent())
                 .cost(findPlaying.get().getCost())
                 .costDescription(findPlaying.get().getCostDescription())
+                .imageUrl(findPlaying.get().getImageUrl())
                 .build();
 
         return ResponseEntity.status(200)

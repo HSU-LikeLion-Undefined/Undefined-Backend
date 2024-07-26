@@ -1,5 +1,6 @@
 package com.likelion.RePlay.domain.playing.web.controller;
 
+import com.likelion.RePlay.domain.playing.web.dto.PlayingApplyRequestDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.service.PlayingServiceImpl;
@@ -35,8 +36,8 @@ public class PlayingController {
         return playingService.filtering(playingFilteringDTO);
     }
 
-    @PutMapping("/{playingId}/{phoneId}")
-    private ResponseEntity<CustomAPIResponse<?>> recruitPlaying(@PathVariable Long playingId, @PathVariable String phoneId) {
-        return playingService.recruitPlaying(playingId, phoneId);
+    @PostMapping("/{playingId}")
+    private ResponseEntity<CustomAPIResponse<?>> recruitPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyRequestDTO playingApplyRequestDTO) {
+        return playingService.recruitPlaying(playingId, playingApplyRequestDTO);
     }
 }

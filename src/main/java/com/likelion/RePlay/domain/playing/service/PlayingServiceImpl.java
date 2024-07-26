@@ -15,6 +15,7 @@ import com.likelion.RePlay.global.enums.IsRecruit;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
+@Slf4j
 @Transactional
 @Service
 @RequiredArgsConstructor
@@ -57,7 +58,12 @@ public class PlayingServiceImpl implements PlayingService {
         }
 
         // 존재한다면 게시글을 DB에 저장한다. 자기소개는 User 엔티티에 저장한다.
+        User user = findUser.get();
+        user.changeIntroduce(playingWriteRequestDTO.getIntroduce());
+        userRepository.save(user);
+
         Playing newPlaying = Playing.builder()
+                .user(user)
                 .title(playingWriteRequestDTO.getTitle())
                 .category(playingWriteRequestDTO.getCategory())
                 .date(date)
@@ -68,6 +74,12 @@ public class PlayingServiceImpl implements PlayingService {
                 .content(playingWriteRequestDTO.getContent())
                 .cost(Long.valueOf(playingWriteRequestDTO.getCost()))
                 .costDescription(playingWriteRequestDTO.getCostDescription())
+                .locate(playingWriteRequestDTO.getLocate())
+                .latitude(playingWriteRequestDTO.getLatitude())
+                .longitude(playingWriteRequestDTO.getLongitude())
+                .state(playingWriteRequestDTO.getState())
+                .district(playingWriteRequestDTO.getDistrict())
+                .imageUrl(playingWriteRequestDTO.getImageUrl())
                 .build();
 
         playingRepository.save(newPlaying);
@@ -219,7 +231,7 @@ public class PlayingServiceImpl implements PlayingService {
                 .category(findPlaying.get().getCategory())
                 .title(findPlaying.get().getTitle())
                 .date(findPlaying.get().getDate())
-                .cost((long) (findPlaying.get().getCost() * 1.03))
+                .cost(findPlaying.get().getCost())
                 .build();
         return ResponseEntity.status(200)
                 .body(CustomAPIResponse.createSuccess(200, playingResponse, "활동 신청이 성공적으로 완료되었습니다."));

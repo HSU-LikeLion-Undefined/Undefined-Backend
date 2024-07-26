@@ -46,10 +46,10 @@ public class Playing extends BaseEntity {
     private String content;
 
     @Column(name="LATITUDE")
-    private float latitude; // null 가능하다면 Float
+    private double latitude;
 
     @Column(name="LONGITUDE")
-    private float longitude;
+    private double longitude;
 
     @Enumerated(EnumType.STRING)
     private IsCompleted isCompleted;
@@ -65,6 +65,9 @@ public class Playing extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private District district; // 구
+
+    @Column(name = "LOCATE")
+    private String locate;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID")

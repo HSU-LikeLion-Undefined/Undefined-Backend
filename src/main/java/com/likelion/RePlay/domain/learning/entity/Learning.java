@@ -44,10 +44,10 @@ public class Learning extends BaseEntity {
     private String content;
 
     @Column(name="LATITUDE")
-    private float latitude; // null 가능하다면 Float
+    private double latitude;
 
     @Column(name="LONGITUDE")
-    private float longitude;
+    private double longitude;
 
     @Enumerated(EnumType.STRING)
     private IsCompleted isCompleted;

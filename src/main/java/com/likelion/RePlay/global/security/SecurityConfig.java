@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/api/user/signUp", "/api/user/login").permitAll()
                         .requestMatchers("/api/playing/**").permitAll()
+                        .requestMatchers("/api/info/**").permitAll()
                         .anyRequest().hasAnyAuthority("ROLE_ADMIN")
                 )
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)

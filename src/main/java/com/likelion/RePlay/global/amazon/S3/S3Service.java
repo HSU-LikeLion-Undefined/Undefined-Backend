@@ -1,6 +1,9 @@
 package com.likelion.RePlay.global.amazon.S3;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -11,6 +14,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+
 
 @Service
 public class S3Service {
@@ -62,3 +66,38 @@ public class S3Service {
         return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region.id(), key); // 변경된 부분
     }
 }
+
+/*
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class AmazonS3Manager {
+
+	private final AmazonS3 amazonS3;
+	private final AmazonConfig amazonConfig;
+
+	public String uploadFile(MultipartFile file){
+		ObjectMetadata metadata = new ObjectMetadata();
+		metadata.setContentType(file.getContentType());
+		metadata.setContentLength(file.getSize());
+		String keyName = generateUuid();
+
+		try {
+			PutObjectResult putObjectResult = amazonS3.putObject(
+					new PutObjectRequest(amazonConfig.getBucket(), keyName, file.getInputStream(), metadata));
+			log.info("result={}", putObjectResult.getContentMd5());
+		}catch (IOException e){
+			log.error("error at AmazonS3Manager uploadFile : {}", (Object) e.getStackTrace());
+		}
+
+
+		return amazonS3.getUrl(amazonConfig.getBucket(), keyName).toString();
+	}
+
+	private String generateUuid(){
+		return UUID.randomUUID().toString();
+	}
+}
+
+* */

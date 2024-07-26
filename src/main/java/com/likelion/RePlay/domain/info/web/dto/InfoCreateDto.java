@@ -1,13 +1,15 @@
 package com.likelion.RePlay.domain.info.web.dto;
 
 import com.likelion.RePlay.domain.info.entity.Info;
-import com.likelion.RePlay.global.enums.RoleName;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class InfoCreateDto {
     @Getter
@@ -15,9 +17,9 @@ public class InfoCreateDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class InfoCreateRequest {
+    public static class InfoCreateRequest implements Serializable {
         @NotNull(message="권한을 입력해주세요.")
-        private RoleName roleName; //권한
+        private String roleName; //권한
 
         @NotBlank(message="제목을 입력해주세요.")
         private String title; //제목
@@ -28,8 +30,10 @@ public class InfoCreateDto {
         @NotEmpty(message = "작성자 이름을 입력해주세요.")
         private String writer; // 작성자 (관리자 이름)
 
-        @NotBlank(message="몇 호인지 입력해주세요.")
+        @NotNull(message="몇 호인지 입력해주세요.")
         private Long infoNum; //생생정보터 호 수
+
+        private List<MultipartFile> images; //이미지
 
         public Info toEntity(){
             return Info.builder()
@@ -38,9 +42,7 @@ public class InfoCreateDto {
                     .infoNum(infoNum)
                     .writer(writer)
                     .build();
-
         }
-
     }
 
     @Getter
@@ -55,5 +57,4 @@ public class InfoCreateDto {
             this.updatedAt = updatedAt;
         }
     }
-
 }

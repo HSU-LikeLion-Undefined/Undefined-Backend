@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlayingFilteringDTO {
-    private List<Date> dateList;
+    private List<String> dateList;
     private List<State> stateList;
     private List<District> districtList;
     private Category category;

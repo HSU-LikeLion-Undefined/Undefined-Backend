@@ -1,5 +1,6 @@
 package com.likelion.RePlay.domain.playing.service;
 
+import com.likelion.RePlay.domain.playing.web.dto.PlayingApplyRequestDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
@@ -15,5 +16,5 @@ public interface PlayingService {
 
     ResponseEntity<CustomAPIResponse<?>> filtering(PlayingFilteringDTO playingFilteringDTO);
 
-    ResponseEntity<CustomAPIResponse<?>> recruitPlaying(Long playingId, String phoneId);
+    ResponseEntity<CustomAPIResponse<?>> recruitPlaying(Long playingId, PlayingApplyRequestDTO playingApplyRequestDTO);
 }

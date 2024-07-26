@@ -17,4 +17,6 @@ public interface PlayingService {
     ResponseEntity<CustomAPIResponse<?>> filtering(PlayingFilteringDTO playingFilteringDTO);
 
     ResponseEntity<CustomAPIResponse<?>> recruitPlaying(Long playingId, PlayingApplyRequestDTO playingApplyRequestDTO);
+
+    ResponseEntity<CustomAPIResponse<?>> cancelPlaying(Long playingId, PlayingApplyRequestDTO playingApplyRequestDTO);
 }

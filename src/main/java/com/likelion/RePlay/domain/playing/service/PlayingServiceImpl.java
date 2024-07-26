@@ -10,22 +10,27 @@ import com.likelion.RePlay.domain.playing.repository.PlayingApplyRepository;
 import com.likelion.RePlay.domain.playing.repository.PlayingRepository;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
+import com.likelion.RePlay.global.enums.District;
 import com.likelion.RePlay.global.enums.IsCompleted;
 import com.likelion.RePlay.global.enums.IsRecruit;
+import com.likelion.RePlay.global.enums.State;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Transactional
 @Service
@@ -147,30 +152,80 @@ public class PlayingServiceImpl implements PlayingService {
     @Override
     public ResponseEntity<CustomAPIResponse<?>> filtering(PlayingFilteringDTO playingFilteringDTO) {
 
-        BooleanBuilder builder = new BooleanBuilder();
+        // 1. 모든 게시글을 DB에서 불러오기
+        List<Playing> allPlayings = playingRepository.findAll();
 
-        if (playingFilteringDTO.getCategory() != null) {
-            builder.and(QPlaying.playing.category.eq(playingFilteringDTO.getCategory()));
-        }
-        if (playingFilteringDTO.getDateList() != null && !playingFilteringDTO.getDateList().isEmpty()) {
-            BooleanBuilder dateBuilder = new BooleanBuilder();
-            for (Date date : playingFilteringDTO.getDateList()) {
-                dateBuilder.or(QPlaying.playing.date.eq(date));
+        // 2. 문자열로 된 dateList를 Date 객체로 변환
+        List<Date> parsedDates = new ArrayList<>();
+        SimpleDateFormat formatter = new SimpleDateFormat("MMMM d", Locale.KOREA); // "8월 2일" 형식으로 변환
+        try {
+            for (String dateString : playingFilteringDTO.getDateList()) {
+                // 연도와 시간을 설정하지 않고 날짜와 월만 설정
+                Date date = formatter.parse(dateString);
+                parsedDates.add(date);
             }
-            builder.and(dateBuilder);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(CustomAPIResponse.createFailWithout(HttpStatus.BAD_REQUEST.value(), "날짜 형식이 잘못되었습니다."));
         }
+
+        // 3. Date 조건과 일치하는 게시글만 남기기 (Date가 null일 경우 필터링하지 않음)
+        List<Playing> filteredByDate = allPlayings;
+        if (!parsedDates.isEmpty()) {
+            filteredByDate = filteredByDate.stream()
+                    .filter(playing -> {
+                        LocalDate playingDate = playing.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        return parsedDates.stream().anyMatch(date -> {
+                            LocalDate filterDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                            return playingDate.getMonth() == filterDate.getMonth() && playingDate.getDayOfMonth() == filterDate.getDayOfMonth();
+                        });
+                    })
+                    .collect(Collectors.toList());
+            System.out.println("날짜 필터 : " + filteredByDate.size() + "개 있습니다.");
+        } else {
+            System.out.println("필터가 적용되지 않았습니다.");
+        }
+
+        // 4. State 및 District 조건과 일치하는 게시글만 남기기 (Null일 경우 필터링하지 않음)
+        List<Playing> filteredByLocation = filteredByDate;
         if (playingFilteringDTO.getStateList() != null && !playingFilteringDTO.getStateList().isEmpty()) {
-            builder.and(QPlaying.playing.state.in(playingFilteringDTO.getStateList()));
-        }
-        if (playingFilteringDTO.getDistrictList() != null && !playingFilteringDTO.getDistrictList().isEmpty()) {
-            builder.and(QPlaying.playing.district.in(playingFilteringDTO.getDistrictList()));
+            filteredByLocation = filteredByLocation.stream()
+                    .filter(playing -> {
+                        boolean matches = false;
+                        for (int i = 0; i < playingFilteringDTO.getStateList().size(); i++) {
+                            State state = playingFilteringDTO.getStateList().get(i);
+                            District district = (playingFilteringDTO.getDistrictList() != null && playingFilteringDTO.getDistrictList().size() > i)
+                                    ? playingFilteringDTO.getDistrictList().get(i)
+                                    : null;
+                            if (playing.getState().equals(state) &&
+                                    (district == null || district.equals(District.ALL) || playing.getDistrict().equals(district))) {
+                                matches = true;
+                                break;
+                            }
+                        }
+                        return matches;
+                    })
+                    .collect(Collectors.toList());
+            System.out.println("시 및 구 필터 : " + filteredByLocation.size() + "개 있습니다.");
+        } else {
+            System.out.println("필터가 적용되지 않았습니다.");
         }
 
-        List<Playing> results = (List<Playing>) playingRepository.findAll(builder);
+        // 5. Category 조건과 일치하는 게시글만 남기기 (Null일 경우 필터링하지 않음)
+        List<Playing> filteredByCategory = filteredByLocation;
+        if (playingFilteringDTO.getCategory() != null) {
+            filteredByCategory = filteredByCategory.stream()
+                    .filter(playing -> playing.getCategory().equals(playingFilteringDTO.getCategory()))
+                    .collect(Collectors.toList());
+            System.out.println("카테고리 필터 : " + filteredByCategory.size() + "개 있습니다.");
+        } else {
+            System.out.println("필터가 적용되지 않았습니다.");
+        }
 
-        // 메인 페이지에서 보여질 정보만 추출해서 보내기
+        // 6. 모든 조건에 부합하는 게시글만 ResponseBody로 전달하기
         List<PlayingListDTO.PlayingResponse> playingResponse = new ArrayList<>();
-        for (Playing result : results) {
+        for (Playing result : filteredByCategory) {
             PlayingListDTO.PlayingResponse response = PlayingListDTO.PlayingResponse.builder()
                     .category(result.getCategory())
                     .title(result.getTitle())
@@ -179,6 +234,7 @@ public class PlayingServiceImpl implements PlayingService {
                     .date(result.getDate())
                     .totalCount(result.getTotalCount())
                     .recruitmentCount(result.getRecruitmentCount())
+                    .imageUrl(result.getImageUrl())
                     .build();
             playingResponse.add(response);
         }

@@ -69,6 +69,9 @@ public class Playing extends BaseEntity {
     @Column(name = "LOCATE")
     private String locate;
 
+    @Column(name = "IMAGE_URL")
+    private String imageUrl;
+
     @ManyToOne
     @JoinColumn(name = "USER_ID")
     private User user;
@@ -80,10 +83,6 @@ public class Playing extends BaseEntity {
     @OneToMany(mappedBy = "playing", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<PlayingComment> playingComments;
-
-    @OneToMany(mappedBy = "playing", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<PlayingImage> playingImages;
 
     @OneToMany(mappedBy = "playing", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

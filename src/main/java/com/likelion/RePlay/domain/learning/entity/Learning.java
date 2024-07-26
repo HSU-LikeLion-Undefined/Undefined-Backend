@@ -2,9 +2,7 @@ package com.likelion.RePlay.domain.learning.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.likelion.RePlay.domain.user.entity.User;
-import com.likelion.RePlay.global.enums.Category;
-import com.likelion.RePlay.global.enums.IsCompleted;
-import com.likelion.RePlay.global.enums.IsRecruit;
+import com.likelion.RePlay.global.enums.*;
 import com.likelion.RePlay.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,8 +35,11 @@ public class Learning extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private IsRecruit isRecruit;
 
-    @Column(name="RECRUIT_COUNT")
-    private Long recruitCount;
+    @Column(name = "TOTAL_COUNT")
+    private Long totalCount;
+
+    @Column(name="RECRUITMENT_COUNT")
+    private Long recruitmentCount;
 
     @Column(name="CONTENT")
     private String content;
@@ -52,6 +53,18 @@ public class Learning extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private IsCompleted isCompleted;
 
+    @Column(name = "LOCATE")
+    private String locate;
+
+    @Enumerated(EnumType.STRING)
+    private State state; // 시
+
+    @Enumerated(EnumType.STRING)
+    private District district; // 구
+
+    @Column(name = "IMAGE_URL")
+    private String imageUrl;
+
     @ManyToOne
     @JoinColumn(name = "USER_ID")
     private User user;
@@ -63,10 +76,6 @@ public class Learning extends BaseEntity {
     @OneToMany(mappedBy = "learning", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<LearningComment> learningComments;
-
-    @OneToMany(mappedBy = "learning", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<LearningImage> learningImages;
 
     @OneToMany(mappedBy = "learning", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

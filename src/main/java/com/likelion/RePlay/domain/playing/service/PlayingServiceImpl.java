@@ -258,7 +258,7 @@ public class PlayingServiceImpl implements PlayingService {
         if (findPlaying.isEmpty()) {
             return ResponseEntity.status(404)
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
-        } else if (findPlaying.isEmpty()) {
+        } else if (findUser.isEmpty()) {
             return ResponseEntity.status(404)
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 유저입니다."));
         }
@@ -313,6 +313,49 @@ public class PlayingServiceImpl implements PlayingService {
                 .build();
 
         return ResponseEntity.status(200)
-                .body(CustomAPIResponse.createSuccess(200, playingResponse, "활동 신청이 성공적으로 완료되었습니다."));
+                .body(CustomAPIResponse.createSuccess(200, playingResponse, "활동 신청이 완료되었습니다."));
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> cancelPlaying(Long playingId, PlayingApplyRequestDTO playingApplyRequestDTO) {
+
+        String phoneId = playingApplyRequestDTO.getPhoneId();
+
+        // 놀이터 게시글이 DB에 존재하는가?
+        Optional<Playing> findPlaying = playingRepository.findById(playingId);
+        // 존재하는 사용자인가?
+        Optional<User> findUser = userRepository.findByPhoneId(phoneId);
+        // 존재하는 신청정보인가?
+        Optional<PlayingApply> findApply = playingApplyRepository.findByUserPhoneId(phoneId);
+
+        // 존재하지 않는다면 오류 반환
+        if (findPlaying.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
+        } else if (findUser.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 유저입니다."));
+        } else if (findApply.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 신청 정보입니다."));
+        }
+
+        // 게시글 작성자와 현재 작성자가 같다면 참가 취소 불가
+        if (findPlaying.get().getUser() == findUser.get()) {
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400, "내가 올린 게시글에 참가 취소할 수 없습니다."));
+        }
+
+        // 해당 참가자의 참가를 취소하고, 해당 게시글의 인원을 한 명 줄인다.
+        // 만약 정원이 다 찬 경우에서 취소한다면, 모집 완료를 모집 중으로 바꾼다.
+        if (findPlaying.get().getIsRecruit() == IsRecruit.FALSE) {
+            findPlaying.get().changeIsRecruit(IsRecruit.TRUE);
+        }
+        findPlaying.get().changeRecruitmentCount(findPlaying.get().getRecruitmentCount() - 1);
+
+        playingApplyRepository.delete(findApply.get());
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, null, "활동 신청이 취소되었습니다."));
     }
 }

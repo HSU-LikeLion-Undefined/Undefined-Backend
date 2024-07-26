@@ -40,4 +40,9 @@ public class PlayingController {
     private ResponseEntity<CustomAPIResponse<?>> recruitPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyRequestDTO playingApplyRequestDTO) {
         return playingService.recruitPlaying(playingId, playingApplyRequestDTO);
     }
+
+    @DeleteMapping("/{playingId}")
+    private ResponseEntity<CustomAPIResponse<?>> cancelPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyRequestDTO playingApplyRequestDTO) {
+        return playingService.cancelPlaying(playingId, playingApplyRequestDTO);
+    }
 }

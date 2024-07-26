@@ -103,6 +103,7 @@ public class PlayingServiceImpl implements PlayingService {
                     .date(playing.getDate())
                     .totalCount(playing.getTotalCount())
                     .recruitmentCount(playing.getRecruitmentCount())
+                    .imageUrl(playing.getImageUrl())
                     .build());
         }
 

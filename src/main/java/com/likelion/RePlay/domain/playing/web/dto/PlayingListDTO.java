@@ -22,6 +22,7 @@ public class PlayingListDTO {
         private Category category;
         private String title;
         private String content;
+        private String locate;
         private State state;
         private District district;
         private Date date;
@@ -29,6 +30,7 @@ public class PlayingListDTO {
         private Long recruitmentCount;
         private Long cost;
         private String costDescription;
+        private String imageUrl;
     }
 
     @Getter @Setter

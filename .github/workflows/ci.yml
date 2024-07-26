@@ -38,15 +38,28 @@ jobs:
       - name: Create application.properties
         run: |
           mkdir -p src/main/resources
-          echo "spring.application.name=RePlay" > src/main/resources/application.properties
+          echo "spring.application.name=replay" > src/main/resources/application.properties
           echo "spring.datasource.url=${{ secrets.DB_URL }}" >> src/main/resources/application.properties
           echo "spring.datasource.username=${{ secrets.DB_USERNAME }}" >> src/main/resources/application.properties
           echo "spring.datasource.password=${{ secrets.DB_PASSWORD }}" >> src/main/resources/application.properties
-          echo "spring.jpa.properties.hibernate.format_sql=true" >> src/main/resources/application.properties
+          echo "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver" >> src/main/resources/application.properties
+          echo "spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect" >> src/main/resources/application.properties
           echo "spring.jpa.hibernate.ddl-auto=update" >> src/main/resources/application.properties
-          echo "spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect" >> src/main/resources/application.properties
+          echo "spring.jpa.properties.hibernate.format_sql=true" >> src/main/resources/application.properties
           echo "application.security.jwt.secret-key=${{ secrets.JWT_SECRET_KEY }}" >> src/main/resources/application.properties
           echo "application.security.jwt.expiration=2592000000" >> src/main/resources/application.properties
+          echo "aws.accessKeyId=${{ secrets.AWS_ACCESS_KEY_ID }}" >> src/main/resources/application.properties
+          echo "aws.secretKey=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> src/main/resources/application.properties
+          echo "aws.region=ap-northeast-2" >> src/main/resources/application.properties
+          echo "aws.s3.bucket=${{ secrets.S3_BUCKET_NAME }}" >> src/main/resources/application.properties
+          echo "cloud.aws.region.static=ap-northeast-2" >> src/main/resources/application.properties
+          echo "cloud.aws.credentials.accessKey=${{ secrets.AWS_ACCESS_KEY_ID }}" >> src/main/resources/application.properties
+          echo "cloud.aws.credentials.secretKey=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> src/main/resources/application.properties
+          echo "cloud.aws.s3.bucket=${{ secrets.S3_BUCKET_NAME }}" >> src/main/resources/application.properties
+          echo "spring.servlet.multipart.enabled=true" >> src/main/resources/application.properties
+          echo "spring.servlet.multipart.max-file-size=10MB" >> src/main/resources/application.properties
+          echo "spring.servlet.multipart.max-request-size=10MB" >> src/main/resources/application.properties
+          echo "logging.level.org.springframework.security=DEBUG" >> src/main/resources/application.properties
           cat src/main/resources/application.properties # 확인을 위해 출력
 
       - name: Grant execute permission for gradlew

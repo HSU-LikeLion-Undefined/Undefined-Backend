@@ -1,6 +1,7 @@
 package com.likelion.RePlay.domain.user.repository;
 
 import com.likelion.RePlay.domain.user.entity.User;
+import com.likelion.RePlay.global.enums.RoleName;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

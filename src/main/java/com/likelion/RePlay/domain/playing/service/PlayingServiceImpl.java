@@ -160,7 +160,7 @@ public class PlayingServiceImpl implements PlayingService {
         SimpleDateFormat formatter = new SimpleDateFormat("MMMM d", Locale.KOREA); // "8월 2일" 형식으로 변환
         try {
             for (String dateString : playingFilteringDTO.getDateList()) {
-                // 연도와 시간을 설정하지 않고 날짜와 월만 설정합니다.
+                // 연도와 시간을 설정하지 않고 날짜와 월만 설정
                 Date date = formatter.parse(dateString);
                 parsedDates.add(date);
             }

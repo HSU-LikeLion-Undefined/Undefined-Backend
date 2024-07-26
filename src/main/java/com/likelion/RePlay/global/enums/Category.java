@@ -12,5 +12,6 @@ public enum Category {
     RESTAURANT,
     ENTERTAINMENT,
     COOKING,
+    DIGITAL,
     ETC
 }

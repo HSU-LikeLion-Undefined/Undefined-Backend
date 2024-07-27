@@ -21,6 +21,11 @@ public class PlayingController {
         return playingService.writePost(playingWriteRequestDTO);
     }
 
+    @PutMapping("/{playingId}")
+    private ResponseEntity<CustomAPIResponse<?>> modifyPost(@PathVariable Long playingId, @RequestBody PlayingWriteRequestDTO playingWriteRequestDTO) {
+        return playingService.modifyPost(playingId, playingWriteRequestDTO);
+    }
+
     @GetMapping("/")
     private ResponseEntity<CustomAPIResponse<?>> getAllPosts() {
         return playingService.getAllPosts();

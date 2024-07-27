@@ -1,8 +1,10 @@
 package com.likelion.RePlay.domain.learning.service;
 
 import com.likelion.RePlay.domain.learning.entity.Learning;
+import com.likelion.RePlay.domain.learning.entity.LearningApply;
 import com.likelion.RePlay.domain.learning.repository.LearningApplyRepository;
 import com.likelion.RePlay.domain.learning.repository.LearningRepository;
+import com.likelion.RePlay.domain.learning.web.dto.LearningApplyRequestDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningListDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
@@ -19,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -214,6 +217,67 @@ public class LearningServiceImpl implements LearningService{
 
         return ResponseEntity.status(200)
                 .body(CustomAPIResponse.createSuccess(200, learningResponse, "조건에 맞는 게시글들을 성공적으로 불러왔습니다."));
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> recruitLearning(Long learningId, LearningApplyRequestDTO learningApplyRequestDTO) {
+
+        String phoneId = learningApplyRequestDTO.getPhoneId();
+
+        Optional<Learning> findLearning = learningRepository.findById(learningId);
+        Optional<User> findUser = userRepository.findByPhoneId(phoneId);
+
+        if (findLearning.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
+        } else if (findUser.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 유저입니다."));
+        }
+
+        if (findLearning.get().getUser() == findUser.get()) {
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400, "내가 올린 게시글에 참가할 수 없습니다."));
+        }
+
+        if (findLearning.get().getIsRecruit() ==IsRecruit.FALSE) {
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400, "인원이 마감되었습니다."));
+        } else if (findLearning.get().getIsCompleted() == IsCompleted.TRUE) {
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400, "모집 완료된 활동입니다."));
+        }
+
+        Optional<LearningApply> findLearningApply = learningApplyRepository.findByUserPhoneId(phoneId);
+
+        if (findLearningApply.isEmpty()) {
+            LearningApply newApply = LearningApply.builder()
+                    .learning(findLearning.get())
+                    .user(findUser.get())
+                    .build();
+
+            learningApplyRepository.save(newApply);
+        } else {
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400, "이미 신청한 활동입니다."));
+        }
+
+        findLearning.get().changeRecruitmentCount(findLearning.get().getRecruitmentCount() + 1);
+
+        if (findLearning.get().getRecruitmentCount() == findLearning.get().getTotalCount()) {
+            findLearning.get().changeIsRecruit(IsRecruit.FALSE);
+        }
+
+        LearningListDTO.LearningResponse learningResponse = LearningListDTO.LearningResponse.builder()
+                .category(findLearning.get().getCategory())
+                .title(findLearning.get().getTitle())
+                .date(findLearning.get().getDate())
+                .locate(findLearning.get().getLocate())
+                .imageUrl(findLearning.get().getImageUrl())
+                .build();
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, learningResponse, "활동 신청이 완료되었습니다."));
     }
 
 

@@ -1,6 +1,7 @@
 package com.likelion.RePlay.domain.learning.web.controller;
 
 import com.likelion.RePlay.domain.learning.service.LearningService;
+import com.likelion.RePlay.domain.learning.web.dto.LearningApplyRequestDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
@@ -37,4 +38,8 @@ public class LearningController {
         return learningService.filtering(learningFilteringDTO);
     }
 
+    @PostMapping("/{learningId}")
+    private ResponseEntity<CustomAPIResponse<?>> recruitLearning(@PathVariable Long learningId, @RequestBody LearningApplyRequestDTO learningApplyRequestDTO) {
+        return learningService.recruitLearning(learningId, learningApplyRequestDTO);
+    }
 }

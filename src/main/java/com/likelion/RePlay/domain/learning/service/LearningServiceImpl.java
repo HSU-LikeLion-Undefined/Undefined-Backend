@@ -2,8 +2,10 @@ package com.likelion.RePlay.domain.learning.service;
 
 import com.likelion.RePlay.domain.learning.entity.Learning;
 import com.likelion.RePlay.domain.learning.entity.LearningApply;
+import com.likelion.RePlay.domain.learning.entity.LearningScrap;
 import com.likelion.RePlay.domain.learning.repository.LearningApplyRepository;
 import com.likelion.RePlay.domain.learning.repository.LearningRepository;
+import com.likelion.RePlay.domain.learning.repository.LearningScrapRepository;
 import com.likelion.RePlay.domain.learning.web.dto.LearningApplyScrapRequestDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningListDTO;
@@ -35,6 +37,7 @@ public class LearningServiceImpl implements LearningService{
     private final UserRepository userRepository;
     private final LearningRepository learningRepository;
     private final LearningApplyRepository learningApplyRepository;
+    private final LearningScrapRepository learningScrapRepository;
 
     @Override
     public ResponseEntity<CustomAPIResponse<?>> writePost(LearningWriteRequestDTO learningWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
@@ -324,9 +327,35 @@ public class LearningServiceImpl implements LearningService{
     @Override
     public ResponseEntity<CustomAPIResponse<?>> scrapLearning(Long learningId, LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
 
+        String phoneId = learningApplyScrapRequestDTO.getPhoneId();
 
+        Optional<Learning> findLearning = learningRepository.findById(learningId);
+        Optional<User> findUser = userRepository.findByPhoneId(phoneId);
 
-        return null;
+        if (findLearning.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
+        } else if (findUser.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 유저입니다."));
+        }
+
+        Optional<LearningScrap> findLearningScrap = learningScrapRepository.findByUserPhoneId(phoneId);
+
+        if (findLearningScrap.isEmpty()) {
+            LearningScrap newScrap = LearningScrap.builder()
+                    .learning(findLearning.get())
+                    .user(findUser.get())
+                    .build();
+
+            learningScrapRepository.save(newScrap);
+            return ResponseEntity.status(200)
+                    .body(CustomAPIResponse.createSuccess(200, null, "스크랩되었습니다."));
+        }else {
+
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400,  "이미 스크랩했습니다."));
+        }
     }
 
 

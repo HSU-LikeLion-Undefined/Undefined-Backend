@@ -122,12 +122,13 @@ public class PlayingServiceImpl implements PlayingService {
     public ResponseEntity<CustomAPIResponse<?>> getPost(Long playingId) {
 
         Optional<Playing> findPlaying = playingRepository.findById(playingId);
-        User user = findPlaying.get().getUser();
 
         if (findPlaying.isEmpty()) {
             return ResponseEntity.status(404)
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
         }
+
+        User user = findPlaying.get().getUser();
 
         PlayingListDTO.PlayingResponse playingResponse = PlayingListDTO.PlayingResponse.builder()
                 .nickname(user.getNickname())

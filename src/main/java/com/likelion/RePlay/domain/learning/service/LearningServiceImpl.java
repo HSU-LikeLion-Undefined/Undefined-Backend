@@ -358,5 +358,34 @@ public class LearningServiceImpl implements LearningService{
         }
     }
 
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> cancelScrap(Long learningId, LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
+
+        String phoneId = learningApplyScrapRequestDTO.getPhoneId();
+
+        Optional<Learning> findLearning = learningRepository.findById(learningId);
+        Optional<User> findUser = userRepository.findByPhoneId(phoneId);
+
+        if (findLearning.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
+        } else if (findUser.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 유저입니다."));
+        }
+
+        Optional<LearningScrap> findLearningScrap = learningScrapRepository.findByUserPhoneId(phoneId);
+
+        if (findLearningScrap.isPresent()) {
+            learningScrapRepository.delete(findLearningScrap.get());
+            return ResponseEntity.status(200)
+                    .body(CustomAPIResponse.createSuccess(200, null, "스크랩이 취소되었습니다."));
+        }else {
+
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400,  "스크랩하지 않은 게시글입니다."));
+        }
+    }
+
 
 }

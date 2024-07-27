@@ -6,4 +6,6 @@ import org.springframework.http.ResponseEntity;
 
 public interface LearningService {
     ResponseEntity<CustomAPIResponse<?>> writePost(LearningWriteRequestDTO learningWriteRequestDTO);
+
+    ResponseEntity<CustomAPIResponse<?>> getAllPosts();
 }

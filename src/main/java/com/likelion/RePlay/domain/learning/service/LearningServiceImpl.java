@@ -3,6 +3,7 @@ package com.likelion.RePlay.domain.learning.service;
 import com.likelion.RePlay.domain.learning.entity.Learning;
 import com.likelion.RePlay.domain.learning.repository.LearningApplyRepository;
 import com.likelion.RePlay.domain.learning.repository.LearningRepository;
+import com.likelion.RePlay.domain.learning.web.dto.LearningListDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
@@ -21,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -79,5 +82,29 @@ public class LearningServiceImpl implements LearningService{
         return ResponseEntity.status(201)
                 .body(CustomAPIResponse.createSuccess(201, null, "게시글을 성공적으로 작성하였습니다."));
 
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getAllPosts() {
+
+        List<Learning> learnings = learningRepository.findAll();
+
+        List<LearningListDTO.LearningResponse> learningResponses = new ArrayList<>();
+
+        for (Learning learning : learnings) {
+            learningResponses.add(LearningListDTO.LearningResponse.builder()
+                    .category(learning.getCategory())
+                    .title(learning.getTitle())
+                    .state(learning.getState())
+                    .district(learning.getDistrict())
+                    .date(learning.getDate())
+                    .totalCount(learning.getTotalCount())
+                    .recruitmentCount(learning.getRecruitmentCount())
+                    .imageUrl(learning.getImageUrl())
+                    .build());
+        }
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, learningResponses, "게시글 목록을 성공적으로 불러왔습니다."));
     }
 }

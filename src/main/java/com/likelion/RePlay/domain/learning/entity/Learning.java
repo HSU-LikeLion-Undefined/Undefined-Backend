@@ -84,4 +84,15 @@ public class Learning extends BaseEntity {
     @OneToMany(mappedBy = "learning", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<LearningApply> learningApplies;
+
+
+    // 연관관계 편의 메서드
+    public void changeIsRecruit(IsRecruit isRecruit) {
+        this.isRecruit = isRecruit;
+    }
+
+    public void changeRecruitmentCount(Long recruitmentCount) {
+        this.recruitmentCount = recruitmentCount;
+    }
+
 }

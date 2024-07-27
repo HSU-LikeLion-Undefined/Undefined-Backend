@@ -1,4 +1,4 @@
-package com.likelion.RePlay.domain.playing.web.dto;
+package com.likelion.RePlay.domain.learning.web.dto;
 
 import lombok.*;
 
@@ -7,6 +7,6 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlayingApplyRequestDTO {
+public class LearningApplyRequestDTO {
     private String phoneId;
 }

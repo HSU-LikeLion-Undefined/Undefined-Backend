@@ -33,6 +33,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/info/getAllInfo").permitAll()
                         .requestMatchers("/api/info/getOneInfo/**").permitAll()
                         .requestMatchers("/api/info/**").authenticated()
+                        .requestMatchers("/api/learning/**").permitAll()
+
+
                         .anyRequest().hasAnyAuthority("ROLE_ADMIN")
                 )
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)

@@ -1,6 +1,6 @@
 package com.likelion.RePlay.domain.playing.web.controller;
 
-import com.likelion.RePlay.domain.playing.web.dto.PlayingApplyRequestDTO;
+import com.likelion.RePlay.domain.playing.web.dto.PlayingApplyScrapRequestDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.service.PlayingServiceImpl;
@@ -37,12 +37,17 @@ public class PlayingController {
     }
 
     @PostMapping("/{playingId}")
-    private ResponseEntity<CustomAPIResponse<?>> recruitPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyRequestDTO playingApplyRequestDTO) {
-        return playingService.recruitPlaying(playingId, playingApplyRequestDTO);
+    private ResponseEntity<CustomAPIResponse<?>> recruitPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
+        return playingService.recruitPlaying(playingId, playingApplyScrapRequestDTO);
     }
 
     @DeleteMapping("/{playingId}")
-    private ResponseEntity<CustomAPIResponse<?>> cancelPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyRequestDTO playingApplyRequestDTO) {
-        return playingService.cancelPlaying(playingId, playingApplyRequestDTO);
+    private ResponseEntity<CustomAPIResponse<?>> cancelPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
+        return playingService.cancelPlaying(playingId, playingApplyScrapRequestDTO);
+    }
+
+    @PostMapping("/{playingId}/scrap")
+    private ResponseEntity<CustomAPIResponse<?>> scrapPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
+        return playingService.scrapPlaying(playingId, playingApplyScrapRequestDTO);
     }
 }

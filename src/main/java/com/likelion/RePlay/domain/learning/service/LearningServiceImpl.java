@@ -87,6 +87,67 @@ public class LearningServiceImpl implements LearningService{
     }
 
     @Override
+    public ResponseEntity<CustomAPIResponse<?>> modifyPost(Long learningId, LearningWriteRequestDTO learningWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
+
+        Optional<User> isAdmin = userRepository.findByPhoneId(userDetails.getPhoneId());
+        Optional<Learning> findLearning = learningRepository.findById(learningId);
+
+        // 관리자만 글을 수정할 수 있다.
+        if (isAdmin.isEmpty() || isAdmin.get().getUserRoles().stream()
+                .noneMatch(userRole -> userRole.getRole().getRoleName() == RoleName.ROLE_ADMIN)) {
+
+            return ResponseEntity.status(403)
+                    .body(CustomAPIResponse.createFailWithout(403, "글 수정 권한이 없습니다."));
+        }
+
+        Learning learning = findLearning.get();
+
+        if (isAdmin.isEmpty())  {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 사용자입니다."));
+        } else if (findLearning.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
+        }
+
+        String dateStr = learningWriteRequestDTO.getDate();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy년 M월 d일 a h시 m분");
+        Date date = new Date();
+        try {
+            date = dateFormat.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // 총 모집 인원이 현재 모집된 인원보다 적으면 에러
+        if (learningWriteRequestDTO.getTotalCount() < learning.getRecruitmentCount()) {
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400, "현재 모집된 인원보다 적은 인원을 모집할 수 없습니다."));
+        }
+
+        learning.changeTitle(learningWriteRequestDTO.getTitle());
+        learning.changeDate(date);
+        learning.changeLocate(learningWriteRequestDTO.getLocate());
+        learning.changeCategory(learningWriteRequestDTO.getCategory());
+        learning.changeContent(learningWriteRequestDTO.getContent());
+        learning.changeImageUrl(learningWriteRequestDTO.getImageUrl());
+        learning.changeTotalCount(learningWriteRequestDTO.getTotalCount());
+
+
+        if (learning.getRecruitmentCount() == learning.getTotalCount()) {
+            learning.changeIsRecruit(IsRecruit.FALSE);
+        }
+
+        if ((learning.getIsRecruit() == IsRecruit.FALSE) && (learning.getRecruitmentCount() < learning.getTotalCount())) {
+            learning.changeIsRecruit(IsRecruit.TRUE);
+        }
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, null, "게시글을 성공적으로 수정하였습니다."));
+
+    }
+
+    @Override
     public ResponseEntity<CustomAPIResponse<?>> getAllPosts() {
 
         List<Learning> learnings = learningRepository.findAll();

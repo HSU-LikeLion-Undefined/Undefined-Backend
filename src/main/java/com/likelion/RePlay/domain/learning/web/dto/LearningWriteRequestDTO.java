@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LearningWriteRequestDTO {
-    private String phoneId;
+    //private String phoneId;
     private String title;
     private String date;
     private String locate; // 카카오맵으로 검색한 주소
@@ -20,9 +20,7 @@ public class LearningWriteRequestDTO {
     private State state;
     private District district;
     private Category category;
-    private String content; // 놀이 설명
+    private String content; // 배움 설명
     private Long totalCount;
-    private String cost; // 참가비용
-    private String costDescription; //참가비용 설명
     private String imageUrl;
 }

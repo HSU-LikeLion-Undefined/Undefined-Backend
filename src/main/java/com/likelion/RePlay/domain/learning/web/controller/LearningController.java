@@ -26,6 +26,11 @@ public class LearningController {
         return learningService.writePost(learningWriteRequestDTO, userDetails);
     }
 
+    @PutMapping("/{learningId}")
+    private ResponseEntity<CustomAPIResponse<?>> modifyPost(@PathVariable Long learningId, @RequestBody LearningWriteRequestDTO learningWriteRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.modifyPost(learningId, learningWriteRequestDTO, userDetails);
+    }
+
     @GetMapping("/")
     private ResponseEntity<CustomAPIResponse<?>> getAllPosts() {
         return learningService.getAllPosts();

@@ -50,4 +50,9 @@ public class PlayingController {
     private ResponseEntity<CustomAPIResponse<?>> scrapPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
         return playingService.scrapPlaying(playingId, playingApplyScrapRequestDTO);
     }
+
+    @DeleteMapping("/{playingId}/scrap")
+    private ResponseEntity<CustomAPIResponse<?>> cancelScrap(@PathVariable Long playingId, @RequestBody PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
+        return playingService.cancelScrap(playingId, playingApplyScrapRequestDTO);
+    }
 }

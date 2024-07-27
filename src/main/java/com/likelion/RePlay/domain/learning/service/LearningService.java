@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 public interface LearningService {
     ResponseEntity<CustomAPIResponse<?>> writePost(LearningWriteRequestDTO learningWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails);
 
+    ResponseEntity<CustomAPIResponse<?>> modifyPost(Long learningId, LearningWriteRequestDTO learningWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails);
+
     ResponseEntity<CustomAPIResponse<?>> getAllPosts();
 
     ResponseEntity<CustomAPIResponse<?>> getPost(Long learningId);
@@ -23,4 +25,5 @@ public interface LearningService {
     ResponseEntity<CustomAPIResponse<?>> scrapLearning(Long learningId, LearningApplyScrapRequestDTO learningApplyScrapRequestDTO);
 
     ResponseEntity<CustomAPIResponse<?>> cancelScrap(Long learningId, LearningApplyScrapRequestDTO learningApplyScrapRequestDTO);
-}
+
+    }

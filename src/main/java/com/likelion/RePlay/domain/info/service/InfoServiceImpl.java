@@ -2,6 +2,7 @@ package com.likelion.RePlay.domain.info.service;
 
 import com.likelion.RePlay.domain.info.entity.Info;
 import com.likelion.RePlay.domain.info.repository.InfoRepository;
+import com.likelion.RePlay.domain.info.web.dto.GetAllInfoResponseDto;
 import com.likelion.RePlay.domain.info.web.dto.InfoCreateDto;
 import com.likelion.RePlay.domain.info.web.dto.InfoModifyDto;
 import com.likelion.RePlay.domain.user.entity.User;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +32,7 @@ public class InfoServiceImpl implements InfoService {
     public ResponseEntity<CustomAPIResponse<?>> createInfo(InfoCreateDto.InfoCreateRequest infoCreateRequest, List<MultipartFile> images) {
         Optional<User> isAdmin = userRepository.findByPhoneId(infoCreateRequest.getWriter());
 
-        // 사용자가 존쟂하지 않거나 관리자가 아니라면 작성 권한 없음
+        // 사용자가 존재하지 않거나 관리자가 아니라면 작성 권한 없음
         if (isAdmin.isEmpty() || isAdmin.get().getUserRoles().stream()
                 .noneMatch(userRole -> userRole.getRole().getRoleName() == RoleName.ROLE_ADMIN)) {
             CustomAPIResponse<Object> failResponse = CustomAPIResponse
@@ -96,5 +98,32 @@ public class InfoServiceImpl implements InfoService {
     public ResponseEntity<CustomAPIResponse<?>> deleteInfo(Long infoId) {
         // 보류
         return null;
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<GetAllInfoResponseDto.FinalResponseDto>> getAllInfo() {
+        List<Info> allInfos = infoRepository.findAll();
+
+        List<GetAllInfoResponseDto.GetInfo> allInfoDtos = allInfos.stream()
+                .map(info -> GetAllInfoResponseDto.GetInfo.builder()
+                        .infoId(info.getInfoId())
+                        .title(info.getTitle())
+                        .content(info.getContent())
+                        .writer(info.getWriter())
+                        .infoNum(info.getInfoNum())
+                        .thumbnailUrl(info.getImages().isEmpty() ? null : info.getImages().get(0).getImageUrl())
+                        .createdAt(info.getCreatedAt().toLocalDate())
+                        .build())
+                .collect(Collectors.toList());
+
+        GetAllInfoResponseDto.FinalResponseDto responseDto = GetAllInfoResponseDto.FinalResponseDto.builder()
+                .allInfos(allInfoDtos)
+                .build();
+
+        // CustomAPIResponse 객체 생성
+        CustomAPIResponse<GetAllInfoResponseDto.FinalResponseDto> response = CustomAPIResponse.createSuccess(
+                HttpStatus.OK.value(), responseDto, "전체 게시글 조회 성공");
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

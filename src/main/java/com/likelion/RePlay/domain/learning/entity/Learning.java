@@ -87,6 +87,34 @@ public class Learning extends BaseEntity {
 
 
     // 연관관계 편의 메서드
+    public void changeDate(Date date) {
+        this.date = date;
+    }
+
+    public void changeLocate(String locate) {
+        this.locate = locate;
+    }
+
+    public void changeCategory(Category category) {
+        this.category = category;
+    }
+
+    public void changeTitle(String title) {
+        this.title = title;
+    }
+
+    public void changeContent(String content) {
+        this.content = content;
+    }
+
+    public void changeImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void changeTotalCount(Long totalCount) {
+        this.totalCount = totalCount;
+    }
+
     public void changeIsRecruit(IsRecruit isRecruit) {
         this.isRecruit = isRecruit;
     }

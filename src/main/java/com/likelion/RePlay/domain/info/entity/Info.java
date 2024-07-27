@@ -21,15 +21,18 @@ public class Info extends BaseEntity {
     @Column(name="INFO_ID")
     private Long infoId;
 
+    @Setter
     @Column(name = "TITLE")
     private String title;
 
+    @Setter
     @Column(name = "CONTENT")
     private String content;
 
     @Column(name="WRITER")
     private String writer; //작성자
 
+    @Setter
     @Column(name="INFO_NUM")
     private Long infoNum; //몇 호인지
 
@@ -47,4 +50,6 @@ public class Info extends BaseEntity {
         images.remove(infoImage);
         infoImage.setInfo(null);
     }
+
+
 }

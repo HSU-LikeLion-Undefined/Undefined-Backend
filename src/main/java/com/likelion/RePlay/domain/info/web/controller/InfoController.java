@@ -31,12 +31,18 @@ public class InfoController {
     @PostMapping("/modifyInfo")
     public ResponseEntity<CustomAPIResponse<?>> modifyInfo(
             @RequestPart("infoModifyRequest") InfoModifyDto.InfoModifyRequest infoModifyRequest,
-            @RequestPart("images") List<MultipartFile> images) {
-        return infoService.modifyInfo(infoModifyRequest, images);
+            @RequestPart("images") List<MultipartFile> images,
+            @AuthenticationPrincipal MyUserDetails userDetails) {
+        return infoService.modifyInfo(infoModifyRequest, images, userDetails);
     }
 
     @GetMapping("/getAllInfo")
     public ResponseEntity<CustomAPIResponse<GetAllInfoResponseDto.FinalResponseDto>> getAllInfo() {
         return infoService.getAllInfo();
+    }
+
+    @GetMapping("/getOneInfo/{infoId}")
+    public ResponseEntity<CustomAPIResponse<?>> getOneInfo(@PathVariable Long infoId) {
+        return infoService.getOneInfo(infoId);
     }
 }

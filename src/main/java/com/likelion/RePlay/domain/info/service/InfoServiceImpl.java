@@ -3,6 +3,7 @@ package com.likelion.RePlay.domain.info.service;
 import com.likelion.RePlay.domain.info.entity.Info;
 import com.likelion.RePlay.domain.info.repository.InfoRepository;
 import com.likelion.RePlay.domain.info.web.dto.GetAllInfoResponseDto;
+import com.likelion.RePlay.domain.info.web.dto.GetOneInfoResponseDto;
 import com.likelion.RePlay.domain.info.web.dto.InfoCreateDto;
 import com.likelion.RePlay.domain.info.web.dto.InfoModifyDto;
 import com.likelion.RePlay.domain.user.entity.User;
@@ -63,7 +64,7 @@ public class InfoServiceImpl implements InfoService {
 
     @Transactional
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> modifyInfo(InfoModifyDto.InfoModifyRequest infoModifyRequest, List<MultipartFile> images) {
+    public ResponseEntity<CustomAPIResponse<?>> modifyInfo(InfoModifyDto.InfoModifyRequest infoModifyRequest, List<MultipartFile> images, MyUserDetails userDetails) {
         // 수정할 글이 존재하지 않는다면 수정할 수 없음
         Optional<Info> optionalInfo = infoRepository.findById(infoModifyRequest.getInfoId());
         if (optionalInfo.isEmpty()) {
@@ -73,7 +74,7 @@ public class InfoServiceImpl implements InfoService {
         }
 
         // 존재하지 않는 사용자거나 관리자가 아니라면 수정 권한 없음
-        Optional<User> isAdmin = userRepository.findByPhoneId(infoModifyRequest.getWriter());
+        Optional<User> isAdmin = userRepository.findByPhoneId(userDetails.getPhoneId());
         if (isAdmin.isEmpty() || isAdmin.get().getUserRoles().stream()
                 .noneMatch(userRole -> userRole.getRole().getRoleName() == RoleName.ROLE_ADMIN)) {
             CustomAPIResponse<Object> failResponse = CustomAPIResponse
@@ -81,6 +82,7 @@ public class InfoServiceImpl implements InfoService {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(failResponse);
         }
 
+        // 작성자 자체는 따로 수정하지 않도록,,,
         Info info = optionalInfo.get();
         info.setTitle(infoModifyRequest.getTitle());
         info.setContent(infoModifyRequest.getContent());
@@ -125,5 +127,24 @@ public class InfoServiceImpl implements InfoService {
                 HttpStatus.OK.value(), responseDto, "전체 게시글 조회 성공");
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getOneInfo(Long infoId) {
+        // 게시글이 존재하지 않음
+        Optional<Info> optionalInfo = infoRepository.findById(infoId);
+        if (optionalInfo.isEmpty()) {
+            CustomAPIResponse<Object> failResponse = CustomAPIResponse
+                    .createFailWithout(HttpStatus.NOT_FOUND.value(), "해당 글을 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(failResponse);
+        }
+
+        Info info = optionalInfo.get();
+        GetOneInfoResponseDto infoResponseDto = GetOneInfoResponseDto.toEntity(info);
+
+        CustomAPIResponse<GetOneInfoResponseDto> successResponse = CustomAPIResponse
+                .createSuccess(HttpStatus.OK.value(), infoResponseDto, "게시글 조회 성공");
+
+        return ResponseEntity.status(HttpStatus.OK).body(successResponse);
     }
 }

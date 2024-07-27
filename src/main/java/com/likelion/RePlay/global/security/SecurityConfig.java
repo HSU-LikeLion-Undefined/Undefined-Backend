@@ -31,6 +31,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/signUp", "/api/user/login").permitAll()
                         .requestMatchers("/api/playing/**").permitAll()
                         .requestMatchers("/api/info/getAllInfo").permitAll()
+                        .requestMatchers("/api/info/getOneInfo/**").permitAll()
                         .requestMatchers("/api/info/**").authenticated()
                         .anyRequest().hasAnyAuthority("ROLE_ADMIN")
                 )

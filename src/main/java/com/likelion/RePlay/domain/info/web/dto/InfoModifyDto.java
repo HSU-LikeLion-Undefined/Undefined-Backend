@@ -2,26 +2,21 @@ package com.likelion.RePlay.domain.info.web.dto;
 
 import com.likelion.RePlay.domain.info.entity.Info;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class InfoModifyDto {
+public class InfoModifyDto implements Serializable {
     @Getter
     @Setter
     @Builder
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor
     @AllArgsConstructor
     public static class InfoModifyRequest {
-        @NotNull(message="권한을 입력해주세요.")
-        private String roleName; //권한
-
         @NotNull(message = "ID를 입력해주세요.")
         private Long infoId; // 수정할 글의 ID
-
-        private String writer; // 작성자 (관리자 이름)
 
         @NotBlank(message = "제목을 입력해주세요.")
         private String title; // 수정할 제목
@@ -43,12 +38,9 @@ public class InfoModifyDto {
 
     @Getter
     @Builder
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ModifyInfo {
         private LocalDateTime updatedAt;
-
-        public ModifyInfo(LocalDateTime updatedAt) {
-            this.updatedAt = updatedAt;
-        }
     }
 }

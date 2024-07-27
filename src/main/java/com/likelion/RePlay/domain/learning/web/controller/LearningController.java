@@ -4,6 +4,7 @@ import com.likelion.RePlay.domain.learning.service.LearningService;
 import com.likelion.RePlay.domain.learning.web.dto.LearningApplyScrapRequestDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
+import com.likelion.RePlay.domain.playing.web.dto.PlayingApplyScrapRequestDTO;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -54,4 +55,10 @@ public class LearningController {
     private ResponseEntity<CustomAPIResponse<?>> scrapLearning(@PathVariable Long learningId, @RequestBody LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
         return learningService.scrapLearning(learningId, learningApplyScrapRequestDTO);
     }
+
+    @DeleteMapping("/{learningId}/scrap")
+    private ResponseEntity<CustomAPIResponse<?>> cancelScrap(@PathVariable Long learningId, @RequestBody LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
+        return learningService.cancelScrap(learningId, learningApplyScrapRequestDTO);
+    }
+
 }

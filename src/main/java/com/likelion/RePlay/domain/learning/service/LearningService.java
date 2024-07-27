@@ -21,4 +21,6 @@ public interface LearningService {
     ResponseEntity<CustomAPIResponse<?>> cancelLearning(Long learningId, LearningApplyScrapRequestDTO learningApplyScrapRequestDTO);
 
     ResponseEntity<CustomAPIResponse<?>> scrapLearning(Long learningId, LearningApplyScrapRequestDTO learningApplyScrapRequestDTO);
+
+    ResponseEntity<CustomAPIResponse<?>> cancelScrap(Long learningId, LearningApplyScrapRequestDTO learningApplyScrapRequestDTO);
 }

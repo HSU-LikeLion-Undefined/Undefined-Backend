@@ -1,6 +1,7 @@
 package com.likelion.RePlay.domain.learning.web.controller;
 
 import com.likelion.RePlay.domain.learning.service.LearningService;
+import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,11 @@ public class LearningController {
     @GetMapping("/{learningId}")
     private ResponseEntity<CustomAPIResponse<?>> getPost(@PathVariable Long learningId) {
         return learningService.getPost(learningId);
+    }
+
+    @PostMapping("/filtering")
+    private ResponseEntity<CustomAPIResponse<?>> filtering(@RequestBody LearningFilteringDTO learningFilteringDTO) {
+        return learningService.filtering(learningFilteringDTO);
     }
 
 }

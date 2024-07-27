@@ -1,12 +1,13 @@
 package com.likelion.RePlay.domain.playing.service;
 
-import com.likelion.RePlay.domain.playing.web.dto.PlayingApplyRequestDTO;
+import com.likelion.RePlay.domain.playing.entity.PlayingScrap;
+import com.likelion.RePlay.domain.playing.repository.PlayingScrapRepository;
+import com.likelion.RePlay.domain.playing.web.dto.PlayingApplyScrapRequestDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingListDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.entity.Playing;
 import com.likelion.RePlay.domain.playing.entity.PlayingApply;
-import com.likelion.RePlay.domain.playing.entity.QPlaying;
 import com.likelion.RePlay.domain.playing.repository.PlayingApplyRepository;
 import com.likelion.RePlay.domain.playing.repository.PlayingRepository;
 import com.likelion.RePlay.domain.user.entity.User;
@@ -16,8 +17,6 @@ import com.likelion.RePlay.global.enums.IsCompleted;
 import com.likelion.RePlay.global.enums.IsRecruit;
 import com.likelion.RePlay.global.enums.State;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.Expressions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -41,6 +40,7 @@ public class PlayingServiceImpl implements PlayingService {
     private final UserRepository userRepository;
     private final PlayingRepository playingRepository;
     private final PlayingApplyRepository playingApplyRepository;
+    private final PlayingScrapRepository playingScrapRepository;
 
     @Override
     public ResponseEntity<CustomAPIResponse<?>> writePost(PlayingWriteRequestDTO playingWriteRequestDTO) {
@@ -246,9 +246,9 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> recruitPlaying(Long playingId, PlayingApplyRequestDTO playingApplyRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> recruitPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
 
-        String phoneId = playingApplyRequestDTO.getPhoneId();
+        String phoneId = playingApplyScrapRequestDTO.getPhoneId();
 
         // 놀이터 게시글이 DB에 존재하는가?
         Optional<Playing> findPlaying = playingRepository.findById(playingId);
@@ -318,9 +318,9 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> cancelPlaying(Long playingId, PlayingApplyRequestDTO playingApplyRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> cancelPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
 
-        String phoneId = playingApplyRequestDTO.getPhoneId();
+        String phoneId = playingApplyScrapRequestDTO.getPhoneId();
 
         // 놀이터 게시글이 DB에 존재하는가?
         Optional<Playing> findPlaying = playingRepository.findById(playingId);
@@ -358,5 +358,46 @@ public class PlayingServiceImpl implements PlayingService {
 
         return ResponseEntity.status(200)
                 .body(CustomAPIResponse.createSuccess(200, null, "활동 신청이 취소되었습니다."));
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> scrapPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
+
+        String phoneId = playingApplyScrapRequestDTO.getPhoneId();
+
+        // 놀이터 게시글이 DB에 존재하는가?
+        Optional<Playing> findPlaying = playingRepository.findById(playingId);
+        // 존재하는 사용자인가?
+        Optional<User> findUser = userRepository.findByPhoneId(phoneId);
+
+        // 존재하지 않는다면 오류 반환
+        if (findPlaying.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
+        } else if (findUser.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 유저입니다."));
+        }
+
+        Optional<PlayingScrap> findPlayingScrap = playingScrapRepository.findByUserPhoneId(phoneId);
+
+        // 스크랩하지 않은 활동일 경우
+        // 해당 게시글 신청 정보에 해당 유저의 정보를 추가한다.
+        if (findPlayingScrap.isEmpty()) {
+            PlayingScrap newScrap = PlayingScrap.builder()
+                    .playing(findPlaying.get())
+                    .user(findUser.get())
+                    .build();
+
+            playingScrapRepository.save(newScrap);
+
+            return ResponseEntity.status(200)
+                    .body(CustomAPIResponse.createSuccess(200, null, "스크랩되었습니다."));
+        }else {
+
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400,  "이미 스크랩했습니다."));
+        }
+
     }
 }

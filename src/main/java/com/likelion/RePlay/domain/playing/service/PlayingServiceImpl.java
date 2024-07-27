@@ -400,4 +400,39 @@ public class PlayingServiceImpl implements PlayingService {
         }
 
     }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> cancelScrap(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
+
+        String phoneId = playingApplyScrapRequestDTO.getPhoneId();
+
+        // 놀이터 게시글이 DB에 존재하는가?
+        Optional<Playing> findPlaying = playingRepository.findById(playingId);
+        // 존재하는 사용자인가?
+        Optional<User> findUser = userRepository.findByPhoneId(phoneId);
+
+        // 존재하지 않는다면 오류 반환
+        if (findPlaying.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
+        } else if (findUser.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 유저입니다."));
+        }
+
+        Optional<PlayingScrap> findPlayingScrap = playingScrapRepository.findByUserPhoneId(phoneId);
+
+        // 스크랩한 않은 활동일 경우 취소한다.
+        if (findPlayingScrap.isPresent()) {
+            playingScrapRepository.delete(findPlayingScrap.get());
+
+            return ResponseEntity.status(200)
+                    .body(CustomAPIResponse.createSuccess(200, null, "스크랩이 취소되었습니다."));
+        }else {
+
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400,  "스크랩하지 않은 게시글입니다."));
+        }
+        
+    }
 }

@@ -21,4 +21,6 @@ public interface PlayingService {
     ResponseEntity<CustomAPIResponse<?>> cancelPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO);
 
     ResponseEntity<CustomAPIResponse<?>> scrapPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO);
+
+    ResponseEntity<CustomAPIResponse<?>> cancelScrap(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO);
 }

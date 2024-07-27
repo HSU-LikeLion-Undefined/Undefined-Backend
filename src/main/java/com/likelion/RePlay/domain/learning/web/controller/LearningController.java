@@ -42,4 +42,9 @@ public class LearningController {
     private ResponseEntity<CustomAPIResponse<?>> recruitLearning(@PathVariable Long learningId, @RequestBody LearningApplyRequestDTO learningApplyRequestDTO) {
         return learningService.recruitLearning(learningId, learningApplyRequestDTO);
     }
+
+    @DeleteMapping("/{learningId}")
+    private ResponseEntity<CustomAPIResponse<?>> cancelLearning(@PathVariable Long learningId, @RequestBody LearningApplyRequestDTO learningApplyRequestDTO) {
+        return learningService.cancelLearning(learningId, learningApplyRequestDTO);
+    }
 }

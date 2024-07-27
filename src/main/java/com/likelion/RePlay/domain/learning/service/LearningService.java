@@ -16,4 +16,6 @@ public interface LearningService {
     ResponseEntity<CustomAPIResponse<?>> filtering(LearningFilteringDTO learningFilteringDTO);
 
     ResponseEntity<CustomAPIResponse<?>> recruitLearning(Long learningId, LearningApplyRequestDTO learningApplyRequestDTO);
+
+    ResponseEntity<CustomAPIResponse<?>> cancelLearning(Long learningId, LearningApplyRequestDTO learningApplyRequestDTO);
 }

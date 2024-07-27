@@ -27,4 +27,6 @@ public class InfoSubmit extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "USER_ID")
     private User user; // 투고 작성 회원
+
+
 }

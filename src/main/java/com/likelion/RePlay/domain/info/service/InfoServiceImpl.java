@@ -2,22 +2,26 @@ package com.likelion.RePlay.domain.info.service;
 
 import com.likelion.RePlay.domain.info.entity.Info;
 import com.likelion.RePlay.domain.info.repository.InfoRepository;
-import com.likelion.RePlay.domain.info.web.dto.GetAllInfoResponseDto;
-import com.likelion.RePlay.domain.info.web.dto.GetOneInfoResponseDto;
-import com.likelion.RePlay.domain.info.web.dto.InfoCreateDto;
-import com.likelion.RePlay.domain.info.web.dto.InfoModifyDto;
+import com.likelion.RePlay.domain.info.web.dto.*;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
 import com.likelion.RePlay.global.enums.RoleName;
+import com.likelion.RePlay.global.mail.MailService;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService.MyUserDetails;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,23 +33,24 @@ public class InfoServiceImpl implements InfoService {
     private final UserRepository userRepository;
     private final InfoImageService infoImageService;
 
+    @Autowired
+    private MailService mailService;
+
     @Transactional
     @Override
     public ResponseEntity<CustomAPIResponse<?>> createInfo(InfoCreateDto.InfoCreateRequest infoCreateRequest, List<MultipartFile> images, MyUserDetails userDetails) {
         Optional<User> isAdmin = userRepository.findByPhoneId(userDetails.getPhoneId());
 
-        // 사용자가 존재하지 않거나 관리자가 아니라면 작성 권한 없음
         if (isAdmin.isEmpty() || isAdmin.get().getUserRoles().stream()
                 .noneMatch(userRole -> userRole.getRole().getRoleName() == RoleName.ROLE_ADMIN)) {
             throw new RuntimeException("글 작성 권한이 없습니다.");
         }
 
-        // writer를 userDetails에서 설정
         String writer = isAdmin.get().getNickname();
         String writerId = isAdmin.get().getPhoneId();
 
         Info info = infoCreateRequest.toEntity();
-        info.setWriter(writer); // writer 설정
+        info.setWriter(writer);
         info.setWriterId(writerId);
         infoRepository.save(info);
 
@@ -65,7 +70,6 @@ public class InfoServiceImpl implements InfoService {
     @Transactional
     @Override
     public ResponseEntity<CustomAPIResponse<?>> modifyInfo(InfoModifyDto.InfoModifyRequest infoModifyRequest, List<MultipartFile> images, MyUserDetails userDetails) {
-        // 수정할 글이 존재하지 않는다면 수정할 수 없음
         Optional<Info> optionalInfo = infoRepository.findById(infoModifyRequest.getInfoId());
         if (optionalInfo.isEmpty()) {
             CustomAPIResponse<Object> failResponse = CustomAPIResponse
@@ -73,7 +77,6 @@ public class InfoServiceImpl implements InfoService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(failResponse);
         }
 
-        // 존재하지 않는 사용자거나 관리자가 아니라면 수정 권한 없음
         Optional<User> isAdmin = userRepository.findByPhoneId(userDetails.getPhoneId());
         if (isAdmin.isEmpty() || isAdmin.get().getUserRoles().stream()
                 .noneMatch(userRole -> userRole.getRole().getRoleName() == RoleName.ROLE_ADMIN)) {
@@ -82,7 +85,6 @@ public class InfoServiceImpl implements InfoService {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(failResponse);
         }
 
-        // 작성자 자체는 따로 수정하지 않도록,,,
         Info info = optionalInfo.get();
         info.setTitle(infoModifyRequest.getTitle());
         info.setContent(infoModifyRequest.getContent());
@@ -122,7 +124,6 @@ public class InfoServiceImpl implements InfoService {
                 .allInfos(allInfoDtos)
                 .build();
 
-        // CustomAPIResponse 객체 생성
         CustomAPIResponse<GetAllInfoResponseDto.FinalResponseDto> response = CustomAPIResponse.createSuccess(
                 HttpStatus.OK.value(), responseDto, "전체 게시글 조회 성공");
 
@@ -131,7 +132,6 @@ public class InfoServiceImpl implements InfoService {
 
     @Override
     public ResponseEntity<CustomAPIResponse<?>> getOneInfo(Long infoId) {
-        // 게시글이 존재하지 않음
         Optional<Info> optionalInfo = infoRepository.findById(infoId);
         if (optionalInfo.isEmpty()) {
             CustomAPIResponse<Object> failResponse = CustomAPIResponse
@@ -146,5 +146,38 @@ public class InfoServiceImpl implements InfoService {
                 .createSuccess(HttpStatus.OK.value(), infoResponseDto, "게시글 조회 성공");
 
         return ResponseEntity.status(HttpStatus.OK).body(successResponse);
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> submitInfo(
+            InfoSubmitRequestDto.InfoSubmitRequest infoSubmitRequest,
+            List<MultipartFile> images, MyUserDetails userDetails) {
+        try {
+            String writer = userDetails.getUsername();
+
+            InfoSubmitResponseDto responseDto = InfoSubmitResponseDto.builder()
+                    .title(infoSubmitRequest.getTitle())
+                    .content(infoSubmitRequest.getContent())
+                    .writer(writer)
+                    .build();
+
+            List<MultipartFile> attachments = images != null ? images : Collections.emptyList();
+
+            mailService.sendMail(responseDto, attachments);
+
+            CustomAPIResponse<Object> successResponse =
+                    CustomAPIResponse.createSuccess(HttpStatus.OK.value(), null, "투고 신청이 완료되었습니다.");
+            return ResponseEntity.status(HttpStatus.OK).body(successResponse);
+        } catch (MessagingException | IOException e) {
+            e.printStackTrace();
+            CustomAPIResponse<Object> failResponse = CustomAPIResponse
+                    .createFailWithout(HttpStatus.INTERNAL_SERVER_ERROR.value(), "정보 제출 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(failResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+            CustomAPIResponse<Object> failResponse = CustomAPIResponse
+                    .createFailWithout(HttpStatus.INTERNAL_SERVER_ERROR.value(), "알 수 없는 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(failResponse);
+        }
     }
 }

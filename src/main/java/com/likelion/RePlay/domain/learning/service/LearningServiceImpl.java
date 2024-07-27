@@ -4,26 +4,21 @@ import com.likelion.RePlay.domain.learning.entity.Learning;
 import com.likelion.RePlay.domain.learning.entity.LearningApply;
 import com.likelion.RePlay.domain.learning.repository.LearningApplyRepository;
 import com.likelion.RePlay.domain.learning.repository.LearningRepository;
-import com.likelion.RePlay.domain.learning.web.dto.LearningApplyRequestDTO;
+import com.likelion.RePlay.domain.learning.web.dto.LearningApplyScrapRequestDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningListDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
-import com.likelion.RePlay.domain.playing.entity.Playing;
-import com.likelion.RePlay.domain.playing.entity.PlayingApply;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
 import com.likelion.RePlay.global.enums.*;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
+import com.likelion.RePlay.global.security.MyUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -42,9 +37,9 @@ public class LearningServiceImpl implements LearningService{
     private final LearningApplyRepository learningApplyRepository;
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> writePost(LearningWriteRequestDTO learningWriteRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> writePost(LearningWriteRequestDTO learningWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
 
-        Optional<User> isAdmin = userRepository.findByPhoneId(learningWriteRequestDTO.getPhoneId());
+        Optional<User> isAdmin = userRepository.findByPhoneId(userDetails.getPhoneId());
 
         // 관리자만 글을 작성할 수 있다.
         if (isAdmin.isEmpty() || isAdmin.get().getUserRoles().stream()
@@ -222,9 +217,9 @@ public class LearningServiceImpl implements LearningService{
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> recruitLearning(Long learningId, LearningApplyRequestDTO learningApplyRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> recruitLearning(Long learningId, LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
 
-        String phoneId = learningApplyRequestDTO.getPhoneId();
+        String phoneId = learningApplyScrapRequestDTO.getPhoneId();
 
         Optional<Learning> findLearning = learningRepository.findById(learningId);
         Optional<User> findUser = userRepository.findByPhoneId(phoneId);
@@ -283,9 +278,9 @@ public class LearningServiceImpl implements LearningService{
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> cancelLearning(Long learningId, LearningApplyRequestDTO learningApplyRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> cancelLearning(Long learningId, LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
 
-        String phoneId = learningApplyRequestDTO.getPhoneId();
+        String phoneId = learningApplyScrapRequestDTO.getPhoneId();
 
         // 놀이터 게시글이 DB에 존재하는가?
         Optional<Learning> findLearning = learningRepository.findById(learningId);
@@ -324,6 +319,14 @@ public class LearningServiceImpl implements LearningService{
         return ResponseEntity.status(200)
                 .body(CustomAPIResponse.createSuccess(200, null, "활동 신청이 취소되었습니다."));
 
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> scrapLearning(Long learningId, LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
+
+
+
+        return null;
     }
 
 

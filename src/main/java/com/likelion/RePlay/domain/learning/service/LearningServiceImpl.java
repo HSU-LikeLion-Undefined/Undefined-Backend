@@ -107,4 +107,37 @@ public class LearningServiceImpl implements LearningService{
         return ResponseEntity.status(200)
                 .body(CustomAPIResponse.createSuccess(200, learningResponses, "게시글 목록을 성공적으로 불러왔습니다."));
     }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getPost(Long learningId) {
+
+        Optional<Learning> findLearning = learningRepository.findById(learningId);
+
+        if (findLearning.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
+        }
+
+        User user = findLearning.get().getUser();
+
+        LearningListDTO.LearningResponse  learningResponse = LearningListDTO.LearningResponse.builder()
+                .nickname(user.getNickname())
+                .introduce(user.getIntroduce())
+                .category(findLearning.get().getCategory())
+                .title(findLearning.get().getTitle())
+                .date(findLearning.get().getDate())
+                .locate(findLearning.get().getLocate())
+                .state(findLearning.get().getState())
+                .district(findLearning.get().getDistrict())
+                .totalCount(findLearning.get().getTotalCount())
+                .recruitmentCount(findLearning.get().getRecruitmentCount())
+                .content(findLearning.get().getContent())
+                .imageUrl(findLearning.get().getImageUrl())
+                .build();
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, learningResponse, "특정 게시글을 성공적으로 불러왔습니다."));
+    }
+
+
 }

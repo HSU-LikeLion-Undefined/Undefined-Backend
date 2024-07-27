@@ -8,4 +8,6 @@ public interface LearningService {
     ResponseEntity<CustomAPIResponse<?>> writePost(LearningWriteRequestDTO learningWriteRequestDTO);
 
     ResponseEntity<CustomAPIResponse<?>> getAllPosts();
+
+    ResponseEntity<CustomAPIResponse<?>> getPost(Long learningId);
 }

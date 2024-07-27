@@ -7,6 +7,6 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlayingApplyRequestDTO {
+public class PlayingApplyScrapRequestDTO {
     private String phoneId;
 }

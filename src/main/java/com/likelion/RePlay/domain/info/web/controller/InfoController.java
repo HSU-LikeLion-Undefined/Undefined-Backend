@@ -2,6 +2,7 @@ package com.likelion.RePlay.domain.info.web;
 
 import com.likelion.RePlay.domain.info.service.InfoService;
 import com.likelion.RePlay.domain.info.web.dto.InfoCreateDto;
+import com.likelion.RePlay.domain.info.web.dto.InfoModifyDto;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,5 +22,12 @@ public class InfoController {
             @RequestPart("infoCreateRequest") InfoCreateDto.InfoCreateRequest infoCreateRequest,
             @RequestPart("images") List<MultipartFile> images) {
         return infoService.createInfo(infoCreateRequest, images);
+    }
+
+    @PostMapping("/modifyInfo")
+    public ResponseEntity<CustomAPIResponse<?>> modifyInfo(
+            @RequestPart("infoModifyRequest") InfoModifyDto.InfoModifyRequest infoModifyRequest,
+            @RequestPart("images") List<MultipartFile> images){
+        return infoService.modifyInfo(infoModifyRequest, images);
     }
 }

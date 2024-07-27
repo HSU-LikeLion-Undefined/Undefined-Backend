@@ -3,13 +3,12 @@ package com.likelion.RePlay.domain.learning.service;
 import com.likelion.RePlay.domain.learning.entity.Learning;
 import com.likelion.RePlay.domain.learning.repository.LearningApplyRepository;
 import com.likelion.RePlay.domain.learning.repository.LearningRepository;
+import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningListDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
-import com.likelion.RePlay.global.enums.IsCompleted;
-import com.likelion.RePlay.global.enums.IsRecruit;
-import com.likelion.RePlay.global.enums.RoleName;
+import com.likelion.RePlay.global.enums.*;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Transactional
@@ -137,6 +136,84 @@ public class LearningServiceImpl implements LearningService{
 
         return ResponseEntity.status(200)
                 .body(CustomAPIResponse.createSuccess(200, learningResponse, "특정 게시글을 성공적으로 불러왔습니다."));
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> filtering(LearningFilteringDTO learningFilteringDTO) {
+
+        List<Learning> allLearnings = learningRepository.findAll();
+
+        List<Date> parseDates = new ArrayList<>();
+        SimpleDateFormat formatter = new SimpleDateFormat("MMMM d", Locale.KOREA);
+        try {
+            for (String dateString : learningFilteringDTO.getDateList()) {
+                Date date = formatter.parse(dateString);
+                parseDates.add(date);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(404, "날짜 형식이 잘못되었습니다."));
+        }
+
+        List<Learning> filteredByDate = allLearnings;
+        if (!parseDates.isEmpty()) {
+            filteredByDate = filteredByDate.stream()
+                    .filter(learning -> {
+                        LocalDate learningDate = learning.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        return parseDates.stream().anyMatch(date -> {
+                            LocalDate filterDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                            return learningDate.getMonth() == filterDate.getMonth() && learningDate.getDayOfMonth() == filterDate.getDayOfMonth();
+                        });
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        List<Learning> filteredByLocation = filteredByDate;
+        if (learningFilteringDTO.getStateList() != null && !learningFilteringDTO.getStateList().isEmpty()) {
+            filteredByLocation = filteredByLocation.stream()
+                    .filter(learning -> {
+                        boolean matches = false;
+                        for (int i = 0; i < learningFilteringDTO.getStateList().size(); i++) {
+                            State state = learningFilteringDTO.getStateList().get(i);
+                            District district = (learningFilteringDTO.getDistrictList() != null && learningFilteringDTO.getDistrictList().size() > i)
+                                    ? learningFilteringDTO.getDistrictList().get(i)
+                                    : null;
+                            if (learning.getState().equals(state) &&
+                                    (district == null || district.equals(District.ALL) || learning.getDistrict().equals(district))) {
+                                matches = true;
+                                break;
+                            }
+                        }
+                        return matches;
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        List<Learning> filteredByCategory = filteredByLocation;
+        if (learningFilteringDTO.getCategory() != null) {
+            filteredByCategory = filteredByCategory.stream()
+                    .filter(learning -> learning.getCategory().equals(learningFilteringDTO.getCategory()))
+                    .collect(Collectors.toList());
+        }
+
+        List<LearningListDTO.LearningResponse> learningResponse = new ArrayList<>();
+        for (Learning result : filteredByCategory) {
+            LearningListDTO.LearningResponse response = LearningListDTO.LearningResponse.builder()
+                    .category(result.getCategory())
+                    .title(result.getTitle())
+                    .state(result.getState())
+                    .district(result.getDistrict())
+                    .date(result.getDate())
+                    .totalCount(result.getTotalCount())
+                    .recruitmentCount(result.getRecruitmentCount())
+                    .imageUrl(result.getImageUrl())
+                    .build();
+            learningResponse.add(response);
+        }
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, learningResponse, "조건에 맞는 게시글들을 성공적으로 불러왔습니다."));
     }
 
 

@@ -29,8 +29,13 @@ public class Info extends BaseEntity {
     @Column(name = "CONTENT")
     private String content;
 
+    @Setter
+    @Column(name="WRITER_ID")
+    private String writerId; //작성자 아이디
+
+    @Setter
     @Column(name="WRITER")
-    private String writer; //작성자
+    private String writer; //작성자 닉네임
 
     @Setter
     @Column(name="INFO_NUM")

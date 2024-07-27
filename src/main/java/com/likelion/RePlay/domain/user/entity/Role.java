@@ -23,4 +23,8 @@ public class Role {
     @Column(name = "ROLE_NAME", nullable = false)
     private RoleName roleName;
 
+    public String getAuthority() {
+        return roleName.name();
+    }
+
 }

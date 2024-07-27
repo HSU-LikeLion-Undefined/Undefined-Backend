@@ -27,7 +27,6 @@ public class InfoCreateDto {
         @NotBlank(message="내용을 입력해주세요.")
         private String content; //내용
 
-        @NotEmpty(message = "작성자 이름을 입력해주세요.")
         private String writer; // 작성자 (관리자 이름)
 
         @NotNull(message="몇 호인지 입력해주세요.")

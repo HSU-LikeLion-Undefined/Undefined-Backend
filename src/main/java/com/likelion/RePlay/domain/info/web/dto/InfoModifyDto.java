@@ -21,7 +21,6 @@ public class InfoModifyDto {
         @NotNull(message = "ID를 입력해주세요.")
         private Long infoId; // 수정할 글의 ID
 
-        @NotEmpty(message = "작성자 이름을 입력해주세요.")
         private String writer; // 작성자 (관리자 이름)
 
         @NotBlank(message = "제목을 입력해주세요.")

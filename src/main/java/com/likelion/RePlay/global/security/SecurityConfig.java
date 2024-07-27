@@ -32,10 +32,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/playing/**").permitAll()
                         .requestMatchers("/api/info/getAllInfo").permitAll()
                         .requestMatchers("/api/info/getOneInfo/**").permitAll()
+                        .requestMatchers("/api/info/submitInfo").authenticated()
                         .requestMatchers("/api/info/**").authenticated()
                         .requestMatchers("/api/learning/**").permitAll()
-
-
                         .anyRequest().hasAnyAuthority("ROLE_ADMIN")
                 )
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)

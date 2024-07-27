@@ -74,7 +74,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
         @Override
         public String getUsername() {
-            return user.getPhoneId();
+            return user.getNickname();
         }
 
         @Override

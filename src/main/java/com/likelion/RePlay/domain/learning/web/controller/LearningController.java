@@ -26,4 +26,9 @@ public class LearningController {
         return learningService.getAllPosts();
     }
 
+    @GetMapping("/{learningId}")
+    private ResponseEntity<CustomAPIResponse<?>> getPost(@PathVariable Long learningId) {
+        return learningService.getPost(learningId);
+    }
+
 }

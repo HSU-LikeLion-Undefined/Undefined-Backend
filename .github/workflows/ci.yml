@@ -68,6 +68,9 @@ jobs:
       - name: Clean and build with Gradle
         run: ./gradlew clean build --no-daemon --stacktrace
 
+      - name: Docker system prune
+        run: docker system prune -a -f
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -95,6 +98,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Docker system prune
+        run: docker system prune -a -f
 
       - name: Deploy to EC2
         env:

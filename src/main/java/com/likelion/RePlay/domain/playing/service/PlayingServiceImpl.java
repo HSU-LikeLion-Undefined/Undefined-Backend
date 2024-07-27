@@ -95,6 +95,70 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
+    public ResponseEntity<CustomAPIResponse<?>> modifyPost(Long playingId, PlayingWriteRequestDTO playingWriteRequestDTO) {
+
+        // 게시글 작성자가 DB에 존재하는가?
+        Optional<User> findUser = userRepository.findByPhoneId(playingWriteRequestDTO.getPhoneId());
+        Optional<Playing> findPlaying = playingRepository.findById(playingId);
+
+        Playing playing = findPlaying.get();
+        User user = findUser.get();
+
+        // 없다면 오류 반환
+        if (findUser.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 사용자입니다."));
+        } else if (findPlaying.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
+        }
+
+        if (playing.getUser().getPhoneId() != user.getPhoneId()) {
+            return ResponseEntity.status(403)
+                    .body(CustomAPIResponse.createFailWithout(403, "본인의 글만 수정할 수 있습니다."));
+        }
+
+
+        String dateStr = playingWriteRequestDTO.getDate();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy년 M월 d일 a h시 m분");
+        Date date = new Date();
+        try {
+            date = dateFormat.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // 총 모집 인원이 현재 모집된 인원보다 적으면 에러
+        if (playingWriteRequestDTO.getTotalCount() < playing.getRecruitmentCount()) {
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400, "현재 모집된 인원보다 적은 인원을 모집할 수 없습니다."));
+        }
+
+        user.changeIntroduce(playingWriteRequestDTO.getIntroduce());
+        playing.changeTitle(playingWriteRequestDTO.getTitle());
+        playing.changeDate(date);
+        playing.changeLocate(playingWriteRequestDTO.getLocate());
+        playing.changeCategory(playingWriteRequestDTO.getCategory());
+        playing.changeContent(playingWriteRequestDTO.getContent());
+        playing.changeImageUrl(playingWriteRequestDTO.getImageUrl());
+        playing.changeTotalCount(playingWriteRequestDTO.getTotalCount());
+        playing.changeCost(Long.valueOf(playingWriteRequestDTO.getCost()));
+        playing.changeCostDescription(playingWriteRequestDTO.getCostDescription());
+
+        if (playing.getRecruitmentCount() == playing.getTotalCount()) {
+            playing.changeIsRecruit(IsRecruit.FALSE);
+        }
+
+        if ((playing.getIsRecruit() == IsRecruit.FALSE) && (playing.getRecruitmentCount() < playing.getTotalCount())) {
+            playing.changeIsRecruit(IsRecruit.TRUE);
+        }
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, null, "게시글을 성공적으로 수정하였습니다."));
+
+    }
+
+    @Override
     public ResponseEntity<CustomAPIResponse<?>> getAllPosts() {
         List<Playing> playings = playingRepository.findAll();
 
@@ -435,4 +499,5 @@ public class PlayingServiceImpl implements PlayingService {
         }
         
     }
+
 }

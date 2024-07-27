@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 public interface PlayingService {
     ResponseEntity<CustomAPIResponse<?>> writePost(PlayingWriteRequestDTO postWriteRequestDTO);
 
+    ResponseEntity<CustomAPIResponse<?>> modifyPost(Long playingId, PlayingWriteRequestDTO playingWriteRequestDTO);
+
     ResponseEntity<CustomAPIResponse<?>> getAllPosts();
 
     ResponseEntity<CustomAPIResponse<?>> getPost(Long playingId);
@@ -23,4 +25,6 @@ public interface PlayingService {
     ResponseEntity<CustomAPIResponse<?>> scrapPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO);
 
     ResponseEntity<CustomAPIResponse<?>> cancelScrap(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO);
+
+
 }

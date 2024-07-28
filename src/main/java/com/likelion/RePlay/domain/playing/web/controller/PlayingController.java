@@ -71,4 +71,11 @@ public class PlayingController {
     private ResponseEntity<CustomAPIResponse<?>> deleteMyPlaying(@PathVariable Long playingId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return playingService.deleteMyPlaying(playingId, userDetails);
     }
+
+    @PostMapping("/{playingId}/complete")
+    private ResponseEntity<CustomAPIResponse<?>> completePlaying(@PathVariable Long playingId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.completePlaying(playingId, userDetails);
+    }
+
+
 }

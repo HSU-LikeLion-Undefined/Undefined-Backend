@@ -1,7 +1,6 @@
 package com.likelion.RePlay.domain.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.likelion.RePlay.domain.info.entity.InfoSubmit;
 import com.likelion.RePlay.domain.learning.entity.*;
 import com.likelion.RePlay.domain.playing.entity.*;
 import com.likelion.RePlay.global.enums.District;
@@ -77,11 +76,6 @@ public class User extends BaseEntity {
     @JsonManagedReference
     @Builder.Default
     private List<PlayingApply> playingApplies = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    @Builder.Default
-    private List<InfoSubmit> infoSubmits = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

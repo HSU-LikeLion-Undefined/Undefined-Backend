@@ -578,4 +578,31 @@ public class PlayingServiceImpl implements PlayingService {
 
     }
 
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> scrapPlayings(MyUserDetailsService.MyUserDetails userDetails) {
+
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+        Long userId = user.getUserId();
+
+        List<PlayingScrap> playingScraps = playingScrapRepository.findAllByUserUserId(userId);
+        List<PlayingListDTO.PlayingResponse> playingResponses = new ArrayList<>();
+
+        for (int i = 0; i <playingScraps.size(); i++) {
+            Playing playing = playingScraps.get(i).getPlaying();
+
+            playingResponses.add(PlayingListDTO.PlayingResponse.builder()
+                    .category(playing.getCategory())
+                    .title(playing.getTitle())
+                    .date(playing.getDate())
+                    .imageUrl(playing.getImageUrl())
+                    .build());
+        }
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, playingResponses, "스크랩한 게시글 목록을 성공적으로 불러왔습니다."));
+
+    }
+
 }

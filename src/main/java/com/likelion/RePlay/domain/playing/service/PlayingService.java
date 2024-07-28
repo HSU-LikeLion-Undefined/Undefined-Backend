@@ -34,4 +34,6 @@ public interface PlayingService {
     ResponseEntity<CustomAPIResponse<?>> completePlaying(Long playingId, MyUserDetailsService.MyUserDetails userDetails);
 
     ResponseEntity<CustomAPIResponse<?>> recruitedPlayings(MyUserDetailsService.MyUserDetails userDetails);
+
+    ResponseEntity<CustomAPIResponse<?>> scrapPlayings(MyUserDetailsService.MyUserDetails userDetails);
 }

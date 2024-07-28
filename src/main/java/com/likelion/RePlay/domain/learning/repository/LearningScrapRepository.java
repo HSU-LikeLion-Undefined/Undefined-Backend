@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface LearningScrapRepository extends JpaRepository<LearningScrap, Long> {
     Optional<LearningScrap> findByUserPhoneId(String phoneId);
+    Optional<LearningScrap> findByUserPhoneIdAndLearningLearningId(String phoneId, Long learningId);
 }

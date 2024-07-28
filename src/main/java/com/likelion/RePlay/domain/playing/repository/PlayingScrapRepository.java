@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface PlayingScrapRepository extends JpaRepository<PlayingScrap, Long> {
     Optional<PlayingScrap> findByUserPhoneId(String phoneId);
+    Optional<PlayingScrap> findByUserPhoneIdAndPlayingPlayingId(String phoneId, Long playingId);
 }

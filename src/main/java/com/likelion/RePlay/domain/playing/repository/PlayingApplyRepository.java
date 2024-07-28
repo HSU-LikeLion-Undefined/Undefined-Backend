@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface PlayingApplyRepository extends JpaRepository<PlayingApply, Long> {
     Optional<PlayingApply> findByUserPhoneId(String phoneId);
+    Optional<PlayingApply> findByUserPhoneIdAndPlayingPlayingId(String phoneId, Long playingId);
 }

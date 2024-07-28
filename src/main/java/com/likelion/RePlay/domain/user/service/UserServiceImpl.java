@@ -9,6 +9,7 @@ import com.likelion.RePlay.domain.user.web.dto.*;
 import com.likelion.RePlay.global.enums.RoleName;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.JwtTokenProvider;
+import com.likelion.RePlay.global.security.MyUserDetailsService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -140,5 +141,10 @@ public class UserServiceImpl implements UserService {
         // 로그인 성공
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), token, "로그인에 성공하였습니다."));
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getMyPage(MyUserDetailsService.MyUserDetails myUserDetails) {
+        return null;
     }
 }

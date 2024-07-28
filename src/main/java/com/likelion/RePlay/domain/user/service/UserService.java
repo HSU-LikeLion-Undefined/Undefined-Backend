@@ -5,6 +5,7 @@ import com.likelion.RePlay.domain.user.web.dto.UserNickNameExistDto;
 import com.likelion.RePlay.domain.user.web.dto.UserPhoneExistDto;
 import com.likelion.RePlay.domain.user.web.dto.UserSignUpRequestDto;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
+import com.likelion.RePlay.global.security.MyUserDetailsService;
 import org.springframework.http.ResponseEntity;
 
 public interface UserService {
@@ -19,5 +20,8 @@ public interface UserService {
 
     //로그인
     ResponseEntity<CustomAPIResponse<?>> login(UserLoginDto userLoginDto);
+
+    //내정보 조회
+    ResponseEntity<CustomAPIResponse<?>> getMyPage(MyUserDetailsService.MyUserDetails myUserDetails);
 
 }

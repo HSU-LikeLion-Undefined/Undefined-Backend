@@ -23,10 +23,10 @@ public class UserSignUpRequestDto {
     @NotEmpty(message = "닉네임이 필요합니다.")
     private String nickname;
 
-    @NotNull(message = "주소 (시)가 필요합니다.")
+    //@NotNull(message = "주소 (시)가 필요합니다.")
     private State state;
 
-    @NotNull(message= "주소 (구)가 필요합니다.")
+    //@NotNull(message= "주소 (구)가 필요합니다.")
     private District district;
 
     @NotNull(message = "출생연도가 필요합니다.")

@@ -69,4 +69,9 @@ public class LearningController {
         return learningService.recruitedLearnings(userDetails);
     }
 
+    @GetMapping("/scrap")
+    private ResponseEntity<CustomAPIResponse<?>> scrapLearnings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.scrapLearnings(userDetails);
+    }
+
 }

@@ -138,5 +138,8 @@ public class Playing extends BaseEntity {
         this.recruitmentCount = recruitmentCount;
     }
 
+    public void changeIsCompleted(IsCompleted isCompleted) {
+        this.isCompleted = isCompleted;
+    }
 
 }

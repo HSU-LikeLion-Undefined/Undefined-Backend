@@ -529,7 +529,15 @@ public class PlayingServiceImpl implements PlayingService {
         
         Optional<Playing> findPlaying = playingRepository.findById(playingId);
         Playing playing = findPlaying.get();
-        
+        Date date = playing.getDate();
+        Date now = new Date();
+
+        if(date.before(now)) {
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400, "활동 날짜가 되지 않았습니다.."));
+
+        }
+
         if (user.getPhoneId() != playing.getUser().getPhoneId()) {
             return ResponseEntity.status(403)
                     .body(CustomAPIResponse.createFailWithout(403, "본인만 게시글을 삭제할 수 있습니다."));

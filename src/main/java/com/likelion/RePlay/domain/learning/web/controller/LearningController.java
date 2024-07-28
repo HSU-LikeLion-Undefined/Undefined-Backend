@@ -1,7 +1,6 @@
 package com.likelion.RePlay.domain.learning.web.controller;
 
 import com.likelion.RePlay.domain.learning.service.LearningService;
-import com.likelion.RePlay.domain.learning.web.dto.LearningApplyScrapRequestDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
@@ -46,23 +45,28 @@ public class LearningController {
     }
 
     @PostMapping("/{learningId}")
-    private ResponseEntity<CustomAPIResponse<?>> recruitLearning(@PathVariable Long learningId, @RequestBody LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
-        return learningService.recruitLearning(learningId, learningApplyScrapRequestDTO);
+    private ResponseEntity<CustomAPIResponse<?>> recruitLearning(@PathVariable Long learningId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.recruitLearning(learningId, userDetails);
     }
 
     @DeleteMapping("/{learningId}")
-    private ResponseEntity<CustomAPIResponse<?>> cancelLearning(@PathVariable Long learningId, @RequestBody LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
-        return learningService.cancelLearning(learningId, learningApplyScrapRequestDTO);
+    private ResponseEntity<CustomAPIResponse<?>> cancelLearning(@PathVariable Long learningId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.cancelLearning(learningId, userDetails);
     }
 
     @PostMapping("/{learningId}/scrap")
-    private ResponseEntity<CustomAPIResponse<?>> scrapLearning(@PathVariable Long learningId, @RequestBody LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
-        return learningService.scrapLearning(learningId, learningApplyScrapRequestDTO);
+    private ResponseEntity<CustomAPIResponse<?>> scrapLearning(@PathVariable Long learningId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.scrapLearning(learningId, userDetails);
     }
 
     @DeleteMapping("/{learningId}/scrap")
-    private ResponseEntity<CustomAPIResponse<?>> cancelScrap(@PathVariable Long learningId, @RequestBody LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
-        return learningService.cancelScrap(learningId, learningApplyScrapRequestDTO);
+    private ResponseEntity<CustomAPIResponse<?>> cancelScrap(@PathVariable Long learningId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.cancelScrap(learningId, userDetails);
+    }
+
+    @GetMapping("/recruited")
+    private ResponseEntity<CustomAPIResponse<?>> recruitedLearnings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.recruitedLearnings(userDetails);
     }
 
 }

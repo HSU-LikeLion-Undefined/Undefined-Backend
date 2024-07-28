@@ -57,4 +57,9 @@ public class InfoController {
     public ResponseEntity<CustomAPIResponse<?>> scrapInfo(@RequestBody InfoScrapDto infoScrapDto, @AuthenticationPrincipal MyUserDetails userDetails) {
         return infoService.scrapInfo(infoScrapDto, userDetails);
     }
+
+    @GetMapping("/getMyScrapInfo")
+    public ResponseEntity<CustomAPIResponse<?>> getMyScrapInfo(@AuthenticationPrincipal MyUserDetails userDetails) {
+        return infoService.getMyScrapInfo(userDetails);
+    }
 }

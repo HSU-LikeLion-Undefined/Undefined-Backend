@@ -13,8 +13,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlayingWriteRequestDTO {
-    @NotNull(message = "회원 아이디는 비워져 있을 수 없습니다.")
-    private String phoneId; // 게시글 작성자 아이디
+//    @NotNull(message = "회원 아이디는 비워져 있을 수 없습니다.")
+//    private String phoneId; // 게시글 작성자 아이디
     private String introduce; // 자기소개
     private String title;
     private String date;

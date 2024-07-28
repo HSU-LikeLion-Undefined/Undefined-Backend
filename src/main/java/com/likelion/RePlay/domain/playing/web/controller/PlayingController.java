@@ -5,8 +5,10 @@ import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.service.PlayingServiceImpl;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
+import com.likelion.RePlay.global.security.MyUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,13 +19,13 @@ public class PlayingController {
     private final PlayingServiceImpl playingService;
 
     @PostMapping("/writePost")
-    private ResponseEntity<CustomAPIResponse<?>> writePost(@RequestBody PlayingWriteRequestDTO playingWriteRequestDTO) {
-        return playingService.writePost(playingWriteRequestDTO);
+    private ResponseEntity<CustomAPIResponse<?>> writePost(@RequestBody PlayingWriteRequestDTO playingWriteRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.writePost(playingWriteRequestDTO, userDetails);
     }
 
     @PutMapping("/{playingId}")
-    private ResponseEntity<CustomAPIResponse<?>> modifyPost(@PathVariable Long playingId, @RequestBody PlayingWriteRequestDTO playingWriteRequestDTO) {
-        return playingService.modifyPost(playingId, playingWriteRequestDTO);
+    private ResponseEntity<CustomAPIResponse<?>> modifyPost(@PathVariable Long playingId, @RequestBody PlayingWriteRequestDTO playingWriteRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.modifyPost(playingId, playingWriteRequestDTO, userDetails);
     }
 
     @GetMapping("/")
@@ -42,22 +44,22 @@ public class PlayingController {
     }
 
     @PostMapping("/{playingId}")
-    private ResponseEntity<CustomAPIResponse<?>> recruitPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
-        return playingService.recruitPlaying(playingId, playingApplyScrapRequestDTO);
+    private ResponseEntity<CustomAPIResponse<?>> recruitPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.recruitPlaying(playingId, playingApplyScrapRequestDTO, userDetails);
     }
 
     @DeleteMapping("/{playingId}")
-    private ResponseEntity<CustomAPIResponse<?>> cancelPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
-        return playingService.cancelPlaying(playingId, playingApplyScrapRequestDTO);
+    private ResponseEntity<CustomAPIResponse<?>> cancelPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.cancelPlaying(playingId, playingApplyScrapRequestDTO, userDetails);
     }
 
     @PostMapping("/{playingId}/scrap")
-    private ResponseEntity<CustomAPIResponse<?>> scrapPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
-        return playingService.scrapPlaying(playingId, playingApplyScrapRequestDTO);
+    private ResponseEntity<CustomAPIResponse<?>> scrapPlaying(@PathVariable Long playingId, @RequestBody PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.scrapPlaying(playingId, playingApplyScrapRequestDTO, userDetails);
     }
 
     @DeleteMapping("/{playingId}/scrap")
-    private ResponseEntity<CustomAPIResponse<?>> cancelScrap(@PathVariable Long playingId, @RequestBody PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
-        return playingService.cancelScrap(playingId, playingApplyScrapRequestDTO);
+    private ResponseEntity<CustomAPIResponse<?>> cancelScrap(@PathVariable Long playingId, @RequestBody PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.cancelScrap(playingId, playingApplyScrapRequestDTO, userDetails);
     }
 }

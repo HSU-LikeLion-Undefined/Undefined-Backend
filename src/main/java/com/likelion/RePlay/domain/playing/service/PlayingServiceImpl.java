@@ -17,6 +17,7 @@ import com.likelion.RePlay.global.enums.IsCompleted;
 import com.likelion.RePlay.global.enums.IsRecruit;
 import com.likelion.RePlay.global.enums.State;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
+import com.likelion.RePlay.global.security.MyUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -43,10 +44,10 @@ public class PlayingServiceImpl implements PlayingService {
     private final PlayingScrapRepository playingScrapRepository;
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> writePost(PlayingWriteRequestDTO playingWriteRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> writePost(PlayingWriteRequestDTO playingWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
 
         // 게시글 작성자가 DB에 존재하는가?
-        Optional<User> findUser = userRepository.findByPhoneId(playingWriteRequestDTO.getPhoneId());
+        Optional<User> findUser = userRepository.findByPhoneId(userDetails.getPhoneId());
 
         // 없다면 오류 반환
         if (findUser.isEmpty()) {
@@ -95,10 +96,10 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> modifyPost(Long playingId, PlayingWriteRequestDTO playingWriteRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> modifyPost(Long playingId, PlayingWriteRequestDTO playingWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
 
         // 게시글 작성자가 DB에 존재하는가?
-        Optional<User> findUser = userRepository.findByPhoneId(playingWriteRequestDTO.getPhoneId());
+        Optional<User> findUser = userRepository.findByPhoneId(userDetails.getPhoneId());
         Optional<Playing> findPlaying = playingRepository.findById(playingId);
 
         Playing playing = findPlaying.get();
@@ -310,9 +311,9 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> recruitPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> recruitPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
 
-        String phoneId = playingApplyScrapRequestDTO.getPhoneId();
+        String phoneId = userDetails.getPhoneId();
 
         // 놀이터 게시글이 DB에 존재하는가?
         Optional<Playing> findPlaying = playingRepository.findById(playingId);
@@ -382,9 +383,9 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> cancelPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> cancelPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
 
-        String phoneId = playingApplyScrapRequestDTO.getPhoneId();
+        String phoneId = userDetails.getPhoneId();
 
         // 놀이터 게시글이 DB에 존재하는가?
         Optional<Playing> findPlaying = playingRepository.findById(playingId);
@@ -425,9 +426,9 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> scrapPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> scrapPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
 
-        String phoneId = playingApplyScrapRequestDTO.getPhoneId();
+        String phoneId = userDetails.getPhoneId();
 
         // 놀이터 게시글이 DB에 존재하는가?
         Optional<Playing> findPlaying = playingRepository.findById(playingId);
@@ -466,9 +467,9 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> cancelScrap(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> cancelScrap(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
 
-        String phoneId = playingApplyScrapRequestDTO.getPhoneId();
+        String phoneId = userDetails.getPhoneId();
 
         // 놀이터 게시글이 DB에 존재하는가?
         Optional<Playing> findPlaying = playingRepository.findById(playingId);

@@ -28,4 +28,5 @@ public interface PlayingService {
     ResponseEntity<CustomAPIResponse<?>> cancelScrap(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO, MyUserDetailsService.MyUserDetails userDetails);
 
 
+    ResponseEntity<CustomAPIResponse<?>> getMyPlayings(MyUserDetailsService.MyUserDetails userDetails);
 }

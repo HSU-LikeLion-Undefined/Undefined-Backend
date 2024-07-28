@@ -62,4 +62,9 @@ public class PlayingController {
     private ResponseEntity<CustomAPIResponse<?>> cancelScrap(@PathVariable Long playingId, @RequestBody PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return playingService.cancelScrap(playingId, playingApplyScrapRequestDTO, userDetails);
     }
+
+    @GetMapping("/myPlayings")
+    private ResponseEntity<CustomAPIResponse<?>> getMyPlayings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.getMyPlayings(userDetails);
+    }
 }

@@ -501,4 +501,25 @@ public class PlayingServiceImpl implements PlayingService {
         
     }
 
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getMyPlayings(MyUserDetailsService.MyUserDetails userDetails) {
+
+        String phoneId = userDetails.getPhoneId();
+
+        List<Playing> playings = playingRepository.findAllByUserPhoneId(phoneId);
+        List<PlayingListDTO.PlayingResponse> playingResponses = new ArrayList<>();
+
+        for (Playing playing : playings) {
+            playingResponses.add(PlayingListDTO.PlayingResponse.builder()
+                    .category(playing.getCategory())
+                    .title(playing.getTitle())
+                    .date(playing.getDate())
+                    .imageUrl(playing.getImageUrl())
+                    .build());
+        }
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, playingResponses, "게시글 목록을 성공적으로 불러왔습니다."));
+
+    }
+
 }

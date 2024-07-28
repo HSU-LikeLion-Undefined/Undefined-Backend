@@ -77,5 +77,9 @@ public class PlayingController {
         return playingService.completePlaying(playingId, userDetails);
     }
 
+    @GetMapping("/recruited")
+    private ResponseEntity<CustomAPIResponse<?>> recruitedPlayings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.recruitedPlayings(userDetails);
+    }
 
 }

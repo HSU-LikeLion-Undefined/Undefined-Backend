@@ -1,10 +1,8 @@
 package com.likelion.RePlay.domain.info.web.controller;
 
+import com.likelion.RePlay.domain.info.entity.Info;
 import com.likelion.RePlay.domain.info.service.InfoService;
-import com.likelion.RePlay.domain.info.web.dto.GetAllInfoResponseDto;
-import com.likelion.RePlay.domain.info.web.dto.InfoCreateDto;
-import com.likelion.RePlay.domain.info.web.dto.InfoModifyDto;
-import com.likelion.RePlay.domain.info.web.dto.InfoSubmitRequestDto;
+import com.likelion.RePlay.domain.info.web.dto.*;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService.MyUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -53,5 +51,10 @@ public class InfoController {
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
             @AuthenticationPrincipal MyUserDetails userDetails) {
         return infoService.submitInfo(infoSubmitRequest, images, userDetails);
+    }
+
+    @PostMapping("/scrapInfo")
+    public ResponseEntity<CustomAPIResponse<?>> scrapInfo(@RequestBody InfoScrapDto infoScrapDto, @AuthenticationPrincipal MyUserDetails userDetails) {
+        return infoService.scrapInfo(infoScrapDto, userDetails);
     }
 }

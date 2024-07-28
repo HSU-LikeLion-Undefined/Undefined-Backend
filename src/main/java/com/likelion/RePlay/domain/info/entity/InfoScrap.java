@@ -1,5 +1,6 @@
 package com.likelion.RePlay.domain.info.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.global.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -18,11 +19,12 @@ public class InfoScrap extends BaseEntity {
     private Long infoScrapId;
 
     @ManyToOne
+    @JsonBackReference(value="info-infoScraps")
     @JoinColumn(name = "INFO_ID")
     private Info info;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name="USER_ID")
     private User user;
-
 }

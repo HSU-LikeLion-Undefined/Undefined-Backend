@@ -1,9 +1,7 @@
 package com.likelion.RePlay.domain.info.service;
 
-import com.likelion.RePlay.domain.info.web.dto.GetAllInfoResponseDto;
-import com.likelion.RePlay.domain.info.web.dto.InfoCreateDto;
-import com.likelion.RePlay.domain.info.web.dto.InfoModifyDto;
-import com.likelion.RePlay.domain.info.web.dto.InfoSubmitRequestDto;
+import com.likelion.RePlay.domain.info.entity.Info;
+import com.likelion.RePlay.domain.info.web.dto.*;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService.MyUserDetails;
 import org.springframework.http.ResponseEntity;
@@ -17,4 +15,5 @@ public interface InfoService {
     ResponseEntity<CustomAPIResponse<GetAllInfoResponseDto.FinalResponseDto>> getAllInfo();
     ResponseEntity<CustomAPIResponse<?>> getOneInfo(Long infoId);
     ResponseEntity<CustomAPIResponse<?>> submitInfo(InfoSubmitRequestDto.InfoSubmitRequest infoSubmitRequest, List<MultipartFile> images, MyUserDetails userDetails);
+    ResponseEntity<CustomAPIResponse<?>> scrapInfo(InfoScrapDto infoScrapDto, MyUserDetails userDetails);
 }

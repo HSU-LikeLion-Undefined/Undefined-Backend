@@ -26,12 +26,14 @@ public class User extends BaseEntity {
     @Column(name = "USER_ID")
     private Long userId;
 
+    @Setter
     @Column(name = "PHONE_ID")
     private String phoneId; // 아이디
 
     @Column(name = "PASSWORD")
     private String password;
 
+    @Setter
     @Column(name = "NICKNAME")
     private String nickname;
 
@@ -41,9 +43,11 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private District district; // 구
 
+    @Setter
     @Column(name = "YEAR")
     private Long year; // 출생연도
 
+    @Setter
     @Column(name = "PROFILE_IMAGE")
     private String profileImage; // 프로필 사진
 
@@ -118,4 +122,5 @@ public class User extends BaseEntity {
     public void changeIntroduce(String introduce) {
         this.introduce = introduce;
     }
+
 }

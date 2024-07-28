@@ -31,9 +31,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/signUp", "/api/user/login",
                                 "/api/user/isExistNickName","/api/user/isExistPhoneId", "/api/user/getMyPage").permitAll()
                         .requestMatchers("/api/playing/**").permitAll()
-                        .requestMatchers("/api/info/getAllInfo").permitAll()
-                        .requestMatchers("/api/info/getOneInfo/**").permitAll()
-                        .requestMatchers("/api/info/submitInfo").authenticated()
+                        .requestMatchers("/api/info/getAllInfo", "/api/info/getOneInfo/**").permitAll()
+                        .requestMatchers("/api/user/**").authenticated()
                         .requestMatchers("/api/info/**").authenticated()
                         .requestMatchers("/api/learning/**").permitAll()
                         .anyRequest().hasAnyAuthority("ROLE_ADMIN")

@@ -1,10 +1,7 @@
 package com.likelion.RePlay.domain.user.web.controller;
 
 import com.likelion.RePlay.domain.user.service.UserServiceImpl;
-import com.likelion.RePlay.domain.user.web.dto.UserLoginDto;
-import com.likelion.RePlay.domain.user.web.dto.UserNickNameExistDto;
-import com.likelion.RePlay.domain.user.web.dto.UserPhoneExistDto;
-import com.likelion.RePlay.domain.user.web.dto.UserSignUpRequestDto;
+import com.likelion.RePlay.domain.user.web.dto.*;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
 import jakarta.validation.Valid;
@@ -12,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,5 +48,13 @@ public class UserController {
     }
 
 
+    // 사용자 정보 수정
+    @PostMapping("/modifyMyPage")
+    private ResponseEntity<CustomAPIResponse<?>> modifyMyPage(
+            @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails,
+            @RequestPart("modifyMyPageDto") ModifyMyPageDto modifyMyPageDto,
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage){
+        return userService.modifyMyPage(userDetails, modifyMyPageDto, profileImage);
+    }
 
 }

@@ -6,6 +6,7 @@ import com.likelion.RePlay.domain.user.entity.UserRole;
 import com.likelion.RePlay.domain.user.repository.RoleRepository;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
 import com.likelion.RePlay.domain.user.web.dto.*;
+import com.likelion.RePlay.global.amazon.S3.S3Service;
 import com.likelion.RePlay.global.enums.RoleName;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.JwtTokenProvider;
@@ -17,7 +18,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final S3Service s3Service;
 
     // 회원가입
     @Transactional
@@ -161,6 +165,40 @@ public class UserServiceImpl implements UserService {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), res, "사용자 정보 조회에 성공하였습니다."));
+
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> modifyMyPage(MyUserDetailsService.MyUserDetails myUserDetails, ModifyMyPageDto modifyMyPageDto, MultipartFile profileImage) {
+        Optional<User> isExistUser = userRepository.findByPhoneId(myUserDetails.getPhoneId());
+        if (isExistUser.isEmpty()) {
+            CustomAPIResponse<Object> failResponse = CustomAPIResponse
+                    .createFailWithout(HttpStatus.NOT_FOUND.value(), "존재하지 않는 회원입니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(failResponse);
+        }
+
+        User user = isExistUser.get();
+        String profileImageUrl = null;
+        if (profileImage != null && !profileImage.isEmpty()) {
+            try {
+                profileImageUrl= s3Service.uploadFile(profileImage);
+            } catch (IOException e) {
+                CustomAPIResponse<Object> failResponse = CustomAPIResponse
+                        .createFailWithout(HttpStatus.INTERNAL_SERVER_ERROR.value(), "프로필 이미지 업로드 실패");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(failResponse);
+            }
+        }
+
+        user.setNickname(modifyMyPageDto.getNickName());
+        user.setYear(modifyMyPageDto.getYear());
+        user.setPhoneId(modifyMyPageDto.getPhoneId());
+        if (profileImageUrl != null) {
+            user.setProfileImage(profileImageUrl);
+        }
+        userRepository.save(user);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), null, "사용자 정보가 수정되었습니다."));
 
     }
 }

@@ -82,4 +82,9 @@ public class PlayingController {
         return playingService.recruitedPlayings(userDetails);
     }
 
+    @GetMapping("/scrap")
+    private ResponseEntity<CustomAPIResponse<?>> scrapPlayings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.scrapPlayings(userDetails);
+    }
+
 }

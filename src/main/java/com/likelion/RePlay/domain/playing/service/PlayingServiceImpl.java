@@ -2,7 +2,6 @@ package com.likelion.RePlay.domain.playing.service;
 
 import com.likelion.RePlay.domain.playing.entity.PlayingScrap;
 import com.likelion.RePlay.domain.playing.repository.PlayingScrapRepository;
-import com.likelion.RePlay.domain.playing.web.dto.PlayingApplyScrapRequestDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingListDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
@@ -112,6 +111,12 @@ public class PlayingServiceImpl implements PlayingService {
                     .body(CustomAPIResponse.createFailWithout(403, "본인의 글만 수정할 수 있습니다."));
         }
 
+        // 현재 모집된 인원이 있다면 수정 불가
+        if (playing.getRecruitmentCount() > 0) {
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400, "모집된 인원이 있으면 게시글을 수정할 수 없습니다."));
+        }
+
         String dateStr = playingWriteRequestDTO.getDate();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy년 M월 d일 a h시 m분");
         Date date = new Date();
@@ -119,12 +124,6 @@ public class PlayingServiceImpl implements PlayingService {
             date = dateFormat.parse(dateStr);
         } catch (ParseException e) {
             e.printStackTrace();
-        }
-
-        // 총 모집 인원이 현재 모집된 인원보다 적으면 에러
-        if (playingWriteRequestDTO.getTotalCount() < playing.getRecruitmentCount()) {
-            return ResponseEntity.status(400)
-                    .body(CustomAPIResponse.createFailWithout(400, "현재 모집된 인원보다 적은 인원을 모집할 수 없습니다."));
         }
 
         user.changeIntroduce(playingWriteRequestDTO.getIntroduce());
@@ -137,14 +136,6 @@ public class PlayingServiceImpl implements PlayingService {
         playing.changeTotalCount(playingWriteRequestDTO.getTotalCount());
         playing.changeCost(Long.valueOf(playingWriteRequestDTO.getCost()));
         playing.changeCostDescription(playingWriteRequestDTO.getCostDescription());
-
-        if (playing.getRecruitmentCount() == playing.getTotalCount()) {
-            playing.changeIsRecruit(IsRecruit.FALSE);
-        }
-
-        if ((playing.getIsRecruit() == IsRecruit.FALSE) && (playing.getRecruitmentCount() < playing.getTotalCount())) {
-            playing.changeIsRecruit(IsRecruit.TRUE);
-        }
 
         return ResponseEntity.status(200)
                 .body(CustomAPIResponse.createSuccess(200, null, "게시글을 성공적으로 수정하였습니다."));
@@ -303,7 +294,7 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> recruitPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
+    public ResponseEntity<CustomAPIResponse<?>> recruitPlaying(Long playingId, MyUserDetailsService.MyUserDetails userDetails) {
 
         String phoneId = userDetails.getPhoneId();
         User user = userRepository.findByPhoneId(phoneId)
@@ -335,13 +326,16 @@ public class PlayingServiceImpl implements PlayingService {
                     .body(CustomAPIResponse.createFailWithout(400, "모집 완료된 활동입니다."));
         }
 
-        Optional<PlayingApply> findPlayingApply = playingApplyRepository.findByUserPhoneId(phoneId);
+        Optional<PlayingApply> findPlayingApply = playingApplyRepository.findByUserPhoneIdAndPlayingPlayingId(phoneId, playingId);
 
         // 신청하지 않은 활동일 경우
         // 해당 게시글 신청 정보에 해당 유저의 정보를 추가한다.
         if (findPlayingApply.isEmpty()) {
+            // 해당 게시글에 모집 인원을 추가한다.
+            playing.changeRecruitmentCount(playing.getRecruitmentCount() + 1);
+
             PlayingApply newApply = PlayingApply.builder()
-                    .playing(findPlaying.get())
+                    .playing(playing)
                     .user(user)
                     .build();
 
@@ -351,9 +345,6 @@ public class PlayingServiceImpl implements PlayingService {
             return ResponseEntity.status(400)
                     .body(CustomAPIResponse.createFailWithout(400, "이미 신청한 활동입니다."));
         }
-
-        // 해당 게시글에 모집 인원을 추가한다.
-        playing.changeRecruitmentCount(playing.getRecruitmentCount() + 1);
 
         // 모집인원이 다 찼을 경우, 모집중 -> 모집완료로 바꾼다.
         if (playing.getRecruitmentCount() == playing.getTotalCount()) {
@@ -374,7 +365,7 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> cancelPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
+    public ResponseEntity<CustomAPIResponse<?>> cancelPlaying(Long playingId, MyUserDetailsService.MyUserDetails userDetails) {
 
         String phoneId = userDetails.getPhoneId();
         User user = userRepository.findByPhoneId(phoneId)
@@ -389,7 +380,7 @@ public class PlayingServiceImpl implements PlayingService {
         Playing playing = findPlaying.get();
 
         // 존재하는 신청정보인가?
-        Optional<PlayingApply> findApply = playingApplyRepository.findByUserPhoneId(phoneId);
+        Optional<PlayingApply> findApply = playingApplyRepository.findByUserPhoneIdAndPlayingPlayingId(phoneId, playingId);
         if (findApply.isEmpty()) {
             return ResponseEntity.status(404)
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 신청 정보입니다."));
@@ -415,7 +406,7 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> scrapPlaying(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
+    public ResponseEntity<CustomAPIResponse<?>> scrapPlaying(Long playingId, MyUserDetailsService.MyUserDetails userDetails) {
 
         String phoneId = userDetails.getPhoneId();
         User user = userRepository.findByPhoneId(phoneId)
@@ -428,7 +419,7 @@ public class PlayingServiceImpl implements PlayingService {
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
         }
 
-        Optional<PlayingScrap> findPlayingScrap = playingScrapRepository.findByUserPhoneId(phoneId);
+        Optional<PlayingScrap> findPlayingScrap = playingScrapRepository.findByUserPhoneIdAndPlayingPlayingId(phoneId, playingId);
 
         // 스크랩하지 않은 활동일 경우
         // 해당 게시글 신청 정보에 해당 유저의 정보를 추가한다.
@@ -451,7 +442,7 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> cancelScrap(Long playingId, PlayingApplyScrapRequestDTO playingApplyScrapRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
+    public ResponseEntity<CustomAPIResponse<?>> cancelScrap(Long playingId, MyUserDetailsService.MyUserDetails userDetails) {
 
         String phoneId = userDetails.getPhoneId();
 
@@ -462,7 +453,7 @@ public class PlayingServiceImpl implements PlayingService {
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
         }
 
-        Optional<PlayingScrap> findPlayingScrap = playingScrapRepository.findByUserPhoneId(phoneId);
+        Optional<PlayingScrap> findPlayingScrap = playingScrapRepository.findByUserPhoneIdAndPlayingPlayingId(phoneId, playingId);
 
         // 스크랩한 않은 활동일 경우 취소한다.
         if (findPlayingScrap.isPresent()) {
@@ -497,6 +488,93 @@ public class PlayingServiceImpl implements PlayingService {
 
         return ResponseEntity.status(200)
                 .body(CustomAPIResponse.createSuccess(200, playingResponses, "게시글 목록을 성공적으로 불러왔습니다."));
+
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> deleteMyPlaying(Long playingId, MyUserDetailsService.MyUserDetails userDetails) {
+
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+
+        // 게시글 존재 여부 확인
+        Optional<Playing> findPlaying = playingRepository.findById(playingId);
+        if (findPlaying.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
+        }
+
+        Playing playing = findPlaying.get();
+
+        // 현재 유저와 게시글 작성자가 동일하지 않다면 삭제 불가
+        if (user.getPhoneId() != playing.getUser().getPhoneId()) {
+            return ResponseEntity.status(403)
+                    .body(CustomAPIResponse.createFailWithout(403, "본인만 게시글을 삭제할 수 있습니다."));
+        }
+
+        // 존재하는 게시글이라면 삭제
+        playingRepository.delete(playing);
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, null, "게시글 삭제를 성공했습니다."));
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> completePlaying(Long playingId, MyUserDetailsService.MyUserDetails userDetails) {
+
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+        
+        Optional<Playing> findPlaying = playingRepository.findById(playingId);
+        Playing playing = findPlaying.get();
+        Date date = playing.getDate();
+        Date now = new Date();
+
+        if(date.before(now)) {
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400, "활동 날짜가 되지 않았습니다.."));
+
+        }
+
+        if (user.getPhoneId() != playing.getUser().getPhoneId()) {
+            return ResponseEntity.status(403)
+                    .body(CustomAPIResponse.createFailWithout(403, "본인만 게시글을 삭제할 수 있습니다."));
+        }
+
+        playing.changeIsRecruit(IsRecruit.FALSE);
+        playing.changeIsCompleted(IsCompleted.TRUE);
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, null, "활동을 완료했습니다."));
+
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> recruitedPlayings(MyUserDetailsService.MyUserDetails userDetails) {
+
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+        Long userId = user.getUserId();
+
+        List<PlayingApply> playingApplies = playingApplyRepository.findAllByUserUserId(userId);
+        List<PlayingListDTO.PlayingResponse> playingResponses = new ArrayList<>();
+
+        for (int i = 0; i <playingApplies.size(); i++) {
+            Playing playing = playingApplies.get(i).getPlaying();
+
+            playingResponses.add(PlayingListDTO.PlayingResponse.builder()
+                    .category(playing.getCategory())
+                    .title(playing.getTitle())
+                    .date(playing.getDate())
+                    .imageUrl(playing.getImageUrl())
+                    .build());
+        }
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, playingResponses, "신청한 게시글 목록을 성공적으로 불러왔습니다."));
 
     }
 

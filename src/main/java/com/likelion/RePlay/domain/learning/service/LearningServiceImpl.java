@@ -6,7 +6,6 @@ import com.likelion.RePlay.domain.learning.entity.LearningScrap;
 import com.likelion.RePlay.domain.learning.repository.LearningApplyRepository;
 import com.likelion.RePlay.domain.learning.repository.LearningRepository;
 import com.likelion.RePlay.domain.learning.repository.LearningScrapRepository;
-import com.likelion.RePlay.domain.learning.web.dto.LearningApplyScrapRequestDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningListDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
@@ -281,27 +280,27 @@ public class LearningServiceImpl implements LearningService{
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> recruitLearning(Long learningId, LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> recruitLearning(Long learningId, MyUserDetailsService.MyUserDetails userDetails) {
 
-        String phoneId = learningApplyScrapRequestDTO.getPhoneId();
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
 
         Optional<Learning> findLearning = learningRepository.findById(learningId);
-        Optional<User> findUser = userRepository.findByPhoneId(phoneId);
 
         if (findLearning.isEmpty()) {
             return ResponseEntity.status(404)
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
-        } else if (findUser.isEmpty()) {
-            return ResponseEntity.status(404)
-                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 유저입니다."));
         }
 
-        if (findLearning.get().getUser() == findUser.get()) {
+        Learning learning = findLearning.get();
+
+        if (learning.getUser().getPhoneId().equals(phoneId)) {
             return ResponseEntity.status(400)
                     .body(CustomAPIResponse.createFailWithout(400, "내가 올린 게시글에 참가할 수 없습니다."));
         }
 
-        if (findLearning.get().getIsRecruit() ==IsRecruit.FALSE) {
+        if (learning.getIsRecruit() == IsRecruit.FALSE) {
             return ResponseEntity.status(400)
                     .body(CustomAPIResponse.createFailWithout(400, "인원이 마감되었습니다."));
         } else if (findLearning.get().getIsCompleted() == IsCompleted.TRUE) {
@@ -309,12 +308,14 @@ public class LearningServiceImpl implements LearningService{
                     .body(CustomAPIResponse.createFailWithout(400, "모집 완료된 활동입니다."));
         }
 
-        Optional<LearningApply> findLearningApply = learningApplyRepository.findByUserPhoneId(phoneId);
+        Optional<LearningApply> findLearningApply = learningApplyRepository.findByUserPhoneIdAndLearningLearningId(phoneId, learningId);
 
         if (findLearningApply.isEmpty()) {
+            learning.changeRecruitmentCount(learning.getRecruitmentCount() + 1);
+
             LearningApply newApply = LearningApply.builder()
                     .learning(findLearning.get())
-                    .user(findUser.get())
+                    .user(user)
                     .build();
 
             learningApplyRepository.save(newApply);
@@ -323,10 +324,9 @@ public class LearningServiceImpl implements LearningService{
                     .body(CustomAPIResponse.createFailWithout(400, "이미 신청한 활동입니다."));
         }
 
-        findLearning.get().changeRecruitmentCount(findLearning.get().getRecruitmentCount() + 1);
 
-        if (findLearning.get().getRecruitmentCount() == findLearning.get().getTotalCount()) {
-            findLearning.get().changeIsRecruit(IsRecruit.FALSE);
+        if (learning.getRecruitmentCount() == learning.getTotalCount()) {
+            learning.changeIsRecruit(IsRecruit.FALSE);
         }
 
         LearningListDTO.LearningResponse learningResponse = LearningListDTO.LearningResponse.builder()
@@ -342,41 +342,39 @@ public class LearningServiceImpl implements LearningService{
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> cancelLearning(Long learningId, LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> cancelLearning(Long learningId, MyUserDetailsService.MyUserDetails userDetails) {
 
-        String phoneId = learningApplyScrapRequestDTO.getPhoneId();
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
 
         // 놀이터 게시글이 DB에 존재하는가?
         Optional<Learning> findLearning = learningRepository.findById(learningId);
-        // 존재하는 사용자인가?
-        Optional<User> findUser = userRepository.findByPhoneId(phoneId);
-        // 존재하는 신청정보인가?
-        Optional<LearningApply> findApply = learningApplyRepository.findByUserPhoneId(phoneId);
-
-        // 존재하지 않는다면 오류 반환
         if (findLearning.isEmpty()) {
             return ResponseEntity.status(404)
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
-        } else if (findUser.isEmpty()) {
-            return ResponseEntity.status(404)
-                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 유저입니다."));
-        } else if (findApply.isEmpty()) {
+        }
+        Learning learning = findLearning.get();
+
+        // 존재하는 신청정보인가?
+        Optional<LearningApply> findApply = learningApplyRepository.findByUserPhoneIdAndLearningLearningId(phoneId, learningId);
+        if (findApply.isEmpty()) {
             return ResponseEntity.status(404)
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 신청 정보입니다."));
         }
 
         // 게시글 작성자와 현재 작성자가 같다면 참가 취소 불가
-        if (findLearning.get().getUser() == findUser.get()) {
+        if (learning.getUser().getPhoneId().equals(phoneId)) {
             return ResponseEntity.status(400)
                     .body(CustomAPIResponse.createFailWithout(400, "내가 올린 게시글에 참가 취소할 수 없습니다."));
         }
 
         // 해당 참가자의 참가를 취소하고, 해당 게시글의 인원을 한 명 줄인다.
         // 만약 정원이 다 찬 경우에서 취소한다면, 모집 완료를 모집 중으로 바꾼다.
-        if (findLearning.get().getIsRecruit() == IsRecruit.FALSE) {
-            findLearning.get().changeIsRecruit(IsRecruit.TRUE);
+        if (learning.getIsRecruit() == IsRecruit.FALSE) {
+            learning.changeIsRecruit(IsRecruit.TRUE);
         }
-        findLearning.get().changeRecruitmentCount(findLearning.get().getRecruitmentCount() - 1);
+        learning.changeRecruitmentCount(learning.getRecruitmentCount() - 1);
 
         learningApplyRepository.delete(findApply.get());
 
@@ -386,30 +384,28 @@ public class LearningServiceImpl implements LearningService{
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> scrapLearning(Long learningId, LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> scrapLearning(Long learningId, MyUserDetailsService.MyUserDetails userDetails) {
 
-        String phoneId = learningApplyScrapRequestDTO.getPhoneId();
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
 
         Optional<Learning> findLearning = learningRepository.findById(learningId);
-        Optional<User> findUser = userRepository.findByPhoneId(phoneId);
-
         if (findLearning.isEmpty()) {
             return ResponseEntity.status(404)
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
-        } else if (findUser.isEmpty()) {
-            return ResponseEntity.status(404)
-                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 유저입니다."));
         }
 
-        Optional<LearningScrap> findLearningScrap = learningScrapRepository.findByUserPhoneId(phoneId);
+        Optional<LearningScrap> findLearningScrap = learningScrapRepository.findByUserPhoneIdAndLearningLearningId(phoneId, learningId);
 
         if (findLearningScrap.isEmpty()) {
             LearningScrap newScrap = LearningScrap.builder()
                     .learning(findLearning.get())
-                    .user(findUser.get())
+                    .user(user)
                     .build();
 
             learningScrapRepository.save(newScrap);
+
             return ResponseEntity.status(200)
                     .body(CustomAPIResponse.createSuccess(200, null, "스크랩되었습니다."));
         }else {
@@ -420,25 +416,21 @@ public class LearningServiceImpl implements LearningService{
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> cancelScrap(Long learningId, LearningApplyScrapRequestDTO learningApplyScrapRequestDTO) {
+    public ResponseEntity<CustomAPIResponse<?>> cancelScrap(Long learningId, MyUserDetailsService.MyUserDetails userDetails) {
 
-        String phoneId = learningApplyScrapRequestDTO.getPhoneId();
+        String phoneId = userDetails.getPhoneId();
 
         Optional<Learning> findLearning = learningRepository.findById(learningId);
-        Optional<User> findUser = userRepository.findByPhoneId(phoneId);
-
         if (findLearning.isEmpty()) {
             return ResponseEntity.status(404)
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
-        } else if (findUser.isEmpty()) {
-            return ResponseEntity.status(404)
-                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 유저입니다."));
         }
 
-        Optional<LearningScrap> findLearningScrap = learningScrapRepository.findByUserPhoneId(phoneId);
+        Optional<LearningScrap> findLearningScrap = learningScrapRepository.findByUserPhoneIdAndLearningLearningId(phoneId, learningId);
 
         if (findLearningScrap.isPresent()) {
             learningScrapRepository.delete(findLearningScrap.get());
+
             return ResponseEntity.status(200)
                     .body(CustomAPIResponse.createSuccess(200, null, "스크랩이 취소되었습니다."));
         }else {
@@ -446,6 +438,33 @@ public class LearningServiceImpl implements LearningService{
             return ResponseEntity.status(400)
                     .body(CustomAPIResponse.createFailWithout(400,  "스크랩하지 않은 게시글입니다."));
         }
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> recruitedLearnings(MyUserDetailsService.MyUserDetails userDetails) {
+
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+        Long userId = user.getUserId();
+
+        List<LearningApply> learningApplies = learningApplyRepository.findAllByUserUserId(userId);
+        List<LearningListDTO.LearningResponse> learningResponses = new ArrayList<>();
+
+        for (int i = 0; i < learningApplies.size(); i++) {
+            Learning learning = learningApplies.get(i).getLearning();
+
+            learningResponses.add(LearningListDTO.LearningResponse.builder()
+                    .category(learning.getCategory())
+                    .title(learning.getTitle())
+                    .date(learning.getDate())
+                    .imageUrl(learning.getImageUrl())
+                    .build());
+        }
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, learningResponses, "신청한 게시글 목록을 성공적으로 불러왔습니다."));
+
     }
 
 

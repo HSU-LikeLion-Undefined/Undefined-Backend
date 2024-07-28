@@ -30,11 +30,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/user/signUp", "/api/user/login",
                                 "/api/user/isExistNickName","/api/user/isExistPhoneId", "/api/user/getMyPage").permitAll()
-                        .requestMatchers("/api/playing/**").permitAll()
+            
+                        .requestMatchers("/api/playing/getPlayings/**").permitAll()
                         .requestMatchers("/api/info/getAllInfo", "/api/info/getOneInfo/**").permitAll()
                         .requestMatchers("/api/user/**").authenticated()
+                        .requestMatchers("/api/playing/**").authenticated()
+                        .requestMatchers("/api/info/submitInfo").authenticated()
                         .requestMatchers("/api/info/**").authenticated()
-                        .requestMatchers("/api/learning/**").permitAll()
+                        .requestMatchers(("/api/learning/getLearning/**")).permitAll()
+                        .requestMatchers("/api/learning/**").authenticated()
                         .anyRequest().hasAnyAuthority("ROLE_ADMIN")
                 )
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)

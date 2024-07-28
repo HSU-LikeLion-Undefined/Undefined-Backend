@@ -46,6 +46,10 @@ public class Info extends BaseEntity {
     @Builder.Default
     private List<InfoImage> images=new ArrayList<>();
 
+    @OneToMany(mappedBy = "info", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value="info-infoScraps")
+    private List<InfoScrap> infoScraps=new ArrayList<>();
+
     public void addImage(InfoImage infoImage) {
         images.add(infoImage);
         infoImage.setInfo(this);
@@ -55,6 +59,4 @@ public class Info extends BaseEntity {
         images.remove(infoImage);
         infoImage.setInfo(null);
     }
-
-
 }

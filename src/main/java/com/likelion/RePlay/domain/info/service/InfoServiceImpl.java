@@ -1,7 +1,9 @@
 package com.likelion.RePlay.domain.info.service;
 
 import com.likelion.RePlay.domain.info.entity.Info;
+import com.likelion.RePlay.domain.info.entity.InfoScrap;
 import com.likelion.RePlay.domain.info.repository.InfoRepository;
+import com.likelion.RePlay.domain.info.repository.InfoScrapRepository;
 import com.likelion.RePlay.domain.info.web.dto.*;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
@@ -32,6 +34,7 @@ public class InfoServiceImpl implements InfoService {
     private final InfoRepository infoRepository;
     private final UserRepository userRepository;
     private final InfoImageService infoImageService;
+    private final InfoScrapRepository infoScrapRepository;
 
     @Autowired
     private MailService mailService;
@@ -178,6 +181,58 @@ public class InfoServiceImpl implements InfoService {
             CustomAPIResponse<Object> failResponse = CustomAPIResponse
                     .createFailWithout(HttpStatus.INTERNAL_SERVER_ERROR.value(), "알 수 없는 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(failResponse);
+        }
+    }
+
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> scrapInfo(InfoScrapDto infoScrapDto, MyUserDetails userDetails) {
+        // Null 체크 추가
+        if (userDetails == null || userDetails.getUser() == null) {
+            CustomAPIResponse<Object> failResponse = CustomAPIResponse
+                    .createFailWithout(HttpStatus.NOT_FOUND.value(), "유효하지 않은 사용자 정보입니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(failResponse);
+        }
+
+        // 사용자 확인
+        Optional<User> isUser = userRepository.findByPhoneId(userDetails.getPhoneId());
+        if (isUser.isEmpty()) {
+            CustomAPIResponse<Object> failResponse = CustomAPIResponse
+                    .createFailWithout(HttpStatus.NOT_FOUND.value(), "해당 사용자를 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(failResponse);
+        }
+
+        // 정보글 확인
+        Optional<Info> optionalInfo = infoRepository.findById(infoScrapDto.getInfoId());
+        if (optionalInfo.isEmpty()) {
+            CustomAPIResponse<Object> failResponse = CustomAPIResponse
+                    .createFailWithout(HttpStatus.NOT_FOUND.value(), "존재하지 않는 정보글입니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(failResponse);
+        }
+
+        Info info = optionalInfo.get();
+
+        // 스크랩 확인
+        Optional<InfoScrap> optionalInfoScrap = infoScrapRepository.findByUserAndInfo(isUser.get(), info);
+        if (optionalInfoScrap.isEmpty()) {
+            // 스크랩되지 않은 게시물이라면
+            InfoScrap newInfoScrap = InfoScrap.builder()
+                    .info(info)
+                    .user(isUser.get())
+                    .build();
+            infoScrapRepository.save(newInfoScrap);
+            InfoScrapDto dto = InfoScrapDto.builder()
+                    .infoId(newInfoScrap.getInfo().getInfoId())
+                    .build();
+            CustomAPIResponse<Object> successResponse = CustomAPIResponse
+                    .createSuccess(HttpStatus.OK.value(), dto, "스크랩 되었습니다.");
+            return ResponseEntity.status(HttpStatus.OK).body(successResponse);
+        } else {
+            // 스크랩된 게시물이라면
+            infoScrapRepository.delete(optionalInfoScrap.get());
+            CustomAPIResponse<Object> successResponse = CustomAPIResponse
+                    .createSuccess(HttpStatus.OK.value(), null, "스크랩 해제 되었습니다.");
+            return ResponseEntity.status(HttpStatus.OK).body(successResponse);
         }
     }
 }

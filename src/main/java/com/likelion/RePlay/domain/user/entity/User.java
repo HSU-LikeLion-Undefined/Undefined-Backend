@@ -1,7 +1,7 @@
 package com.likelion.RePlay.domain.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.likelion.RePlay.domain.info.entity.InfoSubmit;
+import com.likelion.RePlay.domain.info.entity.InfoScrap;
 import com.likelion.RePlay.domain.learning.entity.*;
 import com.likelion.RePlay.domain.playing.entity.*;
 import com.likelion.RePlay.global.enums.District;
@@ -81,11 +81,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     @Builder.Default
-    private List<InfoSubmit> infoSubmits = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    @Builder.Default
     private List<Learning> learnings = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -107,6 +102,11 @@ public class User extends BaseEntity {
     @JsonManagedReference
     @Builder.Default
     private List<LearningApply> learningApplies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @Builder.Default
+    private List<InfoScrap> infoScraps = new ArrayList<>();
 
     public void addRole(Role role) {
         UserRole userRole = new UserRole(this, role);

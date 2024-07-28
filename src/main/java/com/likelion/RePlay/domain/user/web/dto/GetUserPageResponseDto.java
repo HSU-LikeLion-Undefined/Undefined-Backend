@@ -12,5 +12,5 @@ import lombok.Setter;
 public class GetUserPageResponseDto {
     String phoneId;
     String nickName;
-    String year;
+    Long year;
 }

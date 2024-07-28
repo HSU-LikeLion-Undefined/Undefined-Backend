@@ -12,6 +12,7 @@ import com.likelion.RePlay.global.security.JwtTokenProvider;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.property.access.spi.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -145,6 +146,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<CustomAPIResponse<?>> getMyPage(MyUserDetailsService.MyUserDetails myUserDetails) {
-        return null;
+        Optional<User> isExistUser = userRepository.findByPhoneId(myUserDetails.getPhoneId());
+        if (isExistUser.isEmpty()) {
+            CustomAPIResponse<Object> failResponse = CustomAPIResponse
+                    .createFailWithout(HttpStatus.NOT_FOUND.value(), "존재하지 않는 회원입니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(failResponse);
+        }
+        String phoneId = myUserDetails.getPhoneId();
+        String nickName=myUserDetails.getUsername();
+        Long year=myUserDetails.getYear();
+
+        GetUserPageResponseDto res=new GetUserPageResponseDto(phoneId, nickName, year);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), res, "사용자 정보 조회에 성공하였습니다."));
+
     }
 }

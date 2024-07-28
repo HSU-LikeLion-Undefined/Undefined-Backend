@@ -96,5 +96,9 @@ public class MyUserDetailsService implements UserDetailsService {
         public boolean isEnabled() {
             return true;
         }
+
+        public Long getYear() {
+            return user.getYear();
+        }
     }
 }

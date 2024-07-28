@@ -6,9 +6,11 @@ import com.likelion.RePlay.domain.user.web.dto.UserNickNameExistDto;
 import com.likelion.RePlay.domain.user.web.dto.UserPhoneExistDto;
 import com.likelion.RePlay.domain.user.web.dto.UserSignUpRequestDto;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
+import com.likelion.RePlay.global.security.MyUserDetailsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,4 +45,11 @@ public class UserController {
     private ResponseEntity<CustomAPIResponse<?>> login(@RequestBody @Valid UserLoginDto userLoginDto) {
         return userService.login(userLoginDto);
     }
+
+    // 사용자 정보 조회
+    @PostMapping("/getMyPage")
+    private ResponseEntity<CustomAPIResponse<?>> getMyPage(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails){
+        return userService.getMyPage(userDetails);
+    }
+
 }

@@ -440,7 +440,32 @@ public class LearningServiceImpl implements LearningService{
         }
     }
 
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> recruitedLearnings(MyUserDetailsService.MyUserDetails userDetails) {
 
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+        Long userId = user.getUserId();
+
+        List<LearningApply> learningApplies = learningApplyRepository.findAllByUserUserId(userId);
+        List<LearningListDTO.LearningResponse> learningResponses = new ArrayList<>();
+
+        for (int i = 0; i < learningApplies.size(); i++) {
+            Learning learning = learningApplies.get(i).getLearning();
+
+            learningResponses.add(LearningListDTO.LearningResponse.builder()
+                    .category(learning.getCategory())
+                    .title(learning.getTitle())
+                    .date(learning.getDate())
+                    .imageUrl(learning.getImageUrl())
+                    .build());
+        }
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, learningResponses, "신청한 게시글 목록을 성공적으로 불러왔습니다."));
+
+    }
 
 
 }

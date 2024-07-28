@@ -1,5 +1,6 @@
 package com.likelion.RePlay.domain.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.likelion.RePlay.domain.info.entity.InfoScrap;
 import com.likelion.RePlay.domain.learning.entity.*;
@@ -25,12 +26,14 @@ public class User extends BaseEntity {
     @Column(name = "USER_ID")
     private Long userId;
 
+    @Setter
     @Column(name = "PHONE_ID")
     private String phoneId; // 아이디
 
     @Column(name = "PASSWORD")
     private String password;
 
+    @Setter
     @Column(name = "NICKNAME")
     private String nickname;
 
@@ -40,12 +43,15 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private District district; // 구
 
+    @Setter
     @Column(name = "YEAR")
     private Long year; // 출생연도
 
+    @Setter
     @Column(name = "PROFILE_IMAGE")
     private String profileImage; // 프로필 사진
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Builder.Default
     private List<UserRole> userRoles = new ArrayList<>();
@@ -116,4 +122,5 @@ public class User extends BaseEntity {
     public void changeIntroduce(String introduce) {
         this.introduce = introduce;
     }
+
 }

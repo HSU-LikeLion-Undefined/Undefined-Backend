@@ -43,15 +43,14 @@ public class JwtTokenProvider {
         key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKey));
     }
 
-    public String createToken(String username, List<Role> roles) {
-        Claims claims = Jwts.claims().setSubject(username);
+    public String createToken(String phoneId, List<Role> roles) {
+        Claims claims = Jwts.claims().setSubject(phoneId);
         claims.put("auth", roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
                 .collect(Collectors.toList()));
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
-
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)

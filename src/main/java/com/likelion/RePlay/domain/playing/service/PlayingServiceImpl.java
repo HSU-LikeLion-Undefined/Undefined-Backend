@@ -111,6 +111,12 @@ public class PlayingServiceImpl implements PlayingService {
                     .body(CustomAPIResponse.createFailWithout(403, "본인의 글만 수정할 수 있습니다."));
         }
 
+        // 현재 모집된 인원이 있다면 수정 불가
+        if (playing.getRecruitmentCount() > 0) {
+            return ResponseEntity.status(400)
+                    .body(CustomAPIResponse.createFailWithout(400, "모집된 인원이 있으면 게시글을 수정할 수 없습니다."));
+        }
+
         String dateStr = playingWriteRequestDTO.getDate();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy년 M월 d일 a h시 m분");
         Date date = new Date();
@@ -118,12 +124,6 @@ public class PlayingServiceImpl implements PlayingService {
             date = dateFormat.parse(dateStr);
         } catch (ParseException e) {
             e.printStackTrace();
-        }
-
-        // 총 모집 인원이 현재 모집된 인원보다 적으면 에러
-        if (playingWriteRequestDTO.getTotalCount() < playing.getRecruitmentCount()) {
-            return ResponseEntity.status(400)
-                    .body(CustomAPIResponse.createFailWithout(400, "현재 모집된 인원보다 적은 인원을 모집할 수 없습니다."));
         }
 
         user.changeIntroduce(playingWriteRequestDTO.getIntroduce());
@@ -136,14 +136,6 @@ public class PlayingServiceImpl implements PlayingService {
         playing.changeTotalCount(playingWriteRequestDTO.getTotalCount());
         playing.changeCost(Long.valueOf(playingWriteRequestDTO.getCost()));
         playing.changeCostDescription(playingWriteRequestDTO.getCostDescription());
-
-        if (playing.getRecruitmentCount() == playing.getTotalCount()) {
-            playing.changeIsRecruit(IsRecruit.FALSE);
-        }
-
-        if ((playing.getIsRecruit() == IsRecruit.FALSE) && (playing.getRecruitmentCount() < playing.getTotalCount())) {
-            playing.changeIsRecruit(IsRecruit.TRUE);
-        }
 
         return ResponseEntity.status(200)
                 .body(CustomAPIResponse.createSuccess(200, null, "게시글을 성공적으로 수정하였습니다."));
@@ -339,8 +331,11 @@ public class PlayingServiceImpl implements PlayingService {
         // 신청하지 않은 활동일 경우
         // 해당 게시글 신청 정보에 해당 유저의 정보를 추가한다.
         if (findPlayingApply.isEmpty()) {
+            // 해당 게시글에 모집 인원을 추가한다.
+            playing.changeRecruitmentCount(playing.getRecruitmentCount() + 1);
+
             PlayingApply newApply = PlayingApply.builder()
-                    .playing(findPlaying.get())
+                    .playing(playing)
                     .user(user)
                     .build();
 
@@ -350,9 +345,6 @@ public class PlayingServiceImpl implements PlayingService {
             return ResponseEntity.status(400)
                     .body(CustomAPIResponse.createFailWithout(400, "이미 신청한 활동입니다."));
         }
-
-        // 해당 게시글에 모집 인원을 추가한다.
-        playing.changeRecruitmentCount(playing.getRecruitmentCount() + 1);
 
         // 모집인원이 다 찼을 경우, 모집중 -> 모집완료로 바꾼다.
         if (playing.getRecruitmentCount() == playing.getTotalCount()) {

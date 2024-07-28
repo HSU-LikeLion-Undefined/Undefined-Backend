@@ -66,4 +66,9 @@ public class PlayingController {
     private ResponseEntity<CustomAPIResponse<?>> getMyPlayings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return playingService.getMyPlayings(userDetails);
     }
+
+    @DeleteMapping("/myPlayings/{playingId}")
+    private ResponseEntity<CustomAPIResponse<?>> deleteMyPlaying(@PathVariable Long playingId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.deleteMyPlaying(playingId, userDetails);
+    }
 }

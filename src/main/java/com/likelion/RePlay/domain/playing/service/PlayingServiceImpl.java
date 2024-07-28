@@ -499,4 +499,33 @@ public class PlayingServiceImpl implements PlayingService {
 
     }
 
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> deleteMyPlaying(Long playingId, MyUserDetailsService.MyUserDetails userDetails) {
+
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+
+        // 게시글 존재 여부 확인
+        Optional<Playing> findPlaying = playingRepository.findById(playingId);
+        if (findPlaying.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
+        }
+
+        Playing playing = findPlaying.get();
+
+        // 현재 유저와 게시글 작성자가 동일하지 않다면 삭제 불가
+        if (user.getPhoneId() != playing.getUser().getPhoneId()) {
+            return ResponseEntity.status(403)
+                    .body(CustomAPIResponse.createFailWithout(403, "본인만 게시글을 삭제할 수 있습니다."));
+        }
+
+        // 존재하는 게시글이라면 삭제
+        playingRepository.delete(playing);
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, null, "게시글 삭제를 성공했습니다."));
+    }
+
 }

@@ -4,7 +4,6 @@ import com.likelion.RePlay.domain.learning.service.LearningService;
 import com.likelion.RePlay.domain.learning.web.dto.LearningApplyScrapRequestDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
-import com.likelion.RePlay.domain.playing.web.dto.PlayingApplyScrapRequestDTO;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -31,12 +30,12 @@ public class LearningController {
         return learningService.modifyPost(learningId, learningWriteRequestDTO, userDetails);
     }
 
-    @GetMapping("/")
+    @GetMapping("/getLearnings")
     private ResponseEntity<CustomAPIResponse<?>> getAllPosts() {
         return learningService.getAllPosts();
     }
 
-    @GetMapping("/{learningId}")
+    @GetMapping("/getLearnings/{learningId}")
     private ResponseEntity<CustomAPIResponse<?>> getPost(@PathVariable Long learningId) {
         return learningService.getPost(learningId);
     }

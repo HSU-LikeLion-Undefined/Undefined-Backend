@@ -189,6 +189,29 @@ public class UserServiceImpl implements UserService {
             }
         }
 
+        // 원래 사용하던 전화번호가 아니라면
+        if(!(myUserDetails.getPhoneId().equals(modifyMyPageDto.getPhoneId()))){
+            String phoneId = modifyMyPageDto.getPhoneId();
+            //중복 검사
+            Optional<User> isExistPhone = userRepository.findByPhoneId(phoneId);
+            if (isExistPhone.isPresent()) {
+                CustomAPIResponse<Object> failResponse = CustomAPIResponse
+                        .createFailWithout(HttpStatus.BAD_REQUEST.value(), "이미 사용 중인 번호입니다.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(failResponse);
+            }
+        }
+
+        // 원래 사용하던 닉네임이 아니라면
+        if(!(myUserDetails.getUsername().equals(modifyMyPageDto.getNickName()))){
+            String nickName = modifyMyPageDto.getNickName();
+            Optional<User> isExistNickName = userRepository.findByNickname(nickName);
+            if (isExistNickName.isPresent()) {
+                CustomAPIResponse<Object> failResponse=CustomAPIResponse
+                        .createFailWithout(HttpStatus.BAD_REQUEST.value(), "이미 사용 중인 닉네임입니다.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(failResponse);
+            }
+        }
+
         user.setNickname(modifyMyPageDto.getNickName());
         user.setYear(modifyMyPageDto.getYear());
         user.setPhoneId(modifyMyPageDto.getPhoneId());
@@ -197,8 +220,15 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.save(user);
 
+        String newToken = null;
+        if(!(myUserDetails.getPhoneId().equals(modifyMyPageDto.getPhoneId()))){
+            newToken = jwtTokenProvider.createToken(user.getPhoneId(), user.getUserRoles().stream()
+                    .map(UserRole::getRole)
+                    .collect(Collectors.toList()));
+        }
+
         return ResponseEntity.status(HttpStatus.OK)
-                .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), null, "사용자 정보가 수정되었습니다."));
+                .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), newToken, "사용자 정보가 수정되었습니다."));
 
     }
 }

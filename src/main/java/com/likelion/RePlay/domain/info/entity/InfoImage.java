@@ -40,4 +40,5 @@ public class InfoImage extends BaseEntity {
     public String getImageUrl() {
         return imageUrl;
     }
+
 }

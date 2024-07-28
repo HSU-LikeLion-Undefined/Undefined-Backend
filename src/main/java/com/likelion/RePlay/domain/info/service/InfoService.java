@@ -16,4 +16,7 @@ public interface InfoService {
     ResponseEntity<CustomAPIResponse<?>> getOneInfo(Long infoId);
     ResponseEntity<CustomAPIResponse<?>> submitInfo(InfoSubmitRequestDto.InfoSubmitRequest infoSubmitRequest, List<MultipartFile> images, MyUserDetails userDetails);
     ResponseEntity<CustomAPIResponse<?>> scrapInfo(InfoScrapDto infoScrapDto, MyUserDetails userDetails);
+
+    // 내가 스크랩한 정보글 조회
+    ResponseEntity<CustomAPIResponse<?>> getMyScrapInfo(MyUserDetails userDetails);
 }

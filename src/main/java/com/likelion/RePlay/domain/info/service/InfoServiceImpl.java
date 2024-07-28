@@ -1,6 +1,7 @@
 package com.likelion.RePlay.domain.info.service;
 
 import com.likelion.RePlay.domain.info.entity.Info;
+import com.likelion.RePlay.domain.info.entity.InfoImage;
 import com.likelion.RePlay.domain.info.entity.InfoScrap;
 import com.likelion.RePlay.domain.info.repository.InfoRepository;
 import com.likelion.RePlay.domain.info.repository.InfoScrapRepository;
@@ -17,12 +18,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -234,5 +234,32 @@ public class InfoServiceImpl implements InfoService {
                     .createSuccess(HttpStatus.OK.value(), null, "스크랩 해제 되었습니다.");
             return ResponseEntity.status(HttpStatus.OK).body(successResponse);
         }
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getMyScrapInfo(MyUserDetails userDetails) {
+        Long userId = userDetails.getUser().getUserId();
+        List<InfoScrap> infoScrapList = infoScrapRepository.findByUser(userDetails.getUser());
+        List<GetAllMyScrapInfo.GetInfo> infoScrapDto = infoScrapList.stream()
+                .map(scrap -> GetAllMyScrapInfo.GetInfo.builder()
+                        .infoId(scrap.getInfo().getInfoId())
+                        .title(scrap.getInfo().getTitle())
+                        .content(scrap.getInfo().getContent())
+                        .writer(scrap.getInfo().getWriter())
+                        .infoNum(scrap.getInfo().getInfoNum())
+                        .thumbnailUrl(scrap.getInfo().getImages().stream()
+                                .map(InfoImage::getImageUrl)
+                                .collect(Collectors.toList()))
+                        .createdAt(LocalDate.from(scrap.getInfo().getCreatedAt()))
+                        .build())
+                .collect(Collectors.toList());
+
+        GetAllMyScrapInfo.FinalResponseDto res = GetAllMyScrapInfo.FinalResponseDto.builder()
+                .infoScraps(infoScrapDto)
+                .build();
+
+        CustomAPIResponse<Object> successResponse = CustomAPIResponse
+                .createSuccess(HttpStatus.OK.value(), res, "스크랩한 게시글 정보 조회 성공");
+        return ResponseEntity.status(HttpStatus.OK).body(successResponse);
     }
 }

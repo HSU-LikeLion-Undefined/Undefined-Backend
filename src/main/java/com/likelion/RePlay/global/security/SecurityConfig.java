@@ -28,7 +28,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/user/signUp", "/api/user/login").permitAll()
+                        .requestMatchers("/api/user/signUp", "/api/user/login",
+                                "/api/user/isExistNickName","/api/user/isExistPhoneId").permitAll()
                         .requestMatchers("/api/playing/**").permitAll()
                         .requestMatchers("/api/info/getAllInfo").permitAll()
                         .requestMatchers("/api/info/getOneInfo/**").permitAll()

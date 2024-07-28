@@ -5,9 +5,7 @@ import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.entity.UserRole;
 import com.likelion.RePlay.domain.user.repository.RoleRepository;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
-import com.likelion.RePlay.domain.user.web.dto.UserLoginDto;
-import com.likelion.RePlay.domain.user.web.dto.UserSignUpRequestDto;
-import com.likelion.RePlay.domain.user.web.dto.UserSignUpResponseDto;
+import com.likelion.RePlay.domain.user.web.dto.*;
 import com.likelion.RePlay.global.enums.RoleName;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.JwtTokenProvider;
@@ -81,30 +79,34 @@ public class UserServiceImpl implements UserService {
 
     // 전화번호 중복 확인
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> isExistPhoneId(String phoneId) {
-        Optional<User> user = userRepository.findByPhoneId(phoneId);
+    public ResponseEntity<CustomAPIResponse<?>> isExistPhoneId(UserPhoneExistDto userPhoneExistDto) {
+        Optional<User> user = userRepository.findByPhoneId(userPhoneExistDto.getPhoneId());
 
         if (user.isPresent()) {
             CustomAPIResponse<Object> failResponse = CustomAPIResponse
                     .createFailWithout(HttpStatus.BAD_REQUEST.value(), "이미 사용 중인 번호입니다.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(failResponse);
         }
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), null, "사용할 수 있는 번호입니다."));
+        else {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), null, "사용할 수 있는 번호입니다."));
+        }
     }
 
     // 닉네임 중복 확인
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> isExistNickName(String nickName) {
-        Optional<User> user=userRepository.findByNickname(nickName);
+    public ResponseEntity<CustomAPIResponse<?>> isExistNickName(UserNickNameExistDto userNickNameExistDto) {
+        Optional<User> user=userRepository.findByNickname(userNickNameExistDto.getNickName());
         if (user.isPresent()) {
             CustomAPIResponse<Object> failResponse = CustomAPIResponse
                     .createFailWithout(HttpStatus.BAD_REQUEST.value(), "이미 사용 중인 닉네임입니다.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(failResponse);
 
         }
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), null, "사용할 수 있는 닉네임입니다."));
+        else {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), null, "사용할 수 있는 닉네임입니다."));
+        }
 
     }
 

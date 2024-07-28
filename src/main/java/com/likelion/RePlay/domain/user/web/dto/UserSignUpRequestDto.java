@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UserSignUpDto {
+public class UserSignUpRequestDto {
     @NotEmpty(message = "전화번호가 필요합니다.")
     private String phoneId;
 

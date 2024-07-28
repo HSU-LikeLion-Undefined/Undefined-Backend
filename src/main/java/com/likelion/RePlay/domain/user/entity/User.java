@@ -1,5 +1,6 @@
 package com.likelion.RePlay.domain.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.likelion.RePlay.domain.info.entity.InfoScrap;
 import com.likelion.RePlay.domain.learning.entity.*;
@@ -46,6 +47,7 @@ public class User extends BaseEntity {
     @Column(name = "PROFILE_IMAGE")
     private String profileImage; // 프로필 사진
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Builder.Default
     private List<UserRole> userRoles = new ArrayList<>();

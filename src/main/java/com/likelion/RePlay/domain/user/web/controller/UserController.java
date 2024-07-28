@@ -2,7 +2,7 @@ package com.likelion.RePlay.domain.user.web.controller;
 
 import com.likelion.RePlay.domain.user.service.UserServiceImpl;
 import com.likelion.RePlay.domain.user.web.dto.UserLoginDto;
-import com.likelion.RePlay.domain.user.web.dto.UserSignUpDto;
+import com.likelion.RePlay.domain.user.web.dto.UserSignUpRequestDto;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ public class UserController {
 
     //회원가입
     @PostMapping(path = "/signUp")
-    private ResponseEntity<CustomAPIResponse<?>> signUp(@RequestBody @Valid UserSignUpDto userSignUpDto) {
-        return userService.signUp(userSignUpDto);
+    private ResponseEntity<CustomAPIResponse<?>> signUp(@RequestBody @Valid UserSignUpRequestDto userSignUpRequestDto) {
+        return userService.signUp(userSignUpRequestDto);
     }
 
     //로그인

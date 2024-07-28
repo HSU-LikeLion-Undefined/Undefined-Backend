@@ -326,7 +326,7 @@ public class PlayingServiceImpl implements PlayingService {
                     .body(CustomAPIResponse.createFailWithout(400, "모집 완료된 활동입니다."));
         }
 
-        Optional<PlayingApply> findPlayingApply = playingApplyRepository.findByUserPhoneId(phoneId);
+        Optional<PlayingApply> findPlayingApply = playingApplyRepository.findByUserPhoneIdAndPlayingPlayingId(phoneId, playingId);
 
         // 신청하지 않은 활동일 경우
         // 해당 게시글 신청 정보에 해당 유저의 정보를 추가한다.
@@ -380,7 +380,7 @@ public class PlayingServiceImpl implements PlayingService {
         Playing playing = findPlaying.get();
 
         // 존재하는 신청정보인가?
-        Optional<PlayingApply> findApply = playingApplyRepository.findByUserPhoneId(phoneId);
+        Optional<PlayingApply> findApply = playingApplyRepository.findByUserPhoneIdAndPlayingPlayingId(phoneId, playingId);
         if (findApply.isEmpty()) {
             return ResponseEntity.status(404)
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 신청 정보입니다."));

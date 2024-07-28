@@ -309,7 +309,7 @@ public class LearningServiceImpl implements LearningService{
                     .body(CustomAPIResponse.createFailWithout(400, "모집 완료된 활동입니다."));
         }
 
-        Optional<LearningApply> findLearningApply = learningApplyRepository.findByUserPhoneId(phoneId);
+        Optional<LearningApply> findLearningApply = learningApplyRepository.findByUserPhoneIdAndLearningLearningId(phoneId, learningId);
 
         if (findLearningApply.isEmpty()) {
             LearningApply newApply = LearningApply.builder()
@@ -351,7 +351,7 @@ public class LearningServiceImpl implements LearningService{
         // 존재하는 사용자인가?
         Optional<User> findUser = userRepository.findByPhoneId(phoneId);
         // 존재하는 신청정보인가?
-        Optional<LearningApply> findApply = learningApplyRepository.findByUserPhoneId(phoneId);
+        Optional<LearningApply> findApply = learningApplyRepository.findByUserPhoneIdAndLearningLearningId(phoneId, learningId);
 
         // 존재하지 않는다면 오류 반환
         if (findLearning.isEmpty()) {

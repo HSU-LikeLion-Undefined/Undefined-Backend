@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface LearningApplyRepository extends JpaRepository<LearningApply, Long> {
     Optional<LearningApply> findByUserPhoneId(String phoneId);
+    Optional<LearningApply> findByUserPhoneIdAndLearningLearningId(String phoneId, Long learningId);
 }

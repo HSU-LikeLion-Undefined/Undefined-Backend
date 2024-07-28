@@ -13,4 +13,5 @@ public class GetUserPageResponseDto {
     String phoneId;
     String nickName;
     Long year;
+    String profileImage;
 }

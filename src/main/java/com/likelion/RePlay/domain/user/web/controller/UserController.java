@@ -11,10 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -47,7 +44,7 @@ public class UserController {
     }
 
     // 사용자 정보 조회
-    @PostMapping("/getMyPage")
+    @GetMapping("/getMyPage")
     private ResponseEntity<CustomAPIResponse<?>> getMyPage(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails){
         return userService.getMyPage(userDetails);
     }

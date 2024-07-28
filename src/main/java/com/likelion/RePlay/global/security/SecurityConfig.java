@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/user/signUp", "/api/user/login",
-                                "/api/user/isExistNickName","/api/user/isExistPhoneId").permitAll()
+                                "/api/user/isExistNickName","/api/user/isExistPhoneId", "/api/user/getMyPage").permitAll()
                         .requestMatchers("/api/playing/**").permitAll()
                         .requestMatchers("/api/info/getAllInfo").permitAll()
                         .requestMatchers("/api/info/getOneInfo/**").permitAll()

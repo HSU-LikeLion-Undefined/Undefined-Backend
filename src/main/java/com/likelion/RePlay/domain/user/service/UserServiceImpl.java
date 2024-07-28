@@ -155,8 +155,9 @@ public class UserServiceImpl implements UserService {
         String phoneId = myUserDetails.getPhoneId();
         String nickName=myUserDetails.getUsername();
         Long year=myUserDetails.getYear();
+        String profileImage=myUserDetails.getUser().getProfileImage();
 
-        GetUserPageResponseDto res=new GetUserPageResponseDto(phoneId, nickName, year);
+        GetUserPageResponseDto res=new GetUserPageResponseDto(phoneId, nickName, year, profileImage);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), res, "사용자 정보 조회에 성공하였습니다."));

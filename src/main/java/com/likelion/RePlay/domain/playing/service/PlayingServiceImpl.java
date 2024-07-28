@@ -419,7 +419,7 @@ public class PlayingServiceImpl implements PlayingService {
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
         }
 
-        Optional<PlayingScrap> findPlayingScrap = playingScrapRepository.findByUserPhoneId(phoneId);
+        Optional<PlayingScrap> findPlayingScrap = playingScrapRepository.findByUserPhoneIdAndPlayingPlayingId(phoneId, playingId);
 
         // 스크랩하지 않은 활동일 경우
         // 해당 게시글 신청 정보에 해당 유저의 정보를 추가한다.
@@ -453,7 +453,7 @@ public class PlayingServiceImpl implements PlayingService {
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
         }
 
-        Optional<PlayingScrap> findPlayingScrap = playingScrapRepository.findByUserPhoneId(phoneId);
+        Optional<PlayingScrap> findPlayingScrap = playingScrapRepository.findByUserPhoneIdAndPlayingPlayingId(phoneId, playingId);
 
         // 스크랩한 않은 활동일 경우 취소한다.
         if (findPlayingScrap.isPresent()) {

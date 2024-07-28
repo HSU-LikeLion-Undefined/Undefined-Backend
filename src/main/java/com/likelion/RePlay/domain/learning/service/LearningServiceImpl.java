@@ -401,7 +401,7 @@ public class LearningServiceImpl implements LearningService{
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 유저입니다."));
         }
 
-        Optional<LearningScrap> findLearningScrap = learningScrapRepository.findByUserPhoneId(phoneId);
+        Optional<LearningScrap> findLearningScrap = learningScrapRepository.findByUserPhoneIdAndLearningLearningId(phoneId, learningId);
 
         if (findLearningScrap.isEmpty()) {
             LearningScrap newScrap = LearningScrap.builder()
@@ -435,7 +435,7 @@ public class LearningServiceImpl implements LearningService{
                     .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 유저입니다."));
         }
 
-        Optional<LearningScrap> findLearningScrap = learningScrapRepository.findByUserPhoneId(phoneId);
+        Optional<LearningScrap> findLearningScrap = learningScrapRepository.findByUserPhoneIdAndLearningLearningId(phoneId, learningId);
 
         if (findLearningScrap.isPresent()) {
             learningScrapRepository.delete(findLearningScrap.get());

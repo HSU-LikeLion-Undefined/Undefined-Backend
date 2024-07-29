@@ -25,7 +25,7 @@ public class LearningWriteRequestDTO {
 
     @NotNull(message = "모집 인원을 입력해주세요.")
     private Long totalCount;
-    private String imageUrl;
+    private String learningImage;
 
     // 멘토 이름 추가
     private String mentorName;

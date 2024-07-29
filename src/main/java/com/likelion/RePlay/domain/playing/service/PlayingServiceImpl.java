@@ -265,9 +265,6 @@ public class PlayingServiceImpl implements PlayingService {
                         });
                     })
                     .collect(Collectors.toList());
-            System.out.println("날짜 필터 : " + filteredByDate.size() + "개 있습니다.");
-        } else {
-            System.out.println("필터가 적용되지 않았습니다.");
         }
 
         // 4. State 및 District 조건과 일치하는 게시글만 남기기 (Null일 경우 필터링하지 않음)
@@ -290,9 +287,6 @@ public class PlayingServiceImpl implements PlayingService {
                         return matches;
                     })
                     .collect(Collectors.toList());
-            System.out.println("시 및 구 필터 : " + filteredByLocation.size() + "개 있습니다.");
-        } else {
-            System.out.println("필터가 적용되지 않았습니다.");
         }
 
         // 5. Category 조건과 일치하는 게시글만 남기기 (Null일 경우 필터링하지 않음)
@@ -301,9 +295,6 @@ public class PlayingServiceImpl implements PlayingService {
             filteredByCategory = filteredByCategory.stream()
                     .filter(playing -> playing.getCategory().equals(playingFilteringDTO.getCategory()))
                     .collect(Collectors.toList());
-            System.out.println("카테고리 필터 : " + filteredByCategory.size() + "개 있습니다.");
-        } else {
-            System.out.println("필터가 적용되지 않았습니다.");
         }
 
         // 6. 모든 조건에 부합하는 게시글만 ResponseBody로 전달하기

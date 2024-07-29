@@ -1,9 +1,12 @@
 package com.likelion.RePlay.domain.playing.service;
 
+import com.likelion.RePlay.domain.playing.entity.PlayingReview;
 import com.likelion.RePlay.domain.playing.entity.PlayingScrap;
+import com.likelion.RePlay.domain.playing.repository.PlayingReviewRepository;
 import com.likelion.RePlay.domain.playing.repository.PlayingScrapRepository;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingListDTO;
+import com.likelion.RePlay.domain.playing.web.dto.PlayingReviewRequestDto;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.entity.Playing;
 import com.likelion.RePlay.domain.playing.entity.PlayingApply;
@@ -41,6 +44,7 @@ public class PlayingServiceImpl implements PlayingService {
     private final PlayingRepository playingRepository;
     private final PlayingApplyRepository playingApplyRepository;
     private final PlayingScrapRepository playingScrapRepository;
+    private final PlayingReviewRepository playingReviewRepository;
 
     @Override
     public ResponseEntity<CustomAPIResponse<?>> writePost(PlayingWriteRequestDTO playingWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
@@ -579,9 +583,39 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> writePlayingReview(MyUserDetailsService.MyUserDetails userDetails) {
-        return null;
+    public ResponseEntity<CustomAPIResponse<?>> writePlayingReview(PlayingReviewRequestDto playingReviewRequestDto, MyUserDetailsService.MyUserDetails userDetails) {
+        Playing playing= playingRepository.findById(playingReviewRequestDto.getPlayingId()).orElseThrow();
+        Optional<PlayingApply> playingApply=playingApplyRepository.findByUserPhoneIdAndPlayingPlayingId(userDetails.getPhoneId(), playingReviewRequestDto.getPlayingId());
+
+        // 내가 신청하지 않은 활동이라면 리뷰를 작성할 수 없다.
+        if(!(playingApply.isPresent())){
+            CustomAPIResponse<Object> failResponse=CustomAPIResponse
+                    .createFailWithout(HttpStatus.FORBIDDEN.value(), "신청하지 않은 놀이글입니다.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(failResponse);
+
+        }
+        // 만약 아직 완료되지 않은 활동이라면 리뷰를 작성할 수 없다.
+        if(playing.getIsCompleted().equals(IsCompleted.FALSE)){
+            CustomAPIResponse<Object> failResponse=CustomAPIResponse
+                    .createFailWithout(HttpStatus.FORBIDDEN.value(), "아직 완료되지 않은 활동입니다.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(failResponse);
+        }
+
+        PlayingReview playingReview=PlayingReview.builder()
+                .content(playingReviewRequestDto.getContent())
+                .rate(playingReviewRequestDto.getRate())
+                .playing(playing)
+                .user(userDetails.getUser())
+                .build();
+        playingReviewRepository.save(playingReview);
+
+        CustomAPIResponse<Object> successResponse = CustomAPIResponse
+                .createSuccess(HttpStatus.OK.value(), null, "후기가 작성되었습니다.");
+        return ResponseEntity.status(HttpStatus.OK).body(successResponse);
+
+
     }
+
 
 
 }

@@ -21,10 +21,10 @@ public class PlayingReview extends BaseEntity {
     private Long playingReviewId;
 
     @Column(name="CONTENT")
-    private Long content;
+    private String content;
 
     @Column(name="RATE")
-    private BigDecimal rate;
+    private Double rate;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID")
@@ -32,5 +32,5 @@ public class PlayingReview extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "PLAYING_ID")
-    private Playing playing; // 참여회원
+    private Playing playing; // 놀이터 게시글 아이디
 }

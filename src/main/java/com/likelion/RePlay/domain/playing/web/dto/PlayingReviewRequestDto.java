@@ -18,5 +18,5 @@ public class PlayingReviewRequestDto {
 
     // 별점
     @NotNull(message = "평점을 입력해주세요.")
-    private double rate;
+    private Double rate;
 }

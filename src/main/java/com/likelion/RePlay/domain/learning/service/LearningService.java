@@ -7,11 +7,12 @@ import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface LearningService {
-    ResponseEntity<CustomAPIResponse<?>> writePost(LearningWriteRequestDTO learningWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails);
+    ResponseEntity<CustomAPIResponse<?>> writePost(LearningWriteRequestDTO learningWriteRequestDTO, MultipartFile learningImage, MyUserDetailsService.MyUserDetails userDetails);
 
-    ResponseEntity<CustomAPIResponse<?>> modifyPost(Long learningId, LearningWriteRequestDTO learningWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails);
+    ResponseEntity<CustomAPIResponse<?>> modifyPost(Long learningId, LearningWriteRequestDTO learningWriteRequestDTO, MultipartFile learningImage, MyUserDetailsService.MyUserDetails userDetails);
 
     ResponseEntity<CustomAPIResponse<?>> getAllPosts();
 

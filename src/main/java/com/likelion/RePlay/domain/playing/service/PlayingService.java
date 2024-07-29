@@ -7,12 +7,13 @@ import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 
 public interface PlayingService {
-    ResponseEntity<CustomAPIResponse<?>> writePost(PlayingWriteRequestDTO postWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails);
+    ResponseEntity<CustomAPIResponse<?>> writePost(PlayingWriteRequestDTO postWriteRequestDTO, MultipartFile playingImage, MyUserDetailsService.MyUserDetails userDetails);
 
-    ResponseEntity<CustomAPIResponse<?>> modifyPost(Long playingId, PlayingWriteRequestDTO playingWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails);
+    ResponseEntity<CustomAPIResponse<?>> modifyPost(Long playingId, PlayingWriteRequestDTO playingWriteRequestDTO, MultipartFile playingImage, MyUserDetailsService.MyUserDetails userDetails);
 
     ResponseEntity<CustomAPIResponse<?>> getAllPosts();
 

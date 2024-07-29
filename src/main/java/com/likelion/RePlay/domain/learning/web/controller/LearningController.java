@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/learning")
@@ -22,13 +23,20 @@ public class LearningController {
 
     @PostMapping("/writePost")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    private ResponseEntity<CustomAPIResponse<?>> writePost(@RequestBody LearningWriteRequestDTO learningWriteRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
-        return learningService.writePost(learningWriteRequestDTO, userDetails);
+    private ResponseEntity<CustomAPIResponse<?>> writePost(
+            @RequestPart("learningWriteRequestDTO") LearningWriteRequestDTO learningWriteRequestDTO,
+            @RequestPart(value = "learningImage", required = false) MultipartFile learningImage,
+            @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.writePost(learningWriteRequestDTO, learningImage, userDetails);
     }
 
     @PutMapping("/{learningId}")
-    private ResponseEntity<CustomAPIResponse<?>> modifyPost(@PathVariable Long learningId, @RequestBody LearningWriteRequestDTO learningWriteRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
-        return learningService.modifyPost(learningId, learningWriteRequestDTO, userDetails);
+    private ResponseEntity<CustomAPIResponse<?>> modifyPost(
+            @PathVariable Long learningId,
+            @RequestPart("learningWriteRequestDTO") LearningWriteRequestDTO learningWriteRequestDTO,
+            @RequestPart(value = "learningImage", required = false) MultipartFile learningImage,
+            @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.modifyPost(learningId, learningWriteRequestDTO, learningImage, userDetails);
     }
 
     @GetMapping("/getLearnings")

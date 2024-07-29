@@ -8,9 +8,11 @@ import com.likelion.RePlay.domain.playing.service.PlayingServiceImpl;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/playing")
@@ -19,14 +21,22 @@ public class PlayingController {
 
     private final PlayingServiceImpl playingService;
 
-    @PostMapping("/writePost")
-    private ResponseEntity<CustomAPIResponse<?>> writePost(@RequestBody PlayingWriteRequestDTO playingWriteRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
-        return playingService.writePost(playingWriteRequestDTO, userDetails);
+    @PostMapping(value = "/writePost", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    private ResponseEntity<CustomAPIResponse<?>> writePost(
+            @RequestPart("playingWriteRequestDTO") PlayingWriteRequestDTO playingWriteRequestDTO,
+            @RequestPart(value = "playingImage", required = false) MultipartFile playingImage,
+            @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+
+        return playingService.writePost(playingWriteRequestDTO, playingImage, userDetails);
     }
 
     @PutMapping("/{playingId}")
-    private ResponseEntity<CustomAPIResponse<?>> modifyPost(@PathVariable Long playingId, @RequestBody PlayingWriteRequestDTO playingWriteRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
-        return playingService.modifyPost(playingId, playingWriteRequestDTO, userDetails);
+    private ResponseEntity<CustomAPIResponse<?>> modifyPost(
+            @PathVariable Long playingId,
+            @RequestPart("playingWriteRequestDTO") PlayingWriteRequestDTO playingWriteRequestDTO,
+            @RequestPart(value = "playingImage", required = false) MultipartFile playingImage,
+            @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.modifyPost(playingId, playingWriteRequestDTO, playingImage, userDetails);
     }
 
     @GetMapping("/getPlayings")

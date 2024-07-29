@@ -4,7 +4,6 @@ package com.likelion.RePlay.domain.playing.web.dto;
 import com.likelion.RePlay.global.enums.Category;
 import com.likelion.RePlay.global.enums.District;
 import com.likelion.RePlay.global.enums.State;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -28,5 +27,5 @@ public class PlayingWriteRequestDTO {
     private Long totalCount;
     private Long cost; // 참가비용
     private String costDescription; //참가비용 설명
-    private String imageUrl;
+    private String playingImage;
 }

@@ -10,6 +10,7 @@ import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.web.dto.CommentListDTO;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
+import com.likelion.RePlay.global.amazon.S3.S3Service;
 import com.likelion.RePlay.global.enums.*;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
@@ -19,7 +20,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -40,9 +43,10 @@ public class LearningServiceImpl implements LearningService{
     private final LearningMentorRepository learningMentorRepository;
     private final LearningReviewRepository learningReviewRepository;
     private final LearningCommentRepository learningCommentRepository;
+    private final S3Service s3Service;
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> writePost(LearningWriteRequestDTO learningWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
+    public ResponseEntity<CustomAPIResponse<?>> writePost(LearningWriteRequestDTO learningWriteRequestDTO, MultipartFile learningImage, MyUserDetailsService.MyUserDetails userDetails) {
 
         Optional<User> isAdmin = userRepository.findByPhoneId(userDetails.getPhoneId());
 
@@ -76,6 +80,16 @@ public class LearningServiceImpl implements LearningService{
             e.printStackTrace();
         }
 
+        String imageUrl = null;
+        if (learningImage != null && !learningImage.isEmpty()) {
+            try {
+                imageUrl = s3Service.uploadFile(learningImage);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(CustomAPIResponse.createFailWithout(HttpStatus.INTERNAL_SERVER_ERROR.value(), "이미지 업로드를 실패했습니다."));
+            }
+        }
+
         Learning newLearning = Learning.builder()
                 .user(isAdmin.get())
                 .title(learningWriteRequestDTO.getTitle())
@@ -91,7 +105,7 @@ public class LearningServiceImpl implements LearningService{
                 .longitude(learningWriteRequestDTO.getLongitude())
                 .state(learningWriteRequestDTO.getState())
                 .district(learningWriteRequestDTO.getDistrict())
-                .imageUrl(learningWriteRequestDTO.getImageUrl())
+                .imageUrl(imageUrl)
                 .learningMentor(mentor)
                 .build();
 
@@ -103,7 +117,7 @@ public class LearningServiceImpl implements LearningService{
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> modifyPost(Long learningId, LearningWriteRequestDTO learningWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
+    public ResponseEntity<CustomAPIResponse<?>> modifyPost(Long learningId, LearningWriteRequestDTO learningWriteRequestDTO, MultipartFile learningImage, MyUserDetailsService.MyUserDetails userDetails) {
 
         Optional<User> isAdmin = userRepository.findByPhoneId(userDetails.getPhoneId());
         Optional<Learning> findLearning = learningRepository.findById(learningId);
@@ -154,12 +168,22 @@ public class LearningServiceImpl implements LearningService{
                     .body(CustomAPIResponse.createFailWithout(400, "현재 모집된 인원보다 적은 인원을 모집할 수 없습니다."));
         }
 
+        String imageUrl = null;
+        if (learningImage != null && !learningImage.isEmpty()) {
+            try {
+                imageUrl = s3Service.uploadFile(learningImage);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(CustomAPIResponse.createFailWithout(HttpStatus.INTERNAL_SERVER_ERROR.value(), "이미지 업로드를 실패했습니다."));
+            }
+        }
+
         learning.changeTitle(learningWriteRequestDTO.getTitle());
         learning.changeDate(date);
         learning.changeLocate(learningWriteRequestDTO.getLocate());
         learning.changeCategory(learningWriteRequestDTO.getCategory());
         learning.changeContent(learningWriteRequestDTO.getContent());
-        learning.changeImageUrl(learningWriteRequestDTO.getImageUrl());
+        learning.changeImageUrl(imageUrl);
         learning.changeTotalCount(learningWriteRequestDTO.getTotalCount());
         learning.changeLearningMentor(mentor);
 

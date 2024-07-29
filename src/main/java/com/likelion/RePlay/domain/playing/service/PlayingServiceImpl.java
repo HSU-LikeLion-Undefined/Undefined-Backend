@@ -9,7 +9,6 @@ import com.likelion.RePlay.domain.playing.web.dto.PlayingListDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingReviewRequestDto;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
 
-import com.amazonaws.Response;
 import com.likelion.RePlay.domain.playing.entity.PlayingComment;
 import com.likelion.RePlay.domain.playing.repository.PlayingCommentRepository;
 import com.likelion.RePlay.domain.playing.web.dto.*;
@@ -19,6 +18,7 @@ import com.likelion.RePlay.domain.playing.repository.PlayingApplyRepository;
 import com.likelion.RePlay.domain.playing.repository.PlayingRepository;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
+import com.likelion.RePlay.global.amazon.S3.S3Service;
 import com.likelion.RePlay.global.enums.District;
 import com.likelion.RePlay.global.enums.IsCompleted;
 import com.likelion.RePlay.global.enums.IsRecruit;
@@ -31,7 +31,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -49,17 +51,27 @@ public class PlayingServiceImpl implements PlayingService {
     private final PlayingRepository playingRepository;
     private final PlayingApplyRepository playingApplyRepository;
     private final PlayingScrapRepository playingScrapRepository;
-
     private final PlayingReviewRepository playingReviewRepository;
     private final PlayingCommentRepository playingCommentRepository;
+    private final S3Service s3Service;
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> writePost(PlayingWriteRequestDTO playingWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
+    public ResponseEntity<CustomAPIResponse<?>> writePost(PlayingWriteRequestDTO playingWriteRequestDTO, MultipartFile playingImage, MyUserDetailsService.MyUserDetails userDetails) {
 
         // 인증된 사용자 정보에서 phoneId를 가져온다.
         String phoneId = userDetails.getPhoneId();
         User user = userRepository.findByPhoneId(phoneId)
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+
+        String imageUrl = null;
+        if (playingImage != null && !playingImage.isEmpty()) {
+            try {
+                imageUrl = s3Service.uploadFile(playingImage);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(CustomAPIResponse.createFailWithout(HttpStatus.INTERNAL_SERVER_ERROR.value(), "이미지 업로드를 실패했습니다."));
+            }
+        }
 
         String dateStr = playingWriteRequestDTO.getDate();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy년 M월 d일 a h시 m분");
@@ -91,7 +103,7 @@ public class PlayingServiceImpl implements PlayingService {
                 .longitude(playingWriteRequestDTO.getLongitude())
                 .state(playingWriteRequestDTO.getState())
                 .district(playingWriteRequestDTO.getDistrict())
-                .imageUrl(playingWriteRequestDTO.getImageUrl())
+                .imageUrl(imageUrl)
                 .build();
 
         playingRepository.save(newPlaying);
@@ -101,7 +113,7 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> modifyPost(Long playingId, PlayingWriteRequestDTO playingWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
+    public ResponseEntity<CustomAPIResponse<?>> modifyPost(Long playingId, PlayingWriteRequestDTO playingWriteRequestDTO, MultipartFile playingImage, MyUserDetailsService.MyUserDetails userDetails) {
 
         String phoneId = userDetails.getPhoneId();
         User user = userRepository.findByPhoneId(phoneId)
@@ -137,13 +149,23 @@ public class PlayingServiceImpl implements PlayingService {
             e.printStackTrace();
         }
 
+        String imageUrl = null;
+        if (playingImage != null && !playingImage.isEmpty()) {
+            try {
+                imageUrl = s3Service.uploadFile(playingImage);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(CustomAPIResponse.createFailWithout(HttpStatus.INTERNAL_SERVER_ERROR.value(), "이미지 업로드를 실패했습니다."));
+            }
+        }
+
         user.changeIntroduce(playingWriteRequestDTO.getIntroduce());
         playing.changeTitle(playingWriteRequestDTO.getTitle());
         playing.changeDate(date);
         playing.changeLocate(playingWriteRequestDTO.getLocate());
         playing.changeCategory(playingWriteRequestDTO.getCategory());
         playing.changeContent(playingWriteRequestDTO.getContent());
-        playing.changeImageUrl(playingWriteRequestDTO.getImageUrl());
+        playing.changeImageUrl(imageUrl);
         playing.changeTotalCount(playingWriteRequestDTO.getTotalCount());
         playing.changeCost(Long.valueOf(playingWriteRequestDTO.getCost()));
         playing.changeCostDescription(playingWriteRequestDTO.getCostDescription());
@@ -243,9 +265,6 @@ public class PlayingServiceImpl implements PlayingService {
                         });
                     })
                     .collect(Collectors.toList());
-            System.out.println("날짜 필터 : " + filteredByDate.size() + "개 있습니다.");
-        } else {
-            System.out.println("필터가 적용되지 않았습니다.");
         }
 
         // 4. State 및 District 조건과 일치하는 게시글만 남기기 (Null일 경우 필터링하지 않음)
@@ -268,9 +287,6 @@ public class PlayingServiceImpl implements PlayingService {
                         return matches;
                     })
                     .collect(Collectors.toList());
-            System.out.println("시 및 구 필터 : " + filteredByLocation.size() + "개 있습니다.");
-        } else {
-            System.out.println("필터가 적용되지 않았습니다.");
         }
 
         // 5. Category 조건과 일치하는 게시글만 남기기 (Null일 경우 필터링하지 않음)
@@ -279,9 +295,6 @@ public class PlayingServiceImpl implements PlayingService {
             filteredByCategory = filteredByCategory.stream()
                     .filter(playing -> playing.getCategory().equals(playingFilteringDTO.getCategory()))
                     .collect(Collectors.toList());
-            System.out.println("카테고리 필터 : " + filteredByCategory.size() + "개 있습니다.");
-        } else {
-            System.out.println("필터가 적용되지 않았습니다.");
         }
 
         // 6. 모든 조건에 부합하는 게시글만 ResponseBody로 전달하기

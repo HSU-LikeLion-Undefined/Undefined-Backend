@@ -1,9 +1,8 @@
 package com.likelion.RePlay.domain.playing.service;
 
-import com.likelion.RePlay.domain.playing.web.dto.PlayingCommentWriteRequestDTO;
-import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
-import com.likelion.RePlay.domain.playing.web.dto.PlayingReviewRequestDto;
-import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
+import com.likelion.RePlay.domain.learning.web.dto.MentorReviewRequestDto;
+import com.likelion.RePlay.domain.playing.web.dto.*;
+import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
 import org.springframework.http.ResponseEntity;
@@ -49,5 +48,9 @@ public interface PlayingService {
     ResponseEntity<CustomAPIResponse<?>> getAllComments(Long playingId);
 
     ResponseEntity<CustomAPIResponse<?>> deleteComment(Long commentId, MyUserDetailsService.MyUserDetails userDetails);
+
+    // 작성자에 대한 후기 조회
+    ResponseEntity<CustomAPIResponse<?>> getUserReview(UserReviewRequestDto userReviewRequestDto);
+
 
 }

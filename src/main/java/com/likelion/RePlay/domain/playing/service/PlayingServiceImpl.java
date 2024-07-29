@@ -578,4 +578,10 @@ public class PlayingServiceImpl implements PlayingService {
 
     }
 
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> writePlayingReview(MyUserDetailsService.MyUserDetails userDetails) {
+        return null;
+    }
+
+
 }

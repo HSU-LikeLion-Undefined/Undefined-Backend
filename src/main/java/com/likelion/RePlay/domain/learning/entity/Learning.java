@@ -125,4 +125,7 @@ public class Learning extends BaseEntity {
     public void changeRecruitmentCount(Long recruitmentCount) {
         this.recruitmentCount = recruitmentCount;
     }
+    public void changeLearningMentor(LearningMentor learningMentor) {
+        this.learningMentor = learningMentor;
+    }
 }

@@ -23,4 +23,7 @@ public class LearningWriteRequestDTO {
     private String content; // 배움 설명
     private Long totalCount;
     private String imageUrl;
+
+    // 멘토 이름 추가
+    private String mentorName;
 }

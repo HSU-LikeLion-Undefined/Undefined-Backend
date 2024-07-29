@@ -2,8 +2,10 @@ package com.likelion.RePlay.domain.learning.service;
 
 import com.likelion.RePlay.domain.learning.entity.Learning;
 import com.likelion.RePlay.domain.learning.entity.LearningApply;
+import com.likelion.RePlay.domain.learning.entity.LearningMentor;
 import com.likelion.RePlay.domain.learning.entity.LearningScrap;
 import com.likelion.RePlay.domain.learning.repository.LearningApplyRepository;
+import com.likelion.RePlay.domain.learning.repository.LearningMentorRepository;
 import com.likelion.RePlay.domain.learning.repository.LearningRepository;
 import com.likelion.RePlay.domain.learning.repository.LearningScrapRepository;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
@@ -37,6 +39,7 @@ public class LearningServiceImpl implements LearningService{
     private final LearningRepository learningRepository;
     private final LearningApplyRepository learningApplyRepository;
     private final LearningScrapRepository learningScrapRepository;
+    private final LearningMentorRepository learningMentorRepository;
 
     @Override
     public ResponseEntity<CustomAPIResponse<?>> writePost(LearningWriteRequestDTO learningWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
@@ -49,6 +52,19 @@ public class LearningServiceImpl implements LearningService{
 
             return ResponseEntity.status(403)
                     .body(CustomAPIResponse.createFailWithout(403, "글 작성 권한이 없습니다."));
+        }
+
+        // 멘토가 존재하지 않는다면, learningMentorRepository에 추가
+        // 이미 존재한다면, 그 멘토를 가져온다
+        LearningMentor mentor;
+        Optional<LearningMentor> isExist=learningMentorRepository.findLearningMentorNameBy(learningWriteRequestDTO.getMentorName());
+        if(isExist.isEmpty()){
+            mentor= LearningMentor.builder()
+                    .name(learningWriteRequestDTO.getMentorName())
+                    .build();
+            learningMentorRepository.save(mentor);
+        }else {
+            mentor = isExist.get();
         }
 
         String dateStr = learningWriteRequestDTO.getDate();
@@ -76,6 +92,7 @@ public class LearningServiceImpl implements LearningService{
                 .state(learningWriteRequestDTO.getState())
                 .district(learningWriteRequestDTO.getDistrict())
                 .imageUrl(learningWriteRequestDTO.getImageUrl())
+                .learningMentor(mentor)
                 .build();
 
         learningRepository.save(newLearning);
@@ -97,6 +114,19 @@ public class LearningServiceImpl implements LearningService{
 
             return ResponseEntity.status(403)
                     .body(CustomAPIResponse.createFailWithout(403, "글 수정 권한이 없습니다."));
+        }
+
+        // 멘토가 존재하지 않는다면, learningMentorRepository에 추가
+        // 이미 존재한다면, 그 멘토를 가져온다
+        LearningMentor mentor;
+        Optional<LearningMentor> isExist=learningMentorRepository.findLearningMentorNameBy(learningWriteRequestDTO.getMentorName());
+        if(isExist.isEmpty()){
+            mentor= LearningMentor.builder()
+                    .name(learningWriteRequestDTO.getMentorName())
+                    .build();
+            learningMentorRepository.save(mentor);
+        }else {
+            mentor = isExist.get();
         }
 
         Learning learning = findLearning.get();
@@ -131,6 +161,7 @@ public class LearningServiceImpl implements LearningService{
         learning.changeContent(learningWriteRequestDTO.getContent());
         learning.changeImageUrl(learningWriteRequestDTO.getImageUrl());
         learning.changeTotalCount(learningWriteRequestDTO.getTotalCount());
+        learning.changeLearningMentor(mentor);
 
 
         if (learning.getRecruitmentCount() == learning.getTotalCount()) {
@@ -163,6 +194,7 @@ public class LearningServiceImpl implements LearningService{
                     .totalCount(learning.getTotalCount())
                     .recruitmentCount(learning.getRecruitmentCount())
                     .imageUrl(learning.getImageUrl())
+                    .mentorName(learning.getLearningMentor().getName())
                     .build());
         }
 
@@ -195,6 +227,7 @@ public class LearningServiceImpl implements LearningService{
                 .recruitmentCount(findLearning.get().getRecruitmentCount())
                 .content(findLearning.get().getContent())
                 .imageUrl(findLearning.get().getImageUrl())
+                .mentorName(findLearning.get().getLearningMentor().getName())
                 .build();
 
         return ResponseEntity.status(200)
@@ -271,6 +304,7 @@ public class LearningServiceImpl implements LearningService{
                     .totalCount(result.getTotalCount())
                     .recruitmentCount(result.getRecruitmentCount())
                     .imageUrl(result.getImageUrl())
+                    .mentorName(result.getLearningMentor().getName())
                     .build();
             learningResponse.add(response);
         }
@@ -335,6 +369,7 @@ public class LearningServiceImpl implements LearningService{
                 .date(findLearning.get().getDate())
                 .locate(findLearning.get().getLocate())
                 .imageUrl(findLearning.get().getImageUrl())
+                .mentorName(findLearning.get().getLearningMentor().getName())
                 .build();
 
         return ResponseEntity.status(200)
@@ -459,6 +494,7 @@ public class LearningServiceImpl implements LearningService{
                     .title(learning.getTitle())
                     .date(learning.getDate())
                     .imageUrl(learning.getImageUrl())
+                    .mentorName(learning.getLearningMentor().getName())
                     .build());
         }
 

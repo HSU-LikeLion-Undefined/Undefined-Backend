@@ -1,10 +1,7 @@
 package com.likelion.RePlay.domain.learning.web.controller;
 
 import com.likelion.RePlay.domain.learning.service.LearningService;
-import com.likelion.RePlay.domain.learning.web.dto.LearningCommentWriteRequestDTO;
-import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
-import com.likelion.RePlay.domain.learning.web.dto.LearningReviewRequestDto;
-import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
+import com.likelion.RePlay.domain.learning.web.dto.*;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -113,6 +110,12 @@ public class LearningController {
     private ResponseEntity<CustomAPIResponse<?>> deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return learningService.deleteComment(commentId, userDetails);
 
+    }
+
+    @PostMapping("/getMentorReview")
+    private ResponseEntity<CustomAPIResponse<?>> getMentorReview(
+            @RequestBody MentorReviewRequestDto mentorReviewRequestDto){
+        return learningService.getMentorReview(mentorReviewRequestDto);
     }
 
 }

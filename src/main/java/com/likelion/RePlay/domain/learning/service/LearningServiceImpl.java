@@ -564,7 +564,7 @@ public class LearningServiceImpl implements LearningService{
         Date date = learning.getDate();
         Date now = new Date();
 
-        if (date.before(now)) {
+        if (!date.before(now)) {
             return ResponseEntity.status(400)
                     .body(CustomAPIResponse.createFailWithout(400, "활동 날짜가 되지 않았습니다.."));
 
@@ -714,7 +714,8 @@ public class LearningServiceImpl implements LearningService{
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> getMentorReview(String mentorName) {
+    public ResponseEntity<CustomAPIResponse<?>> getMentorReview(MentorReviewRequestDto mentorReviewRequestDto) {
+        String mentorName= mentorReviewRequestDto.getMentorName();
         Optional<LearningMentor> mentor= learningMentorRepository.findByMentorName(mentorName);
 
         // 해당 멘토가 존재하지 않는다면

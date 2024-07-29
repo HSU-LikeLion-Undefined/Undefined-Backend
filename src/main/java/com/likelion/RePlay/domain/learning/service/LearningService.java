@@ -1,9 +1,6 @@
 package com.likelion.RePlay.domain.learning.service;
 
-import com.likelion.RePlay.domain.learning.web.dto.LearningCommentWriteRequestDTO;
-import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
-import com.likelion.RePlay.domain.learning.web.dto.LearningReviewRequestDto;
-import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
+import com.likelion.RePlay.domain.learning.web.dto.*;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +41,6 @@ public interface LearningService {
 
     ResponseEntity<CustomAPIResponse<?>> deleteComment(Long commentId, MyUserDetailsService.MyUserDetails userDetails);
 
-    ResponseEntity<CustomAPIResponse<?>> getMentorReview(String mentorName);
+    ResponseEntity<CustomAPIResponse<?>> getMentorReview(MentorReviewRequestDto mentorReviewRequestDto);
 
 }

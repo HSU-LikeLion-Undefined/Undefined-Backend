@@ -31,8 +31,12 @@ public class LearningController {
     }
 
     @PutMapping("/{learningId}")
-    private ResponseEntity<CustomAPIResponse<?>> modifyPost(@PathVariable Long learningId, @RequestBody LearningWriteRequestDTO learningWriteRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
-        return learningService.modifyPost(learningId, learningWriteRequestDTO, userDetails);
+    private ResponseEntity<CustomAPIResponse<?>> modifyPost(
+            @PathVariable Long learningId,
+            @RequestPart("learningWriteRequestDTO") LearningWriteRequestDTO learningWriteRequestDTO,
+            @RequestPart(value = "learningImage", required = false) MultipartFile learningImage,
+            @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.modifyPost(learningId, learningWriteRequestDTO, learningImage, userDetails);
     }
 
     @GetMapping("/getLearnings")

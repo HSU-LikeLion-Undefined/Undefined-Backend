@@ -117,7 +117,7 @@ public class LearningServiceImpl implements LearningService{
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> modifyPost(Long learningId, LearningWriteRequestDTO learningWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
+    public ResponseEntity<CustomAPIResponse<?>> modifyPost(Long learningId, LearningWriteRequestDTO learningWriteRequestDTO, MultipartFile learningImage, MyUserDetailsService.MyUserDetails userDetails) {
 
         Optional<User> isAdmin = userRepository.findByPhoneId(userDetails.getPhoneId());
         Optional<Learning> findLearning = learningRepository.findById(learningId);
@@ -168,12 +168,22 @@ public class LearningServiceImpl implements LearningService{
                     .body(CustomAPIResponse.createFailWithout(400, "현재 모집된 인원보다 적은 인원을 모집할 수 없습니다."));
         }
 
+        String imageUrl = null;
+        if (learningImage != null && !learningImage.isEmpty()) {
+            try {
+                imageUrl = s3Service.uploadFile(learningImage);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(CustomAPIResponse.createFailWithout(HttpStatus.INTERNAL_SERVER_ERROR.value(), "이미지 업로드를 실패했습니다."));
+            }
+        }
+
         learning.changeTitle(learningWriteRequestDTO.getTitle());
         learning.changeDate(date);
         learning.changeLocate(learningWriteRequestDTO.getLocate());
         learning.changeCategory(learningWriteRequestDTO.getCategory());
         learning.changeContent(learningWriteRequestDTO.getContent());
-        learning.changeImageUrl(learningWriteRequestDTO.getLearningImage());
+        learning.changeImageUrl(imageUrl);
         learning.changeTotalCount(learningWriteRequestDTO.getTotalCount());
         learning.changeLearningMentor(mentor);
 

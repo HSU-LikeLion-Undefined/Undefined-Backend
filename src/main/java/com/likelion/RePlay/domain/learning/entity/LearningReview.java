@@ -18,13 +18,13 @@ public class LearningReview extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="LEARNING_REVIEW_ID")
-    private Long LearningReviewId;
+    private Long learningReviewId;
 
     @Column(name="CONTENT")
-    private Long content;
+    private String content;
 
     @Column(name="RATE")
-    private BigDecimal rate;
+    private Double rate;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID")
@@ -32,5 +32,9 @@ public class LearningReview extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "LEARNING_ID")
-    private Learning learning; // 참여회원
+    private Learning learning;
+
+    @ManyToOne
+    @JoinColumn(name = "MENTOR_ID")
+    private LearningMentor learningMentor;
 }

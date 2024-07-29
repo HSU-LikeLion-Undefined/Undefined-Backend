@@ -31,6 +31,9 @@ public class LearningListDTO {
         private Long cost;
         private String costDescription;
         private String imageUrl;
+
+        // 멘토 추가
+        private String mentorName;
     }
 
     @Getter @Setter

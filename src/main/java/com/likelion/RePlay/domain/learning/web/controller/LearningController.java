@@ -4,6 +4,7 @@ import com.amazonaws.Response;
 import com.likelion.RePlay.domain.learning.service.LearningService;
 import com.likelion.RePlay.domain.learning.web.dto.LearningCommentWriteRequestDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
+import com.likelion.RePlay.domain.learning.web.dto.LearningReviewRequestDto;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
@@ -71,6 +72,18 @@ public class LearningController {
         return learningService.recruitedLearnings(userDetails);
     }
 
+
+    @PostMapping("/writeReview")
+    private ResponseEntity<CustomAPIResponse<?>> writeReviewLearnings(
+            @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails,
+            @RequestBody LearningReviewRequestDto learningReviewRequestDto) {
+        return learningService.writeLearningReview(learningReviewRequestDto, userDetails);
+    }
+
+    @PostMapping("/{learningId}/complete")
+    private ResponseEntity<CustomAPIResponse<?>> completeLearning(@PathVariable Long learningId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.completeLearning(learningId, userDetails);
+      
     @GetMapping("/scrap")
     private ResponseEntity<CustomAPIResponse<?>> scrapLearnings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return learningService.scrapLearnings(userDetails);
@@ -89,6 +102,7 @@ public class LearningController {
     @DeleteMapping("/{commentId}/comment")
     private ResponseEntity<CustomAPIResponse<?>> deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return learningService.deleteComment(commentId, userDetails);
+
     }
 
 }

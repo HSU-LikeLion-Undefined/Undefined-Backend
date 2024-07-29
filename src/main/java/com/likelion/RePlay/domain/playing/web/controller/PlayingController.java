@@ -3,6 +3,7 @@ package com.likelion.RePlay.domain.playing.web.controller;
 import com.amazonaws.Response;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingCommentWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
+import com.likelion.RePlay.domain.playing.web.dto.PlayingReviewRequestDto;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.service.PlayingServiceImpl;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
@@ -83,6 +84,13 @@ public class PlayingController {
     private ResponseEntity<CustomAPIResponse<?>> recruitedPlayings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return playingService.recruitedPlayings(userDetails);
     }
+
+
+    @PostMapping("/writeReview")
+    private ResponseEntity<CustomAPIResponse<?>> writeReviewPlayings(
+            @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails,
+            @RequestBody PlayingReviewRequestDto playingReviewRequestDto) {
+        return playingService.writePlayingReview(playingReviewRequestDto, userDetails);
 
     @GetMapping("/scrap")
     private ResponseEntity<CustomAPIResponse<?>> scrapPlayings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {

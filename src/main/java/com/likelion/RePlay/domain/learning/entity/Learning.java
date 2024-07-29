@@ -57,10 +57,10 @@ public class Learning extends BaseEntity {
     private String locate;
 
     @Enumerated(EnumType.STRING)
-    private State state; // 시
+    private State state;
 
     @Enumerated(EnumType.STRING)
-    private District district; // 구
+    private District district;
 
     @Column(name = "IMAGE_URL")
     private String imageUrl;
@@ -68,6 +68,10 @@ public class Learning extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "USER_ID")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "MENTOR_ID")
+    private LearningMentor learningMentor;
 
     @OneToMany(mappedBy = "learning", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
@@ -84,7 +88,6 @@ public class Learning extends BaseEntity {
     @OneToMany(mappedBy = "learning", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<LearningApply> learningApplies;
-
 
     // 연관관계 편의 메서드
     public void changeDate(Date date) {
@@ -122,5 +125,11 @@ public class Learning extends BaseEntity {
     public void changeRecruitmentCount(Long recruitmentCount) {
         this.recruitmentCount = recruitmentCount;
     }
+    public void changeLearningMentor(LearningMentor learningMentor) {
+        this.learningMentor = learningMentor;
+    }
 
+    public void changeComplete(IsCompleted isCompleted) {
+        this.isCompleted = isCompleted;
+    }
 }

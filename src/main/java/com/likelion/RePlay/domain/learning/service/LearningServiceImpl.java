@@ -1,16 +1,11 @@
 package com.likelion.RePlay.domain.learning.service;
 
-import com.likelion.RePlay.domain.learning.entity.Learning;
-import com.likelion.RePlay.domain.learning.entity.LearningApply;
-import com.likelion.RePlay.domain.learning.entity.LearningComment;
-import com.likelion.RePlay.domain.learning.entity.LearningScrap;
-import com.likelion.RePlay.domain.learning.repository.LearningApplyRepository;
-import com.likelion.RePlay.domain.learning.repository.LearningCommentRepository;
-import com.likelion.RePlay.domain.learning.repository.LearningRepository;
-import com.likelion.RePlay.domain.learning.repository.LearningScrapRepository;
+import com.likelion.RePlay.domain.learning.entity.*;
+import com.likelion.RePlay.domain.learning.repository.*;
 import com.likelion.RePlay.domain.learning.web.dto.LearningCommentWriteRequestDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningListDTO;
+import com.likelion.RePlay.domain.learning.web.dto.LearningReviewRequestDto;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.web.dto.CommentListDTO;
 import com.likelion.RePlay.domain.user.entity.User;
@@ -20,6 +15,7 @@ import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +37,8 @@ public class LearningServiceImpl implements LearningService{
     private final LearningRepository learningRepository;
     private final LearningApplyRepository learningApplyRepository;
     private final LearningScrapRepository learningScrapRepository;
+    private final LearningMentorRepository learningMentorRepository;
+    private final LearningReviewRepository learningReviewRepository;
     private final LearningCommentRepository learningCommentRepository;
 
     @Override
@@ -54,6 +52,19 @@ public class LearningServiceImpl implements LearningService{
 
             return ResponseEntity.status(403)
                     .body(CustomAPIResponse.createFailWithout(403, "글 작성 권한이 없습니다."));
+        }
+
+        // 멘토가 존재하지 않는다면, learningMentorRepository에 추가
+        // 이미 존재한다면, 그 멘토를 가져온다
+        LearningMentor mentor;
+        Optional<LearningMentor> isExist=learningMentorRepository.findByMentorName(learningWriteRequestDTO.getMentorName());
+        if(isExist.isEmpty()){
+            mentor= LearningMentor.builder()
+                    .mentorName(learningWriteRequestDTO.getMentorName())
+                    .build();
+            learningMentorRepository.save(mentor);
+        }else {
+            mentor = isExist.get();
         }
 
         String dateStr = learningWriteRequestDTO.getDate();
@@ -81,6 +92,7 @@ public class LearningServiceImpl implements LearningService{
                 .state(learningWriteRequestDTO.getState())
                 .district(learningWriteRequestDTO.getDistrict())
                 .imageUrl(learningWriteRequestDTO.getImageUrl())
+                .learningMentor(mentor)
                 .build();
 
         learningRepository.save(newLearning);
@@ -102,6 +114,19 @@ public class LearningServiceImpl implements LearningService{
 
             return ResponseEntity.status(403)
                     .body(CustomAPIResponse.createFailWithout(403, "글 수정 권한이 없습니다."));
+        }
+
+        // 멘토가 존재하지 않는다면, learningMentorRepository에 추가
+        // 이미 존재한다면, 그 멘토를 가져온다
+        LearningMentor mentor;
+        Optional<LearningMentor> isExist=learningMentorRepository.findByMentorName(learningWriteRequestDTO.getMentorName());
+        if(isExist.isEmpty()){
+            mentor= LearningMentor.builder()
+                    .mentorName(learningWriteRequestDTO.getMentorName())
+                    .build();
+            learningMentorRepository.save(mentor);
+        }else {
+            mentor = isExist.get();
         }
 
         Learning learning = findLearning.get();
@@ -136,6 +161,7 @@ public class LearningServiceImpl implements LearningService{
         learning.changeContent(learningWriteRequestDTO.getContent());
         learning.changeImageUrl(learningWriteRequestDTO.getImageUrl());
         learning.changeTotalCount(learningWriteRequestDTO.getTotalCount());
+        learning.changeLearningMentor(mentor);
 
 
         if (learning.getRecruitmentCount() == learning.getTotalCount()) {
@@ -168,6 +194,7 @@ public class LearningServiceImpl implements LearningService{
                     .totalCount(learning.getTotalCount())
                     .recruitmentCount(learning.getRecruitmentCount())
                     .imageUrl(learning.getImageUrl())
+                    .mentorName(learning.getLearningMentor().getMentorName())
                     .build());
         }
 
@@ -200,6 +227,7 @@ public class LearningServiceImpl implements LearningService{
                 .recruitmentCount(findLearning.get().getRecruitmentCount())
                 .content(findLearning.get().getContent())
                 .imageUrl(findLearning.get().getImageUrl())
+                .mentorName(findLearning.get().getLearningMentor().getMentorName())
                 .build();
 
         return ResponseEntity.status(200)
@@ -276,6 +304,7 @@ public class LearningServiceImpl implements LearningService{
                     .totalCount(result.getTotalCount())
                     .recruitmentCount(result.getRecruitmentCount())
                     .imageUrl(result.getImageUrl())
+                    .mentorName(result.getLearningMentor().getMentorName())
                     .build();
             learningResponse.add(response);
         }
@@ -340,6 +369,7 @@ public class LearningServiceImpl implements LearningService{
                 .date(findLearning.get().getDate())
                 .locate(findLearning.get().getLocate())
                 .imageUrl(findLearning.get().getImageUrl())
+                .mentorName(findLearning.get().getLearningMentor().getMentorName())
                 .build();
 
         return ResponseEntity.status(200)
@@ -464,6 +494,7 @@ public class LearningServiceImpl implements LearningService{
                     .title(learning.getTitle())
                     .date(learning.getDate())
                     .imageUrl(learning.getImageUrl())
+                    .mentorName(learning.getLearningMentor().getMentorName())
                     .build());
         }
 
@@ -472,7 +503,64 @@ public class LearningServiceImpl implements LearningService{
 
     }
 
+    public ResponseEntity<CustomAPIResponse<?>> writeLearningReview(LearningReviewRequestDto learningReviewRequestDto, MyUserDetailsService.MyUserDetails userDetails) {
+        Learning learning=learningRepository.findById(learningReviewRequestDto.getLearningId()).orElseThrow();
+        Optional<LearningApply> learningApply=learningApplyRepository.findByUserPhoneIdAndLearningLearningId(userDetails.getPhoneId(),learningReviewRequestDto.getLearningId());
+
+                // 내가 신청하지 않은 활동이라면 리뷰를 작성할 수 없다.
+                if(!(learningApply.isPresent())) {
+                    CustomAPIResponse<Object> failResponse = CustomAPIResponse
+                            .createFailWithout(HttpStatus.FORBIDDEN.value(), "신청하지 않은 배움입니다.");
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(failResponse);
+                }
+
+                // 만약 아직 완료되지 않은 활동이라면 리뷰를 작성할 수 없다.
+                if(learning.getIsCompleted().equals(IsCompleted.FALSE)){
+                    CustomAPIResponse<Object> failResponse=CustomAPIResponse
+                            .createFailWithout(HttpStatus.FORBIDDEN.value(), "아직 완료되지 않은 활동입니다.");
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(failResponse);
+                }
+        LearningReview learningReview=LearningReview.builder()
+                .content(learningReviewRequestDto.getContent())
+                .rate(learningReviewRequestDto.getRate())
+                .learningMentor(learning.getLearningMentor())
+                .learning(learning)
+                .user(userDetails.getUser())
+                .build();
+                learningReviewRepository.save(learningReview);
+
+                CustomAPIResponse<Object> successResponse = CustomAPIResponse
+                        .createSuccess(HttpStatus.OK.value(), null, "후기가 작성되었습니다.");
+                return ResponseEntity.status(HttpStatus.OK).body(successResponse);
+    }
+
     @Override
+    public ResponseEntity<CustomAPIResponse<?>> completeLearning(Long learningId, MyUserDetailsService.MyUserDetails userDetails) {
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                        .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+        Optional<Learning> findLearning = learningRepository.findById(learningId);
+        Learning learning = findLearning.get();
+        Date date=learning.getDate();
+        Date now=new Date();
+
+                if(date.before(now)) {
+                    return ResponseEntity.status(400)
+                            .body(CustomAPIResponse.createFailWithout(400, "활동 날짜가 되지 않았습니다.."));
+
+                }
+
+                if (!Objects.equals(user.getPhoneId(), learning.getUser().getPhoneId())) {
+                    return ResponseEntity.status(403)
+                            .body(CustomAPIResponse.createFailWithout(403, "본인만 게시글을 삭제할 수 있습니다."));
+                }
+                learning.changeIsRecruit(IsRecruit.FALSE);
+                learning.changeComplete(IsCompleted.TRUE);
+
+                return ResponseEntity.status(200)
+                        .body(CustomAPIResponse.createSuccess(200, null, "활동을 완료했습니다."));
+
+=======
     public ResponseEntity<CustomAPIResponse<?>> scrapLearnings(MyUserDetailsService.MyUserDetails userDetails) {
 
         String phoneId = userDetails.getPhoneId();
@@ -600,6 +688,7 @@ public class LearningServiceImpl implements LearningService{
 
         return ResponseEntity.status(200)
                 .body(CustomAPIResponse.createSuccess(200, null, "댓글 삭제를 성공했습니다."));
+
 
     }
 

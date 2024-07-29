@@ -35,8 +35,12 @@ public class PlayingController {
     }
 
     @PutMapping("/{playingId}")
-    private ResponseEntity<CustomAPIResponse<?>> modifyPost(@PathVariable Long playingId, @RequestBody PlayingWriteRequestDTO playingWriteRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
-        return playingService.modifyPost(playingId, playingWriteRequestDTO, userDetails);
+    private ResponseEntity<CustomAPIResponse<?>> modifyPost(
+            @PathVariable Long playingId,
+            @RequestPart("playingWriteRequestDTO") PlayingWriteRequestDTO playingWriteRequestDTO,
+            @RequestPart(value = "playingImage", required = false) MultipartFile playingImage,
+            @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.modifyPost(playingId, playingWriteRequestDTO, playingImage, userDetails);
     }
 
     @GetMapping("/getPlayings")

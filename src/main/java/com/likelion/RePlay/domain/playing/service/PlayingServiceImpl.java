@@ -113,7 +113,7 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> modifyPost(Long playingId, PlayingWriteRequestDTO playingWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
+    public ResponseEntity<CustomAPIResponse<?>> modifyPost(Long playingId, PlayingWriteRequestDTO playingWriteRequestDTO, MultipartFile playingImage, MyUserDetailsService.MyUserDetails userDetails) {
 
         String phoneId = userDetails.getPhoneId();
         User user = userRepository.findByPhoneId(phoneId)
@@ -149,13 +149,23 @@ public class PlayingServiceImpl implements PlayingService {
             e.printStackTrace();
         }
 
+        String imageUrl = null;
+        if (playingImage != null && !playingImage.isEmpty()) {
+            try {
+                imageUrl = s3Service.uploadFile(playingImage);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(CustomAPIResponse.createFailWithout(HttpStatus.INTERNAL_SERVER_ERROR.value(), "이미지 업로드를 실패했습니다."));
+            }
+        }
+
         user.changeIntroduce(playingWriteRequestDTO.getIntroduce());
         playing.changeTitle(playingWriteRequestDTO.getTitle());
         playing.changeDate(date);
         playing.changeLocate(playingWriteRequestDTO.getLocate());
         playing.changeCategory(playingWriteRequestDTO.getCategory());
         playing.changeContent(playingWriteRequestDTO.getContent());
-        playing.changeImageUrl(playingWriteRequestDTO.getPlayingImage());
+        playing.changeImageUrl(imageUrl);
         playing.changeTotalCount(playingWriteRequestDTO.getTotalCount());
         playing.changeCost(Long.valueOf(playingWriteRequestDTO.getCost()));
         playing.changeCostDescription(playingWriteRequestDTO.getCostDescription());

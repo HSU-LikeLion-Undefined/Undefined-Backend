@@ -27,10 +27,6 @@ public class PlayingController {
             @RequestPart(value = "playingImage", required = false) MultipartFile playingImage,
             @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
 
-        // 디버깅용 로그 추가
-        System.out.println("DTO: " + playingWriteRequestDTO);
-        System.out.println("Image: " + (playingImage != null ? playingImage.getOriginalFilename() : "No image"));
-
         return playingService.writePost(playingWriteRequestDTO, playingImage, userDetails);
     }
 

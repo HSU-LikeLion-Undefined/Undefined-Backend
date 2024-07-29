@@ -33,7 +33,7 @@ public class SecurityConfig {
                                 "/api/user/isExistNickName","/api/user/isExistPhoneId", "/api/user/getMyPage").permitAll()
                         .requestMatchers("/api/playing/getPlayings/**", "/api/playing/comment/**").permitAll()
                         .requestMatchers("/api/info/getAllInfo", "/api/info/getOneInfo/**").permitAll()
-                        .requestMatchers(("/api/learning/getLearning/**")).permitAll()
+                        .requestMatchers("/api/learning/getLearning/**", "/api/learning/comment/**").permitAll()
                         // 로그인한 사용자만 접근 가능
                         .requestMatchers("/api/user/**").authenticated()
                         .requestMatchers("/api/playing/**").authenticated()

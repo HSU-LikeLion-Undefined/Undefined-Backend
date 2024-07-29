@@ -81,4 +81,9 @@ public class LearningController {
         return learningService.commentLearning(learningId, learningCommentWriteRequestDTO, userDetails);
     }
 
+    @GetMapping("/comment/{learningId}")
+    private ResponseEntity<CustomAPIResponse<?>> getAllComments(@PathVariable Long learningId) {
+        return learningService.getAllComments(learningId);
+    }
+
 }

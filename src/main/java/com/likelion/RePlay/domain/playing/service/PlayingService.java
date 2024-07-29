@@ -1,6 +1,5 @@
 package com.likelion.RePlay.domain.playing.service;
 
-import com.amazonaws.Response;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingCommentWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingReviewRequestDto;
@@ -38,7 +37,11 @@ public interface PlayingService {
 
     ResponseEntity<CustomAPIResponse<?>> writePlayingReview(PlayingReviewRequestDto playingReviewRequestDto, MyUserDetailsService.MyUserDetails userDetails);
 
-    ResponseEntity<CustomAPIResponse<?>> scrapPlayings(MyUserDetailsService.MyUserDetails userDetails);
+    // 스크랩하기
+    ResponseEntity<CustomAPIResponse<?>> scrapPlayings(Long playingId, MyUserDetailsService.MyUserDetails userDetails);
+
+    // 스크랩한 게시물 조회
+    ResponseEntity<CustomAPIResponse<?>> getMyScrapPlaying(MyUserDetailsService.MyUserDetails userDetails);
 
     ResponseEntity<CustomAPIResponse<?>> commentPlaying(Long playingId, PlayingCommentWriteRequestDTO playingCommentWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails);
 

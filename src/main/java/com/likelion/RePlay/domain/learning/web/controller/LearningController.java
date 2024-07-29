@@ -1,6 +1,5 @@
 package com.likelion.RePlay.domain.learning.web.controller;
 
-import com.amazonaws.Response;
 import com.likelion.RePlay.domain.learning.service.LearningService;
 import com.likelion.RePlay.domain.learning.web.dto.LearningCommentWriteRequestDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
@@ -57,9 +56,10 @@ public class LearningController {
         return learningService.cancelLearning(learningId, userDetails);
     }
 
+    // 스크랩 설정
     @PostMapping("/{learningId}/scrap")
     private ResponseEntity<CustomAPIResponse<?>> scrapLearning(@PathVariable Long learningId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
-        return learningService.scrapLearning(learningId, userDetails);
+        return learningService.scrapLearning(learningId,userDetails);
     }
 
     @DeleteMapping("/{learningId}/scrap")
@@ -83,10 +83,12 @@ public class LearningController {
     @PostMapping("/{learningId}/complete")
     private ResponseEntity<CustomAPIResponse<?>> completeLearning(@PathVariable Long learningId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return learningService.completeLearning(learningId, userDetails);
-      
+    }
+
+    // 스크랩 조회
     @GetMapping("/scrap")
     private ResponseEntity<CustomAPIResponse<?>> scrapLearnings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
-        return learningService.scrapLearnings(userDetails);
+        return learningService.getMyScrapLearnings(userDetails);
     }
 
     @PostMapping("/{learningId}/comment")

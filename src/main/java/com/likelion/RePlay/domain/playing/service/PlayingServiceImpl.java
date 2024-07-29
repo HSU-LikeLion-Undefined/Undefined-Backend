@@ -416,8 +416,9 @@ public class PlayingServiceImpl implements PlayingService {
                 .body(CustomAPIResponse.createSuccess(200, null, "활동 신청이 취소되었습니다."));
     }
 
+    // 스크랩
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> scrapPlaying(Long playingId, MyUserDetailsService.MyUserDetails userDetails) {
+    public ResponseEntity<CustomAPIResponse<?>> scrapPlayings(Long playingId, MyUserDetailsService.MyUserDetails userDetails) {
 
         String phoneId = userDetails.getPhoneId();
         User user = userRepository.findByPhoneId(phoneId)
@@ -625,8 +626,9 @@ public class PlayingServiceImpl implements PlayingService {
     }
 
 
+    // 스크랩한 놀이터 게시글 조회
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> scrapPlayings(MyUserDetailsService.MyUserDetails userDetails) {
+    public ResponseEntity<CustomAPIResponse<?>> getMyScrapPlaying(MyUserDetailsService.MyUserDetails userDetails) {
 
         String phoneId = userDetails.getPhoneId();
         User user = userRepository.findByPhoneId(phoneId)

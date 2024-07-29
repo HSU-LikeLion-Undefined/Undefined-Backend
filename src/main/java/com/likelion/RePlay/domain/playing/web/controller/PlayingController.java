@@ -1,6 +1,5 @@
 package com.likelion.RePlay.domain.playing.web.controller;
 
-import com.amazonaws.Response;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingCommentWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingReviewRequestDto;
@@ -55,21 +54,25 @@ public class PlayingController {
         return playingService.cancelPlaying(playingId, userDetails);
     }
 
+
     @PostMapping("/{playingId}/scrap")
     private ResponseEntity<CustomAPIResponse<?>> scrapPlaying(@PathVariable Long playingId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
-        return playingService.scrapPlaying(playingId, userDetails);
+        return playingService.scrapPlayings(playingId, userDetails);
     }
 
+    // 스크랩 취소
     @DeleteMapping("/{playingId}/scrap")
     private ResponseEntity<CustomAPIResponse<?>> cancelScrap(@PathVariable Long playingId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return playingService.cancelScrap(playingId, userDetails);
     }
 
+    // 작성 놀이터 조회
     @GetMapping("/myPlayings")
     private ResponseEntity<CustomAPIResponse<?>> getMyPlayings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return playingService.getMyPlayings(userDetails);
     }
 
+    // 내가 만든 놀이터 삭제
     @DeleteMapping("/myPlayings/{playingId}")
     private ResponseEntity<CustomAPIResponse<?>> deleteMyPlaying(@PathVariable Long playingId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return playingService.deleteMyPlaying(playingId, userDetails);
@@ -86,15 +89,18 @@ public class PlayingController {
     }
 
 
+    // 리뷰 작성
     @PostMapping("/writeReview")
     private ResponseEntity<CustomAPIResponse<?>> writeReviewPlayings(
             @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails,
             @RequestBody PlayingReviewRequestDto playingReviewRequestDto) {
         return playingService.writePlayingReview(playingReviewRequestDto, userDetails);
+    }
 
+    // 스크랩한 게시물 가져오기
     @GetMapping("/scrap")
-    private ResponseEntity<CustomAPIResponse<?>> scrapPlayings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
-        return playingService.scrapPlayings(userDetails);
+    private ResponseEntity<CustomAPIResponse<?>> scrapPlaying(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.getMyScrapPlaying(userDetails);
     }
 
     @PostMapping("/{playingId}/comment")

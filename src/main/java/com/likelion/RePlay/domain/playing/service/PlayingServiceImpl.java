@@ -2,20 +2,16 @@ package com.likelion.RePlay.domain.playing.service;
 
 import com.likelion.RePlay.domain.playing.entity.PlayingReview;
 import com.likelion.RePlay.domain.playing.entity.PlayingScrap;
-import com.likelion.RePlay.domain.playing.repository.PlayingReviewRepository;
-import com.likelion.RePlay.domain.playing.repository.PlayingScrapRepository;
+import com.likelion.RePlay.domain.playing.repository.*;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingListDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingReviewRequestDto;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
 
 import com.likelion.RePlay.domain.playing.entity.PlayingComment;
-import com.likelion.RePlay.domain.playing.repository.PlayingCommentRepository;
 import com.likelion.RePlay.domain.playing.web.dto.*;
 import com.likelion.RePlay.domain.playing.entity.Playing;
 import com.likelion.RePlay.domain.playing.entity.PlayingApply;
-import com.likelion.RePlay.domain.playing.repository.PlayingApplyRepository;
-import com.likelion.RePlay.domain.playing.repository.PlayingRepository;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
 import com.likelion.RePlay.global.amazon.S3.S3Service;
@@ -561,7 +557,7 @@ public class PlayingServiceImpl implements PlayingService {
         Date date = playing.getDate();
         Date now = new Date();
 
-        if (date.before(now)) {
+        if (!date.before(now)) {
             return ResponseEntity.status(400)
                     .body(CustomAPIResponse.createFailWithout(400, "활동 날짜가 되지 않았습니다.."));
 
@@ -777,6 +773,53 @@ public class PlayingServiceImpl implements PlayingService {
 
         return ResponseEntity.status(200)
                 .body(CustomAPIResponse.createSuccess(200, null, "댓글 삭제를 성공했습니다."));
+
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getUserReview(UserReviewRequestDto userReviewRequestDto) {
+        String userName= userReviewRequestDto.getUserName();
+        Optional<User> isExist= userRepository.findByNickname(userName);
+
+                // 해당 사용자가 존재하지 않는다면
+                if (isExist.isEmpty()) {
+                    CustomAPIResponse<Object> failResponse = CustomAPIResponse
+                            .createFailWithout(HttpStatus.NOT_FOUND.value(), "존재하지 않는 사용자입니다.");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(failResponse);
+                }
+
+                List<PlayingReview> playingReviews=playingReviewRepository.findReviewsByRecipientNickname(isExist.get().getNickname());
+
+                // 평균 점수 계산
+                double averageRate=0;
+                if (!playingReviews.isEmpty()) {
+                    double sumRate = playingReviews.stream()
+                            .mapToDouble(PlayingReview::getRate)
+                            .sum();
+                    averageRate = sumRate / playingReviews.size();
+                }
+
+                List<PlayingReview> recentReviews=playingReviews.stream()
+                        //Comparator.comparing(PlayingReview::getCreatedAt)는 getCreatedAt 메서드를 기준으로 정렬하는 Comparator를 생성
+                        .sorted(Comparator.comparing(PlayingReview::getCreatedAt)
+                                .reversed())
+                        .limit(4)
+                        .toList();
+
+                List<GetUserReviewResponseDto.GetReview> reviewList=recentReviews.stream()
+                        .map(playingReview -> GetUserReviewResponseDto.GetReview.builder()
+                                .writer(playingReview.getUser().getNickname())
+                                .content(playingReview.getContent())
+                                .rate(playingReview.getRate())
+                               .build()).collect(Collectors.toList());
+
+                GetUserReviewResponseDto.FinalResponseDto res=GetUserReviewResponseDto.FinalResponseDto.builder()
+                        .reviewList(reviewList)
+                        .averageRate(averageRate)
+                        .build();
+
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), res, "사용자 리뷰 조회에 성공하였습니다."));
 
     }
 

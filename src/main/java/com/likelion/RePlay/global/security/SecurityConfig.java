@@ -32,9 +32,11 @@ public class SecurityConfig {
                         //비로그인 사용자도 접근 가능
                         .requestMatchers("/api/user/signUp", "/api/user/login",
                                 "/api/user/isExistNickName","/api/user/isExistPhoneId", "/api/user/getMyPage").permitAll()
-                        .requestMatchers("/api/playing/getPlayings/**", "/api/playing/comment/**", "/api/playing/filtering").permitAll()
+                        .requestMatchers("/api/playing/getPlayings/**", "/api/playing/comment/**",
+                                "/api/playing/filtering", "/api/playing/getUserReview").permitAll()
                         .requestMatchers("/api/info/getAllInfo", "/api/info/getOneInfo/**").permitAll()
-                        .requestMatchers("/api/learning/getLearnings/**", "/api/learning/comment/**", "/api/learning/filtering").permitAll()
+                        .requestMatchers("/api/learning/getLearnings/**", "/api/learning/comment/**",
+                                "/api/learning/filtering", "/api/learning/getMentorReview").permitAll()
 
                         // 로그인한 사용자만 접근 가능
                         .requestMatchers("/api/user/**").authenticated()

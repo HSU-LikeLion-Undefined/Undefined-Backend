@@ -1,9 +1,7 @@
 package com.likelion.RePlay.domain.playing.web.controller;
 
-import com.likelion.RePlay.domain.playing.web.dto.PlayingCommentWriteRequestDTO;
-import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
-import com.likelion.RePlay.domain.playing.web.dto.PlayingReviewRequestDto;
-import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
+import com.likelion.RePlay.domain.learning.web.dto.MentorReviewRequestDto;
+import com.likelion.RePlay.domain.playing.web.dto.*;
 import com.likelion.RePlay.domain.playing.service.PlayingServiceImpl;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
@@ -126,6 +124,12 @@ public class PlayingController {
     @DeleteMapping("/{commentId}/comment")
     private ResponseEntity<CustomAPIResponse<?>> deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return playingService.deleteComment(commentId, userDetails);
+    }
+
+    @PostMapping("/getUserReview")
+    private ResponseEntity<CustomAPIResponse<?>> getUserReview(
+            @RequestBody UserReviewRequestDto userReviewRequestDto){
+        return playingService.getUserReview(userReviewRequestDto);
     }
 
 }

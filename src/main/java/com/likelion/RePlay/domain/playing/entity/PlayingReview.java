@@ -26,6 +26,8 @@ public class PlayingReview extends BaseEntity {
     @Column(name="RATE")
     private Double rate;
 
+
+    // 리뷰 작성자
     @ManyToOne
     @JoinColumn(name = "USER_ID")
     private User user;

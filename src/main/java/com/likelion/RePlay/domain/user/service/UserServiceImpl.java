@@ -220,7 +220,9 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.save(user);
 
+
         String newToken = null;
+        // 전화번호가 수정되면 새로운 토크인 발급된다
         if(!(myUserDetails.getPhoneId().equals(modifyMyPageDto.getPhoneId()))){
             newToken = jwtTokenProvider.createToken(user.getPhoneId(), user.getUserRoles().stream()
                     .map(UserRole::getRole)

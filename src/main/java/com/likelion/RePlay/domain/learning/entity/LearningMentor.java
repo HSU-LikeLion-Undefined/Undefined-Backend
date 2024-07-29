@@ -17,5 +17,5 @@ public class LearningMentor extends BaseEntity {
     private Long learningMentorId;
 
     @Column
-    private String name;
+    private String mentorName;
 }

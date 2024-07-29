@@ -54,10 +54,10 @@ public class LearningServiceImpl implements LearningService{
         // 멘토가 존재하지 않는다면, learningMentorRepository에 추가
         // 이미 존재한다면, 그 멘토를 가져온다
         LearningMentor mentor;
-        Optional<LearningMentor> isExist=learningMentorRepository.findLearningMentorNameBy(learningWriteRequestDTO.getMentorName());
+        Optional<LearningMentor> isExist=learningMentorRepository.findByMentorName(learningWriteRequestDTO.getMentorName());
         if(isExist.isEmpty()){
             mentor= LearningMentor.builder()
-                    .name(learningWriteRequestDTO.getMentorName())
+                    .mentorName(learningWriteRequestDTO.getMentorName())
                     .build();
             learningMentorRepository.save(mentor);
         }else {
@@ -116,10 +116,10 @@ public class LearningServiceImpl implements LearningService{
         // 멘토가 존재하지 않는다면, learningMentorRepository에 추가
         // 이미 존재한다면, 그 멘토를 가져온다
         LearningMentor mentor;
-        Optional<LearningMentor> isExist=learningMentorRepository.findLearningMentorNameBy(learningWriteRequestDTO.getMentorName());
+        Optional<LearningMentor> isExist=learningMentorRepository.findByMentorName(learningWriteRequestDTO.getMentorName());
         if(isExist.isEmpty()){
             mentor= LearningMentor.builder()
-                    .name(learningWriteRequestDTO.getMentorName())
+                    .mentorName(learningWriteRequestDTO.getMentorName())
                     .build();
             learningMentorRepository.save(mentor);
         }else {
@@ -191,7 +191,7 @@ public class LearningServiceImpl implements LearningService{
                     .totalCount(learning.getTotalCount())
                     .recruitmentCount(learning.getRecruitmentCount())
                     .imageUrl(learning.getImageUrl())
-                    .mentorName(learning.getLearningMentor().getName())
+                    .mentorName(learning.getLearningMentor().getMentorName())
                     .build());
         }
 
@@ -224,7 +224,7 @@ public class LearningServiceImpl implements LearningService{
                 .recruitmentCount(findLearning.get().getRecruitmentCount())
                 .content(findLearning.get().getContent())
                 .imageUrl(findLearning.get().getImageUrl())
-                .mentorName(findLearning.get().getLearningMentor().getName())
+                .mentorName(findLearning.get().getLearningMentor().getMentorName())
                 .build();
 
         return ResponseEntity.status(200)
@@ -301,7 +301,7 @@ public class LearningServiceImpl implements LearningService{
                     .totalCount(result.getTotalCount())
                     .recruitmentCount(result.getRecruitmentCount())
                     .imageUrl(result.getImageUrl())
-                    .mentorName(result.getLearningMentor().getName())
+                    .mentorName(result.getLearningMentor().getMentorName())
                     .build();
             learningResponse.add(response);
         }
@@ -366,7 +366,7 @@ public class LearningServiceImpl implements LearningService{
                 .date(findLearning.get().getDate())
                 .locate(findLearning.get().getLocate())
                 .imageUrl(findLearning.get().getImageUrl())
-                .mentorName(findLearning.get().getLearningMentor().getName())
+                .mentorName(findLearning.get().getLearningMentor().getMentorName())
                 .build();
 
         return ResponseEntity.status(200)
@@ -491,7 +491,7 @@ public class LearningServiceImpl implements LearningService{
                     .title(learning.getTitle())
                     .date(learning.getDate())
                     .imageUrl(learning.getImageUrl())
-                    .mentorName(learning.getLearningMentor().getName())
+                    .mentorName(learning.getLearningMentor().getMentorName())
                     .build());
         }
 

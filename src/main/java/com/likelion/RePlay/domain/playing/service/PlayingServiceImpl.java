@@ -287,6 +287,10 @@ public class PlayingServiceImpl implements PlayingService {
                         return matches;
                     })
                     .collect(Collectors.toList());
+        } else if (playingFilteringDTO.getDistrictList() != null && !playingFilteringDTO.getDistrictList().isEmpty()) {
+            // state가 없는데 district가 있는 경우 오류 반환
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(CustomAPIResponse.createFailWithout(HttpStatus.BAD_REQUEST.value(), "State가 선택되지 않았습니다."));
         }
 
         // 5. Category 조건과 일치하는 게시글만 남기기 (Null일 경우 필터링하지 않음)

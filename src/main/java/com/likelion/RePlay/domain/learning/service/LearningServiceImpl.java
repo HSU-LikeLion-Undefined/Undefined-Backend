@@ -12,6 +12,7 @@ import com.likelion.RePlay.domain.learning.web.dto.LearningCommentWriteRequestDT
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningListDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
+import com.likelion.RePlay.domain.playing.web.dto.CommentListDTO;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
 import com.likelion.RePlay.global.enums.*;
@@ -540,6 +541,39 @@ public class LearningServiceImpl implements LearningService{
 
         return ResponseEntity.status(201)
                 .body(CustomAPIResponse.createSuccess(201, null, "댓글을 작성하였습니다."));
+
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getAllComments(Long learningId) {
+
+        List<LearningComment> learningComments = learningCommentRepository.findAllByLearningLearningId(learningId);
+        List<CommentListDTO.CommentResponse> commentResponses = new ArrayList<>();
+
+        Optional<Learning> findLearning = learningRepository.findById(learningId);
+        if (findLearning.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "게시글을 찾을 수 없습니다."));
+        }
+
+        for (LearningComment learningComment : learningComments) {
+            Long parentCommentId = 0L;
+
+            if (learningComment.getParent() != null) {
+                parentCommentId = learningComment.getParent().getLearningCommentId();
+            }
+
+            commentResponses.add(CommentListDTO.CommentResponse.builder()
+                    .content(learningComment.getContent())
+                    .date(learningComment.getDate())
+                    .nickname(learningComment.getUser().getNickname())
+                    .commentId(learningComment.getLearningCommentId())
+                    .parentCommentId(parentCommentId)
+                    .build());
+        }
+
+        return ResponseEntity.status(201)
+                .body(CustomAPIResponse.createSuccess(201, commentResponses, "해당 게시글의 댓글과 답글을 불러왔습니다."));
 
     }
 

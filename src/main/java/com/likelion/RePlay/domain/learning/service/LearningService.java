@@ -32,4 +32,6 @@ public interface LearningService {
     ResponseEntity<CustomAPIResponse<?>> scrapLearnings(MyUserDetailsService.MyUserDetails userDetails);
 
     ResponseEntity<CustomAPIResponse<?>> commentLearning(Long learningId, LearningCommentWriteRequestDTO learningCommentWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails);
+
+    ResponseEntity<CustomAPIResponse<?>> getAllComments(Long learningId);
 }

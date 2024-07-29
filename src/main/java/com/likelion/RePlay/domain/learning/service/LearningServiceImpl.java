@@ -577,5 +577,31 @@ public class LearningServiceImpl implements LearningService{
 
     }
 
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> deleteComment(Long commentId, MyUserDetailsService.MyUserDetails userDetails) {
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+
+        Optional<LearningComment> findComment = learningCommentRepository.findById(commentId);
+        if (findComment.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 댓글입니다."));
+        }
+
+        LearningComment comment = findComment.get();
+
+        if (!comment.getUser().getPhoneId().equals(phoneId)) {
+            return ResponseEntity.status(403)
+                    .body(CustomAPIResponse.createFailWithout(403, "본인이 작성한 댓글만 삭제할 수 있습니다."));
+        }
+
+        learningCommentRepository.delete(comment);
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, null, "댓글 삭제를 성공했습니다."));
+
+    }
+
 
 }

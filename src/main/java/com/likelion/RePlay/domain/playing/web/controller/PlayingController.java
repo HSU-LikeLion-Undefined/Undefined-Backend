@@ -1,5 +1,7 @@
 package com.likelion.RePlay.domain.playing.web.controller;
 
+import com.amazonaws.Response;
+import com.likelion.RePlay.domain.playing.web.dto.PlayingCommentWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingReviewRequestDto;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
@@ -83,11 +85,31 @@ public class PlayingController {
         return playingService.recruitedPlayings(userDetails);
     }
 
+
     @PostMapping("/writeReview")
     private ResponseEntity<CustomAPIResponse<?>> writeReviewPlayings(
             @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails,
             @RequestBody PlayingReviewRequestDto playingReviewRequestDto) {
         return playingService.writePlayingReview(playingReviewRequestDto, userDetails);
+
+    @GetMapping("/scrap")
+    private ResponseEntity<CustomAPIResponse<?>> scrapPlayings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.scrapPlayings(userDetails);
+    }
+
+    @PostMapping("/{playingId}/comment")
+    private ResponseEntity<CustomAPIResponse<?>> commentPlaying(@PathVariable Long playingId, @RequestBody PlayingCommentWriteRequestDTO playingCommentWriteRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.commentPlaying(playingId, playingCommentWriteRequestDTO, userDetails);
+    }
+
+    @GetMapping("/comment/{playingId}")
+    private ResponseEntity<CustomAPIResponse<?>> getAllComments(@PathVariable Long playingId) {
+        return playingService.getAllComments(playingId);
+    }
+
+    @DeleteMapping("/{commentId}/comment")
+    private ResponseEntity<CustomAPIResponse<?>> deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.deleteComment(commentId, userDetails);
     }
 
 }

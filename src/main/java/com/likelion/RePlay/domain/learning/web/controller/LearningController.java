@@ -1,6 +1,8 @@
 package com.likelion.RePlay.domain.learning.web.controller;
 
+import com.amazonaws.Response;
 import com.likelion.RePlay.domain.learning.service.LearningService;
+import com.likelion.RePlay.domain.learning.web.dto.LearningCommentWriteRequestDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningReviewRequestDto;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
@@ -70,6 +72,7 @@ public class LearningController {
         return learningService.recruitedLearnings(userDetails);
     }
 
+
     @PostMapping("/writeReview")
     private ResponseEntity<CustomAPIResponse<?>> writeReviewLearnings(
             @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails,
@@ -80,6 +83,26 @@ public class LearningController {
     @PostMapping("/{learningId}/complete")
     private ResponseEntity<CustomAPIResponse<?>> completeLearning(@PathVariable Long learningId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return learningService.completeLearning(learningId, userDetails);
+      
+    @GetMapping("/scrap")
+    private ResponseEntity<CustomAPIResponse<?>> scrapLearnings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.scrapLearnings(userDetails);
+    }
+
+    @PostMapping("/{learningId}/comment")
+    private ResponseEntity<CustomAPIResponse<?>> commentLearning(@PathVariable Long learningId, @RequestBody LearningCommentWriteRequestDTO learningCommentWriteRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.commentLearning(learningId, learningCommentWriteRequestDTO, userDetails);
+    }
+
+    @GetMapping("/comment/{learningId}")
+    private ResponseEntity<CustomAPIResponse<?>> getAllComments(@PathVariable Long learningId) {
+        return learningService.getAllComments(learningId);
+    }
+
+    @DeleteMapping("/{commentId}/comment")
+    private ResponseEntity<CustomAPIResponse<?>> deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.deleteComment(commentId, userDetails);
+
     }
 
 }

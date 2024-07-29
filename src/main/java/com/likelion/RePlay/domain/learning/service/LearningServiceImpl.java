@@ -2,10 +2,12 @@ package com.likelion.RePlay.domain.learning.service;
 
 import com.likelion.RePlay.domain.learning.entity.*;
 import com.likelion.RePlay.domain.learning.repository.*;
+import com.likelion.RePlay.domain.learning.web.dto.LearningCommentWriteRequestDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningListDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningReviewRequestDto;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
+import com.likelion.RePlay.domain.playing.web.dto.CommentListDTO;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
 import com.likelion.RePlay.global.enums.*;
@@ -37,6 +39,7 @@ public class LearningServiceImpl implements LearningService{
     private final LearningScrapRepository learningScrapRepository;
     private final LearningMentorRepository learningMentorRepository;
     private final LearningReviewRepository learningReviewRepository;
+    private final LearningCommentRepository learningCommentRepository;
 
     @Override
     public ResponseEntity<CustomAPIResponse<?>> writePost(LearningWriteRequestDTO learningWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
@@ -500,7 +503,6 @@ public class LearningServiceImpl implements LearningService{
 
     }
 
-    @Override
     public ResponseEntity<CustomAPIResponse<?>> writeLearningReview(LearningReviewRequestDto learningReviewRequestDto, MyUserDetailsService.MyUserDetails userDetails) {
         Learning learning=learningRepository.findById(learningReviewRequestDto.getLearningId()).orElseThrow();
         Optional<LearningApply> learningApply=learningApplyRepository.findByUserPhoneIdAndLearningLearningId(userDetails.getPhoneId(),learningReviewRequestDto.getLearningId());
@@ -557,6 +559,135 @@ public class LearningServiceImpl implements LearningService{
 
                 return ResponseEntity.status(200)
                         .body(CustomAPIResponse.createSuccess(200, null, "활동을 완료했습니다."));
+
+=======
+    public ResponseEntity<CustomAPIResponse<?>> scrapLearnings(MyUserDetailsService.MyUserDetails userDetails) {
+
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+        Long userId = user.getUserId();
+
+        List<LearningScrap> learningScraps = learningScrapRepository.findAllByUserUserId(userId);
+        List<LearningListDTO.LearningResponse> learningResponses = new ArrayList<>();
+
+        for (int i = 0; i < learningScraps.size(); i++) {
+            Learning learning = learningScraps.get(i).getLearning();
+
+            learningResponses.add(LearningListDTO.LearningResponse.builder()
+                    .category(learning.getCategory())
+                    .title(learning.getTitle())
+                    .date(learning.getDate())
+                    .imageUrl(learning.getImageUrl())
+                    .build());
+        }
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, learningResponses, "스크랩한 게시글 목록을 성공적으로 불러왔습니다."));
+
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> commentLearning(Long learningId, LearningCommentWriteRequestDTO learningCommentWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
+
+        // 댓글 작성자가 존재하는가?
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+
+        Optional<Learning> findLearning = learningRepository.findById(learningId);
+        if (findLearning.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "게시글을 찾을 수 없습니다."));
+        }
+
+        String dateStr = learningCommentWriteRequestDTO.getDate();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy년 M월 d일 a h시 m분");
+        Date date = new Date();
+        try {
+            date = dateFormat.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        LearningComment parentComment = null;
+
+        if (learningCommentWriteRequestDTO.getParentCommentId() != null) {
+            Optional<LearningComment> findParentComment = learningCommentRepository.findByLearningCommentId(learningCommentWriteRequestDTO.getParentCommentId());
+            parentComment = findParentComment.get();
+        }
+
+        LearningComment newComment = LearningComment.builder()
+                .user(user)
+                .learning(findLearning.get())
+                .content(learningCommentWriteRequestDTO.getContent())
+                .date(date)
+                .parent(parentComment)
+                .build();
+
+        learningCommentRepository.save(newComment);
+
+        return ResponseEntity.status(201)
+                .body(CustomAPIResponse.createSuccess(201, null, "댓글을 작성하였습니다."));
+
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getAllComments(Long learningId) {
+
+        List<LearningComment> learningComments = learningCommentRepository.findAllByLearningLearningId(learningId);
+        List<CommentListDTO.CommentResponse> commentResponses = new ArrayList<>();
+
+        Optional<Learning> findLearning = learningRepository.findById(learningId);
+        if (findLearning.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "게시글을 찾을 수 없습니다."));
+        }
+
+        for (LearningComment learningComment : learningComments) {
+            Long parentCommentId = 0L;
+
+            if (learningComment.getParent() != null) {
+                parentCommentId = learningComment.getParent().getLearningCommentId();
+            }
+
+            commentResponses.add(CommentListDTO.CommentResponse.builder()
+                    .content(learningComment.getContent())
+                    .date(learningComment.getDate())
+                    .nickname(learningComment.getUser().getNickname())
+                    .commentId(learningComment.getLearningCommentId())
+                    .parentCommentId(parentCommentId)
+                    .build());
+        }
+
+        return ResponseEntity.status(201)
+                .body(CustomAPIResponse.createSuccess(201, commentResponses, "해당 게시글의 댓글과 답글을 불러왔습니다."));
+
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> deleteComment(Long commentId, MyUserDetailsService.MyUserDetails userDetails) {
+        String phoneId = userDetails.getPhoneId();
+        User user = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+
+        Optional<LearningComment> findComment = learningCommentRepository.findById(commentId);
+        if (findComment.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 댓글입니다."));
+        }
+
+        LearningComment comment = findComment.get();
+
+        if (!comment.getUser().getPhoneId().equals(phoneId)) {
+            return ResponseEntity.status(403)
+                    .body(CustomAPIResponse.createFailWithout(403, "본인이 작성한 댓글만 삭제할 수 있습니다."));
+        }
+
+        learningCommentRepository.delete(comment);
+
+        return ResponseEntity.status(200)
+                .body(CustomAPIResponse.createSuccess(200, null, "댓글 삭제를 성공했습니다."));
 
 
     }

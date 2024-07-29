@@ -3,6 +3,7 @@ package com.likelion.RePlay.domain.learning.web.dto;
 import com.likelion.RePlay.global.enums.Category;
 import com.likelion.RePlay.global.enums.District;
 import com.likelion.RePlay.global.enums.State;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -21,6 +22,8 @@ public class LearningWriteRequestDTO {
     private District district;
     private Category category;
     private String content; // 배움 설명
+
+    @NotNull(message = "모집 인원을 입력해주세요.")
     private Long totalCount;
     private String imageUrl;
 

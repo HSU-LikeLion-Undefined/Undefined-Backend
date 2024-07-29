@@ -128,4 +128,8 @@ public class Learning extends BaseEntity {
     public void changeLearningMentor(LearningMentor learningMentor) {
         this.learningMentor = learningMentor;
     }
+
+    public void changeComplete(IsCompleted isCompleted) {
+        this.isCompleted = isCompleted;
+    }
 }

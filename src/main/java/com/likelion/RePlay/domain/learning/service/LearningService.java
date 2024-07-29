@@ -29,4 +29,6 @@ public interface LearningService {
     ResponseEntity<CustomAPIResponse<?>> recruitedLearnings(MyUserDetailsService.MyUserDetails userDetails);
 
     ResponseEntity<CustomAPIResponse<?>> writeLearningReview(LearningReviewRequestDto learningReviewRequestDto, MyUserDetailsService.MyUserDetails userDetails);
+
+    ResponseEntity<CustomAPIResponse<?>> completePlaying(Long learningId, MyUserDetailsService.MyUserDetails userDetails);
 }

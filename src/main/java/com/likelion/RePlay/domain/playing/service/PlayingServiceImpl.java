@@ -77,7 +77,7 @@ public class PlayingServiceImpl implements PlayingService {
                 .totalCount(playingWriteRequestDTO.getTotalCount())
                 .recruitmentCount(0L)
                 .content(playingWriteRequestDTO.getContent())
-                .cost(Long.valueOf(playingWriteRequestDTO.getCost()))
+                .cost(playingWriteRequestDTO.getCost())
                 .costDescription(playingWriteRequestDTO.getCostDescription())
                 .locate(playingWriteRequestDTO.getLocate())
                 .latitude(playingWriteRequestDTO.getLatitude())

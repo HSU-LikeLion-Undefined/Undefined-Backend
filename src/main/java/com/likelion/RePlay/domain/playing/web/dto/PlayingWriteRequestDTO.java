@@ -26,7 +26,7 @@ public class PlayingWriteRequestDTO {
     private Category category;
     private String content; // 놀이 설명
     private Long totalCount;
-    private String cost; // 참가비용
+    private Long cost; // 참가비용
     private String costDescription; //참가비용 설명
     private String imageUrl;
 }

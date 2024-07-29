@@ -77,4 +77,9 @@ public class LearningController {
         return learningService.writeLearningReview(learningReviewRequestDto, userDetails);
     }
 
+    @PostMapping("/{learningId}/complete")
+    private ResponseEntity<CustomAPIResponse<?>> completeLearning(@PathVariable Long learningId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.completePlaying(learningId, userDetails);
+    }
+
 }

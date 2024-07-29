@@ -308,6 +308,10 @@ public class LearningServiceImpl implements LearningService{
                         return matches;
                     })
                     .collect(Collectors.toList());
+        } else if (learningFilteringDTO.getDistrictList() != null && !learningFilteringDTO.getDistrictList().isEmpty()) {
+            // state가 없는데 district가 있는 경우 오류 반환
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(CustomAPIResponse.createFailWithout(HttpStatus.BAD_REQUEST.value(), "State가 선택되지 않았습니다."));
         }
 
         List<Learning> filteredByCategory = filteredByLocation;

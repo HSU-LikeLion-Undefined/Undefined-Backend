@@ -1,5 +1,6 @@
 package com.likelion.RePlay.domain.playing.web.controller;
 
+import com.amazonaws.Response;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingCommentWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
@@ -89,11 +90,13 @@ public class PlayingController {
     }
 
     @PostMapping("/{playingId}/comment")
-    private ResponseEntity<CustomAPIResponse<?>> commentPlaying(
-            @PathVariable Long playingId,
-            @RequestBody PlayingCommentWriteRequestDTO playingCommentWriteRequestDTO,
-            @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+    private ResponseEntity<CustomAPIResponse<?>> commentPlaying(@PathVariable Long playingId, @RequestBody PlayingCommentWriteRequestDTO playingCommentWriteRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return playingService.commentPlaying(playingId, playingCommentWriteRequestDTO, userDetails);
+    }
+
+    @GetMapping("/comment/{playingId}")
+    private ResponseEntity<CustomAPIResponse<?>> getAllComments(@PathVariable Long playingId) {
+        return playingService.getAllComments(playingId);
     }
 
 }

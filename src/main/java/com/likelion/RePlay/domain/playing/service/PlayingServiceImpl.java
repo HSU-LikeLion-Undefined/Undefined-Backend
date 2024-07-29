@@ -1,5 +1,6 @@
 package com.likelion.RePlay.domain.playing.service;
 
+import com.amazonaws.Response;
 import com.likelion.RePlay.domain.playing.entity.PlayingComment;
 import com.likelion.RePlay.domain.playing.entity.PlayingScrap;
 import com.likelion.RePlay.domain.playing.repository.PlayingCommentRepository;
@@ -341,7 +342,7 @@ public class PlayingServiceImpl implements PlayingService {
                     .build();
 
             playingApplyRepository.save(newApply);
-        }else {
+        } else {
             // 이미 신청한 활동일 경우, 오류 반환
             return ResponseEntity.status(400)
                     .body(CustomAPIResponse.createFailWithout(400, "이미 신청한 활동입니다."));
@@ -434,10 +435,10 @@ public class PlayingServiceImpl implements PlayingService {
 
             return ResponseEntity.status(200)
                     .body(CustomAPIResponse.createSuccess(200, null, "스크랩되었습니다."));
-        }else {
+        } else {
 
             return ResponseEntity.status(400)
-                    .body(CustomAPIResponse.createFailWithout(400,  "이미 스크랩했습니다."));
+                    .body(CustomAPIResponse.createFailWithout(400, "이미 스크랩했습니다."));
         }
 
     }
@@ -462,12 +463,12 @@ public class PlayingServiceImpl implements PlayingService {
 
             return ResponseEntity.status(200)
                     .body(CustomAPIResponse.createSuccess(200, null, "스크랩이 취소되었습니다."));
-        }else {
+        } else {
 
             return ResponseEntity.status(400)
-                    .body(CustomAPIResponse.createFailWithout(400,  "스크랩하지 않은 게시글입니다."));
+                    .body(CustomAPIResponse.createFailWithout(400, "스크랩하지 않은 게시글입니다."));
         }
-        
+
     }
 
     @Override
@@ -527,13 +528,13 @@ public class PlayingServiceImpl implements PlayingService {
         String phoneId = userDetails.getPhoneId();
         User user = userRepository.findByPhoneId(phoneId)
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
-        
+
         Optional<Playing> findPlaying = playingRepository.findById(playingId);
         Playing playing = findPlaying.get();
         Date date = playing.getDate();
         Date now = new Date();
 
-        if(date.before(now)) {
+        if (date.before(now)) {
             return ResponseEntity.status(400)
                     .body(CustomAPIResponse.createFailWithout(400, "활동 날짜가 되지 않았습니다.."));
 
@@ -563,7 +564,7 @@ public class PlayingServiceImpl implements PlayingService {
         List<PlayingApply> playingApplies = playingApplyRepository.findAllByUserUserId(userId);
         List<PlayingListDTO.PlayingResponse> playingResponses = new ArrayList<>();
 
-        for (int i = 0; i <playingApplies.size(); i++) {
+        for (int i = 0; i < playingApplies.size(); i++) {
             Playing playing = playingApplies.get(i).getPlaying();
 
             playingResponses.add(PlayingListDTO.PlayingResponse.builder()
@@ -590,7 +591,7 @@ public class PlayingServiceImpl implements PlayingService {
         List<PlayingScrap> playingScraps = playingScrapRepository.findAllByUserUserId(userId);
         List<PlayingListDTO.PlayingResponse> playingResponses = new ArrayList<>();
 
-        for (int i = 0; i <playingScraps.size(); i++) {
+        for (int i = 0; i < playingScraps.size(); i++) {
             Playing playing = playingScraps.get(i).getPlaying();
 
             playingResponses.add(PlayingListDTO.PlayingResponse.builder()
@@ -652,6 +653,39 @@ public class PlayingServiceImpl implements PlayingService {
 
         return ResponseEntity.status(201)
                 .body(CustomAPIResponse.createSuccess(201, null, "댓글을 작성하였습니다."));
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getAllComments(Long playingId) {
+
+        List<PlayingComment> playingComments = playingCommentRepository.findAllByPlayingPlayingId(playingId);
+        List<CommentListDTO.CommentResponse> commentResponses = new ArrayList<>();
+
+        // DB에서 해당 게시글을 찾는다.
+        Optional<Playing> findPlaying = playingRepository.findById(playingId);
+        if (findPlaying.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "게시글을 찾을 수 없습니다."));
+        }
+
+        for (PlayingComment playingComment : playingComments) {
+            Long parentCommentId = 0L;
+
+            if (playingComment.getParent() != null) {
+                parentCommentId = playingComment.getParent().getPlayingCommentId();
+            }
+
+            commentResponses.add(CommentListDTO.CommentResponse.builder()
+                    .content(playingComment.getContent())
+                    .date(playingComment.getDate())
+                    .nickname(playingComment.getUser().getNickname())
+                    .commentId(playingComment.getPlayingCommentId())
+                    .parentCommentId(parentCommentId)
+                    .build());
+        }
+
+        return ResponseEntity.status(201)
+                .body(CustomAPIResponse.createSuccess(201, commentResponses, "해당 게시글의 댓글과 답글을 불러왔습니다."));
     }
 
 }

@@ -725,13 +725,8 @@ public class LearningServiceImpl implements LearningService{
         }
 
         List<LearningReview> learningReviews=learningReviewRepository.findByLearningMentor(mentor.get());
-        List<GetMentorReviewResponseDto.GetReview> reviewList=learningReviews.stream()
-                .map(learningReview -> GetMentorReviewResponseDto.GetReview.builder()
-                        .writer(learningReview.getUser().getNickname())
-                        .content(learningReview.getContent())
-                        .rate(learningReview.getRate())
-                        .build()).collect(Collectors.toList());
 
+        // 평균 점수 계산
         double averageRate=0;
         if (!learningReviews.isEmpty()) {
             double sumRate = learningReviews.stream()
@@ -739,6 +734,21 @@ public class LearningServiceImpl implements LearningService{
                     .sum();
             averageRate = sumRate / learningReviews.size();
         }
+
+        List<LearningReview> recentReviews=learningReviews.stream()
+                //Comparator.comparing(LearningReview::getCreatedAt)는 getCreatedAt 메서드를 기준으로 정렬하는 Comparator를 생성
+                .sorted(Comparator.comparing(LearningReview::getCreatedAt)
+                        .reversed())
+                .limit(4)
+                .toList();
+
+
+        List<GetMentorReviewResponseDto.GetReview> reviewList=recentReviews.stream()
+                .map(learningReview -> GetMentorReviewResponseDto.GetReview.builder()
+                        .writer(learningReview.getUser().getNickname())
+                        .content(learningReview.getContent())
+                        .rate(learningReview.getRate())
+                        .build()).collect(Collectors.toList());
 
 
         GetMentorReviewResponseDto.FinalResponseDto res=GetMentorReviewResponseDto.FinalResponseDto.builder()

@@ -19,8 +19,8 @@ public class LearningComment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="Learning_COMMENT_ID")
-    private Long LearningCommentId;
+    @Column(name="LEARNING_COMMENT_ID")
+    private Long learningCommentId;
 
     @Column(name="CONTENT")
     private String content;

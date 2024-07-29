@@ -79,7 +79,7 @@ public class LearningController {
 
     @PostMapping("/{learningId}/complete")
     private ResponseEntity<CustomAPIResponse<?>> completeLearning(@PathVariable Long learningId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
-        return learningService.completePlaying(learningId, userDetails);
+        return learningService.completeLearning(learningId, userDetails);
     }
 
 }

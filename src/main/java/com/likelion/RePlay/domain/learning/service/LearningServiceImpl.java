@@ -533,7 +533,7 @@ public class LearningServiceImpl implements LearningService{
     }
 
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> completePlaying(Long learningId, MyUserDetailsService.MyUserDetails userDetails) {
+    public ResponseEntity<CustomAPIResponse<?>> completeLearning(Long learningId, MyUserDetailsService.MyUserDetails userDetails) {
         String phoneId = userDetails.getPhoneId();
         User user = userRepository.findByPhoneId(phoneId)
                         .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));

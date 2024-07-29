@@ -99,4 +99,9 @@ public class PlayingController {
         return playingService.getAllComments(playingId);
     }
 
+    @DeleteMapping("/{commentId}/comment")
+    private ResponseEntity<CustomAPIResponse<?>> deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.deleteComment(commentId, userDetails);
+    }
+
 }

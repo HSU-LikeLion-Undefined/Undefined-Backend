@@ -5,6 +5,10 @@ import com.likelion.RePlay.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 @Getter
 @Entity
 @Builder
@@ -19,7 +23,10 @@ public class PlayingComment extends BaseEntity {
     private Long playingCommentId;
 
     @Column(name="CONTENT")
-    private Long content;
+    private String content;
+
+    @Column(name = "DATE")
+    private Date date;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID")
@@ -28,4 +35,12 @@ public class PlayingComment extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "PLAYING_ID")
     private Playing playing;
+
+    // 자기 참조 관계 설정
+    @ManyToOne
+    @JoinColumn(name = "PARENT_ID")
+    private PlayingComment parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PlayingComment> replies = new ArrayList<>();
 }

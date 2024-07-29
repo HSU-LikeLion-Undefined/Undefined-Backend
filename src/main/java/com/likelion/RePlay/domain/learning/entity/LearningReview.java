@@ -24,7 +24,7 @@ public class LearningReview extends BaseEntity {
     private String content;
 
     @Column(name="RATE")
-    private BigDecimal rate;
+    private Double rate;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID")

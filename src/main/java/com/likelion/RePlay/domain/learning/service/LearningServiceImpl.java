@@ -1,15 +1,10 @@
 package com.likelion.RePlay.domain.learning.service;
 
-import com.likelion.RePlay.domain.learning.entity.Learning;
-import com.likelion.RePlay.domain.learning.entity.LearningApply;
-import com.likelion.RePlay.domain.learning.entity.LearningMentor;
-import com.likelion.RePlay.domain.learning.entity.LearningScrap;
-import com.likelion.RePlay.domain.learning.repository.LearningApplyRepository;
-import com.likelion.RePlay.domain.learning.repository.LearningMentorRepository;
-import com.likelion.RePlay.domain.learning.repository.LearningRepository;
-import com.likelion.RePlay.domain.learning.repository.LearningScrapRepository;
+import com.likelion.RePlay.domain.learning.entity.*;
+import com.likelion.RePlay.domain.learning.repository.*;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningListDTO;
+import com.likelion.RePlay.domain.learning.web.dto.LearningReviewRequestDto;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
@@ -18,6 +13,7 @@ import com.likelion.RePlay.global.response.CustomAPIResponse;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +36,7 @@ public class LearningServiceImpl implements LearningService{
     private final LearningApplyRepository learningApplyRepository;
     private final LearningScrapRepository learningScrapRepository;
     private final LearningMentorRepository learningMentorRepository;
+    private final LearningReviewRepository learningReviewRepository;
 
     @Override
     public ResponseEntity<CustomAPIResponse<?>> writePost(LearningWriteRequestDTO learningWriteRequestDTO, MyUserDetailsService.MyUserDetails userDetails) {
@@ -501,6 +498,38 @@ public class LearningServiceImpl implements LearningService{
         return ResponseEntity.status(200)
                 .body(CustomAPIResponse.createSuccess(200, learningResponses, "신청한 게시글 목록을 성공적으로 불러왔습니다."));
 
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> writeLearningReview(LearningReviewRequestDto learningReviewRequestDto, MyUserDetailsService.MyUserDetails userDetails) {
+        Learning learning=learningRepository.findById(learningReviewRequestDto.getLearningId()).orElseThrow();
+        Optional<LearningApply> learningApply=learningApplyRepository.findByUserPhoneIdAndLearningLearningId(userDetails.getPhoneId(),learningReviewRequestDto.getLearningId());
+
+                // 내가 신청하지 않은 활동이라면 리뷰를 작성할 수 없다.
+                if(!(learningApply.isPresent())) {
+                    CustomAPIResponse<Object> failResponse = CustomAPIResponse
+                            .createFailWithout(HttpStatus.FORBIDDEN.value(), "신청하지 않은 배움입니다.");
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(failResponse);
+                }
+
+                // 만약 아직 완료되지 않은 활동이라면 리뷰를 작성할 수 없다.
+                if(learning.getIsCompleted().equals(IsCompleted.FALSE)){
+                    CustomAPIResponse<Object> failResponse=CustomAPIResponse
+                            .createFailWithout(HttpStatus.FORBIDDEN.value(), "아직 완료되지 않은 활동입니다.");
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(failResponse);
+                }
+        LearningReview learningReview=LearningReview.builder()
+                .content(learningReviewRequestDto.getContent())
+                .rate(learningReviewRequestDto.getRate())
+                .learningMentor(learning.getLearningMentor())
+                .learning(learning)
+                .user(userDetails.getUser())
+                .build();
+                learningReviewRepository.save(learningReview);
+
+                CustomAPIResponse<Object> successResponse = CustomAPIResponse
+                        .createSuccess(HttpStatus.OK.value(), null, "후기가 작성되었습니다.");
+                return ResponseEntity.status(HttpStatus.OK).body(successResponse);
     }
 
 

@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface LearningMentorRepository extends JpaRepository<LearningMentor, Long> {
     Optional<LearningMentor> findLearningMentorBy(Long learningMentorId);
     Optional<LearningMentor> findLearningMentorNameBy(String learningMentorName);
+
 }

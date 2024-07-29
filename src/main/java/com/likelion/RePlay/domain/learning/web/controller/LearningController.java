@@ -1,6 +1,8 @@
 package com.likelion.RePlay.domain.learning.web.controller;
 
+import com.amazonaws.Response;
 import com.likelion.RePlay.domain.learning.service.LearningService;
+import com.likelion.RePlay.domain.learning.web.dto.LearningCommentWriteRequestDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
 import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
 import com.likelion.RePlay.global.response.CustomAPIResponse;
@@ -72,6 +74,11 @@ public class LearningController {
     @GetMapping("/scrap")
     private ResponseEntity<CustomAPIResponse<?>> scrapLearnings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return learningService.scrapLearnings(userDetails);
+    }
+
+    @PostMapping("/{learningId}/comment")
+    private ResponseEntity<CustomAPIResponse<?>> commentLearning(@PathVariable Long learningId, @RequestBody LearningCommentWriteRequestDTO learningCommentWriteRequestDTO, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.commentLearning(learningId, learningCommentWriteRequestDTO, userDetails);
     }
 
 }

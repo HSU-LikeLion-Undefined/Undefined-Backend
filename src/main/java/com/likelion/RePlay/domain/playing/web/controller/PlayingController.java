@@ -1,5 +1,6 @@
 package com.likelion.RePlay.domain.playing.web.controller;
 
+import com.likelion.RePlay.domain.playing.web.dto.PlayingCommentWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingFilteringDTO;
 import com.likelion.RePlay.domain.playing.web.dto.PlayingWriteRequestDTO;
 import com.likelion.RePlay.domain.playing.service.PlayingServiceImpl;
@@ -85,6 +86,14 @@ public class PlayingController {
     @GetMapping("/scrap")
     private ResponseEntity<CustomAPIResponse<?>> scrapPlayings(@AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
         return playingService.scrapPlayings(userDetails);
+    }
+
+    @PostMapping("/{playingId}/comment")
+    private ResponseEntity<CustomAPIResponse<?>> commentPlaying(
+            @PathVariable Long playingId,
+            @RequestBody PlayingCommentWriteRequestDTO playingCommentWriteRequestDTO,
+            @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.commentPlaying(playingId, playingCommentWriteRequestDTO, userDetails);
     }
 
 }

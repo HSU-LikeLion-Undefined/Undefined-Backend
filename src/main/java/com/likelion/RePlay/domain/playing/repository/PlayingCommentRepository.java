@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface PlayingCommentRepository extends JpaRepository<PlayingComment, Long> {
     Optional<PlayingComment> findByPlayingCommentId(Long playingCommentId);
+    List<PlayingComment> findAllByPlayingPlayingId(Long playingId);
 }

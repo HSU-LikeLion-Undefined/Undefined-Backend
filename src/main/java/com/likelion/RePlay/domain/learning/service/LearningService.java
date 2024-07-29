@@ -44,4 +44,6 @@ public interface LearningService {
 
     ResponseEntity<CustomAPIResponse<?>> deleteComment(Long commentId, MyUserDetailsService.MyUserDetails userDetails);
 
+    ResponseEntity<CustomAPIResponse<?>> getMentorReview(String mentorName);
+
 }

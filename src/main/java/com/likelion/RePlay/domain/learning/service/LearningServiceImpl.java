@@ -2,11 +2,7 @@ package com.likelion.RePlay.domain.learning.service;
 
 import com.likelion.RePlay.domain.learning.entity.*;
 import com.likelion.RePlay.domain.learning.repository.*;
-import com.likelion.RePlay.domain.learning.web.dto.LearningCommentWriteRequestDTO;
-import com.likelion.RePlay.domain.learning.web.dto.LearningFilteringDTO;
-import com.likelion.RePlay.domain.learning.web.dto.LearningListDTO;
-import com.likelion.RePlay.domain.learning.web.dto.LearningReviewRequestDto;
-import com.likelion.RePlay.domain.learning.web.dto.LearningWriteRequestDTO;
+import com.likelion.RePlay.domain.learning.web.dto.*;
 import com.likelion.RePlay.domain.playing.web.dto.CommentListDTO;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
@@ -714,6 +710,44 @@ public class LearningServiceImpl implements LearningService{
         return ResponseEntity.status(200)
                 .body(CustomAPIResponse.createSuccess(200, null, "댓글 삭제를 성공했습니다."));
 
+
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getMentorReview(String mentorName) {
+        Optional<LearningMentor> mentor= learningMentorRepository.findByMentorName(mentorName);
+
+        // 해당 멘토가 존재하지 않는다면
+        if (mentor.isEmpty()) {
+            CustomAPIResponse<Object> failResponse = CustomAPIResponse
+                    .createFailWithout(HttpStatus.NOT_FOUND.value(), "존재하지 않는 멘토입니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(failResponse);
+        }
+
+        List<LearningReview> learningReviews=learningReviewRepository.findByLearningMentor(mentor.get());
+        List<GetMentorReviewResponseDto.GetReview> reviewList=learningReviews.stream()
+                .map(learningReview -> GetMentorReviewResponseDto.GetReview.builder()
+                        .writer(learningReview.getUser().getNickname())
+                        .content(learningReview.getContent())
+                        .rate(learningReview.getRate())
+                        .build()).collect(Collectors.toList());
+
+        double averageRate=0;
+        if (!learningReviews.isEmpty()) {
+            double sumRate = learningReviews.stream()
+                    .mapToDouble(LearningReview::getRate)
+                    .sum();
+            averageRate = sumRate / learningReviews.size();
+        }
+
+
+        GetMentorReviewResponseDto.FinalResponseDto res=GetMentorReviewResponseDto.FinalResponseDto.builder()
+                .reviewList(reviewList)
+                .averageRate(averageRate)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), res, "멘토 리뷰 조회에 성공하였습니다."));
 
     }
 

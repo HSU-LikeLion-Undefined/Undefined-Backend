@@ -595,6 +595,7 @@ public class PlayingServiceImpl implements PlayingService {
                     .category(playing.getCategory())
                     .title(playing.getTitle())
                     .date(playing.getDate())
+                    .isCompleted(playing.getIsCompleted())
                     .imageUrl(playing.getImageUrl())
                     .build());
         }

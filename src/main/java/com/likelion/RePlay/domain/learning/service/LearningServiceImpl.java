@@ -519,6 +519,7 @@ public class LearningServiceImpl implements LearningService{
                     .date(learning.getDate())
                     .imageUrl(learning.getImageUrl())
                     .mentorName(learning.getLearningMentor().getMentorName())
+                    .isCompleted(learning.getIsCompleted())
                     .build());
         }
 
@@ -604,6 +605,7 @@ public class LearningServiceImpl implements LearningService{
                     .title(learning.getTitle())
                     .date(learning.getDate())
                     .imageUrl(learning.getImageUrl())
+                    .isCompleted(learning.getIsCompleted())
                     .build());
         }
 

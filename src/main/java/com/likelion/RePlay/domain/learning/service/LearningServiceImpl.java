@@ -605,6 +605,7 @@ public class LearningServiceImpl implements LearningService{
                     .title(learning.getTitle())
                     .date(learning.getDate())
                     .imageUrl(learning.getImageUrl())
+                    .isCompleted(learning.getIsCompleted())
                     .build());
         }
 

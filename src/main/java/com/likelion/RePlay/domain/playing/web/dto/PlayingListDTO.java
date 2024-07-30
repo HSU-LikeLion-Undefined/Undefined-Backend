@@ -3,6 +3,7 @@ package com.likelion.RePlay.domain.playing.web.dto;
 
 import com.likelion.RePlay.global.enums.Category;
 import com.likelion.RePlay.global.enums.District;
+import com.likelion.RePlay.global.enums.IsCompleted;
 import com.likelion.RePlay.global.enums.State;
 import lombok.*;
 
@@ -30,6 +31,7 @@ public class PlayingListDTO {
         private Long recruitmentCount;
         private Long cost;
         private String costDescription;
+        private IsCompleted isCompleted;
         private String imageUrl;
     }
 

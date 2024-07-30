@@ -69,8 +69,8 @@ public class UserServiceImpl implements UserService {
                 .phoneId(phoneId)
                 .password(passwordEncoder.encode(userSignUpRequestDto.getPassword())) // 비밀번호 암호화
                 .nickname(userSignUpRequestDto.getNickname())
-                .state(userSignUpRequestDto.getState())
-                .district(userSignUpRequestDto.getDistrict())
+                //.state(userSignUpRequestDto.getState())
+                //.district(userSignUpRequestDto.getDistrict())
                 .year(userSignUpRequestDto.getYear())
                 .build();
 

@@ -37,11 +37,11 @@ public class User extends BaseEntity {
     @Column(name = "NICKNAME")
     private String nickname;
 
-    @Enumerated(EnumType.STRING)
-    private State state; // 시
-
-    @Enumerated(EnumType.STRING)
-    private District district; // 구
+//    @Enumerated(EnumType.STRING)
+//    private State state; // 시
+//
+//    @Enumerated(EnumType.STRING)
+//    private District district; // 구
 
     @Setter
     @Column(name = "YEAR")

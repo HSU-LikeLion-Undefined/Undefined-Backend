@@ -18,4 +18,12 @@ public class LearningMentor extends BaseEntity {
 
     @Column
     private String mentorName;
+
+    @Column
+    private String introduce;
+
+    // 연관관계 편의 메서드
+    public void changeIntroduce(String introduce) {
+        this.introduce = introduce;
+    }
 }

@@ -135,10 +135,12 @@ public class LearningServiceImpl implements LearningService{
         if(isExist.isEmpty()){
             mentor= LearningMentor.builder()
                     .mentorName(learningWriteRequestDTO.getMentorName())
+                    .introduce(learningWriteRequestDTO.getIntroduce())
                     .build();
             learningMentorRepository.save(mentor);
         }else {
             mentor = isExist.get();
+            mentor.changeIntroduce(learningWriteRequestDTO.getIntroduce());
         }
 
         Learning learning = findLearning.get();

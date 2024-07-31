@@ -826,5 +826,40 @@ public class PlayingServiceImpl implements PlayingService {
 
     }
 
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getApplicant(Long playingId, MyUserDetailsService.MyUserDetails userDetails) {
+
+        // 인증된 사용자 정보에서 phoneId를 가져온다.
+        String phoneId = userDetails.getPhoneId();
+        User writer = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+
+        Optional<Playing> findPlaying = playingRepository.findById(playingId);
+        if (findPlaying.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
+        }
+
+        if (!writer.equals(findPlaying.get().getUser())) {
+            return ResponseEntity.status(403)
+                    .body(CustomAPIResponse.createFailWithout(403, "작성자만 참가자를 볼 수 있습니다."));
+        }
+
+        List<PlayingApply> playingApplies = playingApplyRepository.findAllByPlayingPlayingId(playingId);
+
+        List<ApplicantListDTO.ApplicantResponse> applicantResponses = new ArrayList<>();
+
+        for (PlayingApply playingApply : playingApplies) {
+            applicantResponses.add(ApplicantListDTO.ApplicantResponse.builder()
+                    .nickname(playingApply.getUser().getNickname())
+                    .phoneId(playingApply.getUser().getPhoneId())
+                    .profileImage(playingApply.getUser().getProfileImage())
+                    .build());
+        }
+
+        return ResponseEntity.status(201)
+                .body(CustomAPIResponse.createSuccess(201, applicantResponses, "참가 신청자 목록을 불러왔습니다."));
+    }
+
 
 }

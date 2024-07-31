@@ -53,4 +53,5 @@ public interface PlayingService {
     ResponseEntity<CustomAPIResponse<?>> getUserReview(UserReviewRequestDto userReviewRequestDto);
 
 
+    ResponseEntity<CustomAPIResponse<?>> getApplicant(Long playingId, MyUserDetailsService.MyUserDetails userDetails);
 }

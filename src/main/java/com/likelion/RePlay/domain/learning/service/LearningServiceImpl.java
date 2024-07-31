@@ -240,7 +240,6 @@ public class LearningServiceImpl implements LearningService{
 
         LearningListDTO.LearningResponse  learningResponse = LearningListDTO.LearningResponse.builder()
                 .nickname(user.getNickname())
-                .introduce(user.getIntroduce())
                 .category(findLearning.get().getCategory())
                 .title(findLearning.get().getTitle())
                 .date(findLearning.get().getDate())
@@ -252,6 +251,7 @@ public class LearningServiceImpl implements LearningService{
                 .content(findLearning.get().getContent())
                 .imageUrl(findLearning.get().getImageUrl())
                 .mentorName(findLearning.get().getLearningMentor().getMentorName())
+                .introduce(findLearning.get().getLearningMentor().getIntroduce())
                 .build();
 
         return ResponseEntity.status(200)

@@ -132,4 +132,11 @@ public class PlayingController {
         return playingService.getUserReview(userReviewRequestDto);
     }
 
+    // 신청자 조회
+    @GetMapping("/getApplicant/{playingId}")
+    private ResponseEntity<CustomAPIResponse<?>> getApplicant(@PathVariable Long playingId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return playingService.getApplicant(playingId, userDetails);
+    }
+
+
 }

@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface PlayingApplyRepository extends JpaRepository<PlayingApply, Long> {
     List<PlayingApply> findAllByUserUserId(Long userId);
+    List<PlayingApply> findAllByPlayingPlayingId(Long playingId);
     Optional<PlayingApply> findByUserPhoneId(String phoneId);
     Optional<PlayingApply> findByUserPhoneIdAndPlayingPlayingId(String phoneId, Long playingId);
 }

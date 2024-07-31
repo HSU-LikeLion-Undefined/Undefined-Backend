@@ -19,7 +19,6 @@ public class LearningListDTO {
     @AllArgsConstructor
     public static class LearningResponse {
         private String nickname;
-        private String introduce;
         private Category category;
         private String title;
         private String content;
@@ -36,6 +35,7 @@ public class LearningListDTO {
 
         // 멘토 추가
         private String mentorName;
+        private String introduce;
     }
 
     @Getter @Setter

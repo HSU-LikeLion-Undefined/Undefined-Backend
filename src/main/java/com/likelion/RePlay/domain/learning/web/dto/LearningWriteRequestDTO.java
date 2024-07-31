@@ -46,4 +46,7 @@ public class LearningWriteRequestDTO {
 
     // 멘토 이름 추가
     private String mentorName;
+
+    // 멘토 소개 추가
+    private String introduce;
 }

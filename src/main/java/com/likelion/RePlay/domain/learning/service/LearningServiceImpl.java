@@ -3,6 +3,7 @@ package com.likelion.RePlay.domain.learning.service;
 import com.likelion.RePlay.domain.learning.entity.*;
 import com.likelion.RePlay.domain.learning.repository.*;
 import com.likelion.RePlay.domain.learning.web.dto.*;
+import com.likelion.RePlay.domain.playing.web.dto.ApplicantListDTO;
 import com.likelion.RePlay.domain.playing.web.dto.CommentListDTO;
 import com.likelion.RePlay.domain.user.entity.User;
 import com.likelion.RePlay.domain.user.repository.UserRepository;
@@ -769,6 +770,45 @@ public class LearningServiceImpl implements LearningService{
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), res, "멘토 리뷰 조회에 성공하였습니다."));
+
+    }
+
+    @Override
+    public ResponseEntity<CustomAPIResponse<?>> getApplicant(Long learningId, MyUserDetailsService.MyUserDetails userDetails) {
+
+        // 인증된 사용자 정보에서 phoneId를 가져온다.
+        String phoneId = userDetails.getPhoneId();
+        User admin = userRepository.findByPhoneId(phoneId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자입니다."));
+
+
+        if (admin.getUserRoles().stream()
+                .noneMatch(userRole -> userRole.getRole().getRoleName() == RoleName.ROLE_ADMIN)) {
+
+            return ResponseEntity.status(403)
+                    .body(CustomAPIResponse.createFailWithout(403, "배움터는 관리자만 참가자를 볼 수 있습니다."));
+        }
+
+        Optional<Learning> findLearning = learningRepository.findById(learningId);
+        if (findLearning.isEmpty()) {
+            return ResponseEntity.status(404)
+                    .body(CustomAPIResponse.createFailWithout(404, "존재하지 않는 게시글입니다."));
+        }
+
+        List<LearningApply> learningApplies = learningApplyRepository.findAllByLearningLearningId(learningId);
+        List<ApplicantListDTO.ApplicantResponse> applicantResponses = new ArrayList<>();
+
+        for (LearningApply learningApply : learningApplies) {
+            applicantResponses.add(ApplicantListDTO.ApplicantResponse.builder()
+                    .nickname(learningApply.getUser().getNickname())
+                    .phoneId(learningApply.getUser().getPhoneId())
+                    .profileImage(learningApply.getUser().getProfileImage())
+                    .build());
+        }
+
+
+        return ResponseEntity.status(201)
+                .body(CustomAPIResponse.createSuccess(201, applicantResponses, "참가 신청자 목록을 불러왔습니다."));
 
     }
 

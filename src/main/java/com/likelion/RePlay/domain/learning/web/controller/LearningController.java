@@ -118,4 +118,9 @@ public class LearningController {
         return learningService.getMentorReview(mentorReviewRequestDto);
     }
 
+    // 신청자 조회
+    @GetMapping("/getApplicant/{learningId}")
+    private ResponseEntity<CustomAPIResponse<?>> getApplicant(@PathVariable Long learningId, @AuthenticationPrincipal MyUserDetailsService.MyUserDetails userDetails) {
+        return learningService.getApplicant(learningId, userDetails);
+    }
 }

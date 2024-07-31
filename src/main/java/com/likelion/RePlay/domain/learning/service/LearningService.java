@@ -43,4 +43,5 @@ public interface LearningService {
 
     ResponseEntity<CustomAPIResponse<?>> getMentorReview(MentorReviewRequestDto mentorReviewRequestDto);
 
+    ResponseEntity<CustomAPIResponse<?>> getApplicant(Long learningId, MyUserDetailsService.MyUserDetails userDetails);
 }

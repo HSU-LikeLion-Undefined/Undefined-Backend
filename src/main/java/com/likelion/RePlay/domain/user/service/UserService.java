@@ -17,7 +17,7 @@ public interface UserService {
     ResponseEntity<CustomAPIResponse<?>> isExistNickName(UserNickNameExistDto userNickNameExistDto);
 
     //로그인
-    ResponseEntity<CustomAPIResponse<?>> login(UserLoginDto userLoginDto);
+    ResponseEntity<CustomAPIResponse<?>> login(UserLoginRequestDto userLoginRequestDto);
 
     //내정보 조회
     ResponseEntity<CustomAPIResponse<?>> getMyPage(MyUserDetailsService.MyUserDetails myUserDetails);

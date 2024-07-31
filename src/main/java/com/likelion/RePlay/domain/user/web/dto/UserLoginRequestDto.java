@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UserLoginDto {
+public class UserLoginRequestDto {
     @NotEmpty(message = "아이디가 필요합니다.")
     private String phoneId;
 

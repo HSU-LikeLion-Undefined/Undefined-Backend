@@ -37,8 +37,8 @@ public class UserController {
 
     //로그인
     @PostMapping(path = "/login")
-    private ResponseEntity<CustomAPIResponse<?>> login(@RequestBody @Valid UserLoginDto userLoginDto) {
-        return userService.login(userLoginDto);
+    private ResponseEntity<CustomAPIResponse<?>> login(@RequestBody @Valid UserLoginRequestDto userLoginRequestDto) {
+        return userService.login(userLoginRequestDto);
     }
 
     // 사용자 정보 조회

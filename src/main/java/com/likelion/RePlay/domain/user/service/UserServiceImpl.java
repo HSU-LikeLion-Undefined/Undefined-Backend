@@ -13,7 +13,6 @@ import com.likelion.RePlay.global.security.JwtTokenProvider;
 import com.likelion.RePlay.global.security.MyUserDetailsService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.property.access.spi.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -119,8 +118,8 @@ public class UserServiceImpl implements UserService {
 
     // 로그인
     @Override
-    public ResponseEntity<CustomAPIResponse<?>> login(UserLoginDto userLoginDto) {
-        Optional<User> isExistUser = userRepository.findByPhoneId(userLoginDto.getPhoneId());
+    public ResponseEntity<CustomAPIResponse<?>> login(UserLoginRequestDto userLoginRequestDto) {
+        Optional<User> isExistUser = userRepository.findByPhoneId(userLoginRequestDto.getPhoneId());
         if (isExistUser.isEmpty()) {
             CustomAPIResponse<Object> failResponse = CustomAPIResponse
                     .createFailWithout(HttpStatus.NOT_FOUND.value(), "전화번호가 존재하지 않는 회원입니다.");
@@ -130,7 +129,7 @@ public class UserServiceImpl implements UserService {
         User user = isExistUser.get();
 
         // 패스워드 불일치
-        if (!passwordEncoder.matches(userLoginDto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(userLoginRequestDto.getPassword(), user.getPassword())) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(CustomAPIResponse.createFailWithout(HttpStatus.UNAUTHORIZED.value(),
@@ -143,9 +142,16 @@ public class UserServiceImpl implements UserService {
 
         String token = jwtTokenProvider.createToken(user.getPhoneId(), roles);
 
+        // 역할 목록을 문자열 리스트로 변환
+        List<String> roleNames = roles.stream()
+                .map(Role::getAuthority)
+                .collect(Collectors.toList());
+
+        UserLoginResponseDto userLoginResponseDto = new UserLoginResponseDto(token, roleNames);
+
         // 로그인 성공
         return ResponseEntity.status(HttpStatus.OK)
-                .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), token, "로그인에 성공하였습니다."));
+                .body(CustomAPIResponse.createSuccess(HttpStatus.OK.value(), userLoginResponseDto, "로그인에 성공하였습니다."));
     }
 
     @Override

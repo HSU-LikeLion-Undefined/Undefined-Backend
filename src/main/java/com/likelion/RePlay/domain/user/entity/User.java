@@ -51,6 +51,7 @@ public class User extends BaseEntity {
     @Column(name = "PROFILE_IMAGE")
     private String profileImage; // 프로필 사진
 
+
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Builder.Default

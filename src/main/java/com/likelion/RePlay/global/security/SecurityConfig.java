@@ -52,4 +52,14 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
+    @Bean
+    public SecurityFilterChain secureFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .requiresChannel(channel ->
+                        channel.anyRequest().requiresSecure())
+                .authorizeRequests(authorize ->
+                        authorize.anyRequest().permitAll())
+                .build();
+    }
 }

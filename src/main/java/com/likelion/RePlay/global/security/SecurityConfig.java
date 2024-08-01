@@ -43,7 +43,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/learning/**").authenticated()
                         .anyRequest().hasAnyAuthority("ROLE_ADMIN")
                 )
-                .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .requiresChannel(channel ->
+                channel.anyRequest().requiresSecure()); // HTTPS로 리디렉션
+
 
         return http.build();
     }

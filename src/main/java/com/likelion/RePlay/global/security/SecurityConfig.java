@@ -28,8 +28,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-
-                        //비로그인 사용자도 접근 가능
+                        // 비로그인 사용자도 접근 가능
                         .requestMatchers("/api/user/signUp", "/api/user/login",
                                 "/api/user/isExistNickName","/api/user/isExistPhoneId", "/api/user/getMyPage").permitAll()
                         .requestMatchers("/api/playing/getPlayings/**", "/api/playing/comment/**",
@@ -37,6 +36,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/info/getAllInfo", "/api/info/getOneInfo/**").permitAll()
                         .requestMatchers("/api/learning/getLearnings/**", "/api/learning/comment/**",
                                 "/api/learning/filtering", "/api/learning/getMentorReview").permitAll()
+                        // 추가된 경로
+                        .requestMatchers("/.well-known/pki-validation/36508677B8FB9467010A0C13C561D3CA.txt").permitAll()
 
                         // 로그인한 사용자만 접근 가능
                         .requestMatchers("/api/user/**").authenticated()

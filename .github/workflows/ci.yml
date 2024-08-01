@@ -66,6 +66,10 @@ jobs:
           echo "spring.mail.password=${{ secrets.GMAIL_PASSWORD }}" >> src/main/resources/application.properties
           echo "spring.mail.properties.mail.smtp.starttls.enable=true" >> src/main/resources/application.properties
           echo "spring.mail.properties.mail.smtp.auth=true" >> src/main/resources/application.properties
+          echo "server.ssl.key-store=classpath:keystore/keystore.p12" >> src/main/resources/application.properties
+          echo "server.ssl.key-store-password=${{ secrets.SSL_KEY_STORE_PASSWORD }}" >> src/main/resources/application.properties
+          echo "server.ssl.keyStoreType=PKCS12" >> src/main/resources/application.properties
+          echo "server.ssl.keyAlias=1" >> src/main/resources/application.properties
           cat src/main/resources/application.properties # 확인을 위해 출력
 
       - name: Grant execute permission for gradlew

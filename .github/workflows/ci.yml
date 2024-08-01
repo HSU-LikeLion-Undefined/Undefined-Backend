@@ -40,7 +40,7 @@ jobs:
           mkdir -p src/main/resources
           echo "spring.application.name=replay" > src/main/resources/application.properties
           echo "spring.datasource.url=${{ secrets.DB_URL }}" >> src/main/resources/application.properties
-          echo "spring.datasource.username=${{ secrets.DB_USERNAME }}" >> src/main/resources/application.properties
+          echo "spring.datasource.username=${{ secrets.DB_USERNAME }}" >> src/main/resources.application.properties
           echo "spring.datasource.password=${{ secrets.DB_PASSWORD }}" >> src/main/resources/application.properties
           echo "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver" >> src/main/resources/application.properties
           echo "spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect" >> src/main/resources/application.properties
@@ -67,7 +67,7 @@ jobs:
           echo "spring.mail.properties.mail.smtp.starttls.enable=true" >> src/main/resources/application.properties
           echo "spring.mail.properties.mail.smtp.auth=true" >> src/main/resources/application.properties
           echo "server.ssl.key-store=classpath:keystore/keystore.p12" >> src/main/resources/application.properties
-          echo "server.ssl.key-store-password=1234" >> src/main/resources/application.properties
+          echo "server.ssl.key-store-password=${{ secrets.SSL_KEYSTORE_PASSWORD }}" >> src/main/resources/application.properties
           echo "server.ssl.keyStoreType=PKCS12" >> src/main/resources/application.properties
           echo "server.ssl.keyAlias=1" >> src/main/resources/application.properties
           cat src/main/resources/application.properties # 확인을 위해 출력

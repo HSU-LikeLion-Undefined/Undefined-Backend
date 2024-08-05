@@ -1,0 +1,6 @@
+package com.likelion.RePlay.global.enums;
+
+public enum State {
+    SEOUL, PUSAN, DAEGU, INCHEON, GWANGJU, DAEJEON, ULSAN, SEJONG,
+    GEYONGGI, KANGWON, CHUNGBUK,CHUNGNAM, JEONBUK, JEONNAM, KYUNGBUK, KYUNGNAM, JEJU
+}
